@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+coverage-final.json
+lcov.info
 /.nyc_output
 /.vitest
 /playwright-report
