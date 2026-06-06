@@ -53,6 +53,8 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - validações executadas
   - pendências e próxima etapa recomendada
 - Registrar essa atualização em commit separado na branch `contexto-agents`.
+- Depois de atualizar e enviar `contexto-agents`, sempre abrir PR para `develop`
+  e não deixar a atualização de contexto sem PR.
 - Usar commit Conventional Commit, por exemplo:
   `docs: atualiza contexto agents`.
 - Não misturar atualização de contexto com commits de feature, teste ou correção.
