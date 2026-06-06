@@ -14,7 +14,7 @@ export default defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "src/app/**",
-        "src/components/ui/**",
+        "src/components/**",
         "src/lib/utils.ts",
         "src/**/*.d.ts",
         "src/**/.gitkeep",
