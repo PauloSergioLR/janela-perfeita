@@ -39,10 +39,27 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - marcar checklist da issue
   - abrir PR para `develop`
   - aguardar CI verde
+  - aprovar a PR após testes/checks passarem e antes do merge
+  - se o GitHub bloquear autoaprovação, registrar a limitação na PR
   - fazer merge sem excluir branch
   - fechar issue
   - mover card para `Done`
   - sincronizar `develop` local
+
+## Contexto de sessões
+
+- Ao fim de cada branch/tarefa, consolidar no `AGENTS.md` o contexto relevante
+  da sessão:
+  - decisões novas
+  - status de issues, PRs e branches
+  - validações executadas
+  - pendências e próxima etapa recomendada
+- Registrar essa atualização em commit separado na branch `contexto-agents`.
+- Depois de atualizar e enviar `contexto-agents`, sempre abrir PR para `develop`
+  e não deixar a atualização de contexto sem PR.
+- Usar commit Conventional Commit, por exemplo:
+  `docs: atualiza contexto agents`.
+- Não misturar atualização de contexto com commits de feature, teste ou correção.
 
 ## GitHub
 
