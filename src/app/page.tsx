@@ -7,7 +7,6 @@ import {
   CalendarDays,
   Camera,
   Car,
-  CheckCircle2,
   Clock3,
   Footprints,
   Loader2,
@@ -17,6 +16,10 @@ import {
   Search,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { AttributionFooter } from "@/components/result/attribution-footer";
+import { RecommendationCard } from "@/components/result/recommendation-card";
+import { ScoreBreakdown } from "@/components/result/score-breakdown";
+import { ScoreTimeline } from "@/components/result/score-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -424,85 +427,55 @@ export default function Home() {
           </Card>
 
           <aside className="flex flex-col gap-4">
-            <Card className="rounded-lg border-border/80 shadow-sm">
-              <CardHeader>
-                <CardTitle>Status</CardTitle>
-                <CardDescription>
-                  {selectedActivity
-                    ? `${selectedActivity.name} em ${selectedDate || "data"}`
-                    : "Aguardando selecao"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {recommendationMutation.isIdle ? (
-                  <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                    <Clock3 className="mt-0.5 size-4 shrink-0" />
-                    <span>
-                      Nenhuma busca executada nesta sessao.
-                    </span>
-                  </div>
-                ) : null}
-
-                {recommendationMutation.isPending ? (
-                  <div className="flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
-                    <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
-                    <span>Calculando scores e melhores janelas.</span>
-                  </div>
-                ) : null}
-
-                {recommendationMutation.isError ? (
-                  <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-                    <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                    <span>{(recommendationMutation.error as Error).message}</span>
-                  </div>
-                ) : null}
-
-                {recommendationMutation.isSuccess && recommendation ? (
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-950">
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-700" />
-                      <span>Recomendacao gerada para {recommendation.city.name}.</span>
+            {recommendationMutation.isSuccess && recommendation ? (
+              <RecommendationCard recommendation={recommendation} />
+            ) : (
+              <Card className="rounded-lg border-border/80 shadow-sm">
+                <CardHeader>
+                  <CardTitle>Status</CardTitle>
+                  <CardDescription>
+                    {selectedActivity
+                      ? `${selectedActivity.name} em ${selectedDate || "data"}`
+                      : "Aguardando selecao"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {recommendationMutation.isIdle ? (
+                    <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                      <Clock3 className="mt-0.5 size-4 shrink-0" />
+                      <span>Nenhuma busca executada nesta sessao.</span>
                     </div>
+                  ) : null}
 
-                    {recommendation.bestWindow ? (
-                      <div className="rounded-lg border border-border p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Melhor janela
-                            </p>
-                            <p className="mt-1 text-2xl font-semibold text-slate-950">
-                              {recommendation.bestWindow.startLabel} -{" "}
-                              {recommendation.bestWindow.endLabel}
-                            </p>
-                          </div>
-                          <Badge className="h-7 bg-slate-950 px-3 text-white">
-                            {recommendation.bestWindow.avgScore}/100
-                          </Badge>
-                        </div>
-                        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                          {recommendation.bestWindow.highlights.map(
-                            (highlight) => (
-                              <li key={highlight} className="flex gap-2">
-                                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald-600" />
-                                <span>{highlight}</span>
-                              </li>
-                            ),
-                          )}
-                        </ul>
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-                        Nenhuma janela boa encontrada para os parametros
-                        escolhidos.
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
+                  {recommendationMutation.isPending ? (
+                    <div className="flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+                      <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
+                      <span>Calculando scores e melhores janelas.</span>
+                    </div>
+                  ) : null}
+
+                  {recommendationMutation.isError ? (
+                    <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                      <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                      <span>
+                        {(recommendationMutation.error as Error).message}
+                      </span>
+                    </div>
+                  ) : null}
+                </CardContent>
+              </Card>
+            )}
           </aside>
         </section>
+
+        {recommendationMutation.isSuccess && recommendation ? (
+          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+            <ScoreTimeline recommendation={recommendation} />
+            <ScoreBreakdown recommendation={recommendation} />
+          </section>
+        ) : null}
+
+        <AttributionFooter disclaimer={recommendation?.disclaimer} />
       </div>
     </main>
   );
