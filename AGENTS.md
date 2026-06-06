@@ -39,6 +39,8 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - marcar checklist da issue
   - abrir PR para `develop`
   - aguardar CI verde
+  - aprovar a PR após testes/checks passarem e antes do merge
+  - se o GitHub bloquear autoaprovação, registrar a limitação na PR
   - fazer merge sem excluir branch
   - fechar issue
   - mover card para `Done`
