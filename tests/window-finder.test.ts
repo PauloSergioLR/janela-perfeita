@@ -64,6 +64,19 @@ describe("buscador de janelas", () => {
     expect(windows).toEqual([]);
   });
 
+  it("retorna vazio quando nenhum score atinge o minimo", () => {
+    const windows = findBestWindows(
+      [
+        makeScore("2026-06-05T08:00", 20),
+        makeScore("2026-06-05T09:00", 59),
+        makeScore("2026-06-05T10:00", 40),
+      ],
+      activity,
+    );
+
+    expect(windows).toEqual([]);
+  });
+
   it("retorna top 3 ordenado por media, pico e duracao", () => {
     const windows = findBestWindows(
       [
@@ -85,5 +98,6 @@ describe("buscador de janelas", () => {
       "2026-06-05T11:00",
       "2026-06-05T14:00",
     ]);
+    expect(windows.map((window) => window.avgScore)).toEqual([95, 80, 80]);
   });
 });
