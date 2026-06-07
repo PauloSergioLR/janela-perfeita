@@ -84,7 +84,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #8 Resultado visual e timeline - concluída.
   - #9 Testes e qualidade - concluída.
   - #10 PWA, README e deploy - concluída.
-  - #32 T11 - Polimento de textos em PT-BR - aberta em `Todo`.
+  - #32 T11 - Polimento de textos em PT-BR - concluída.
   - #33 T12 - Adicionar probabilidade de chuva e weather code - aberta em `Todo`.
   - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - aberta em `Todo`.
   - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
@@ -373,11 +373,28 @@ Concluído:
   `C:\Users\lll\Downloads\Janela_Perfeita_Roteiro_Continuacao_Melhorias.md`.
 - Issues pós-MVP #32 a #57 criadas a partir do roteiro e adicionadas ao Project
   `Janela Perfeita` com status `Todo`.
-- Nenhuma issue pós-MVP foi iniciada ainda.
+- Issue #32 concluída na branch `feature/10-copy-polish-ptbr`.
+- PR #59 (`feature/10-copy-polish-ptbr` -> `develop`) mergeada com CI verde.
+- Commit principal da T11:
+  - `5669143 fix: melhora textos e mensagens da interface`
+- Entrega da T11:
+  - acentuação e padronização de textos visíveis da UI;
+  - mensagens de erro, loading e empty states mais claras;
+  - metadata e disclaimers em PT-BR correto;
+  - rótulo visível `Golden hour` substituído por `Hora dourada`, preservando o
+    identificador técnico `golden_hour`;
+  - testes atualizados para as mensagens corrigidas.
+- Issue #32 fechada e card movido para `Done`.
+- Validações locais executadas na T11:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
 
 ## Próxima etapa recomendada
 
-MVP concluído. Continuação pós-MVP aberta com issues #32 a #57 no Project.
+MVP concluído. Continuação pós-MVP em andamento com issues #33 a #57 abertas no
+Project.
 
 Branches principais:
 
@@ -394,7 +411,7 @@ https://janela-perfeita.vercel.app
 
 Próximos passos recomendados:
 
-- Iniciar pela issue #32, T11 - Polimento de textos em PT-BR.
+- Iniciar pela issue #33, T12 - Adicionar probabilidade de chuva e weather code.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
