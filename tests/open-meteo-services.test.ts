@@ -23,6 +23,10 @@ function createForecastFixture() {
       time: hours,
       temperature_2m: hours.map(() => 20),
       precipitation: hours.map(() => 0),
+      precipitation_probability: hours.map(() => 0),
+      rain: hours.map(() => 0),
+      showers: hours.map(() => 0),
+      weather_code: hours.map(() => 0),
       wind_speed_10m: hours.map(() => 10),
       cloud_cover: hours.map(() => 40),
       uv_index: hours.map(() => 2),
@@ -65,6 +69,12 @@ describe("serviço de previsão Open-Meteo", () => {
     expect(url.searchParams.get("start_date")).toBe("2026-06-05");
     expect(url.searchParams.get("end_date")).toBe("2026-06-05");
     expect(url.searchParams.get("daily")).toBe("sunrise,sunset");
+    expect(url.searchParams.get("hourly")).toContain(
+      "precipitation_probability",
+    );
+    expect(url.searchParams.get("hourly")).toContain("rain");
+    expect(url.searchParams.get("hourly")).toContain("showers");
+    expect(url.searchParams.get("hourly")).toContain("weather_code");
     expect(url.searchParams.get("hourly")).toContain("wind_speed_10m");
     expect(url.searchParams.get("hourly")).toContain("cloud_cover");
     expect(url.searchParams.get("hourly")).toContain("relative_humidity_2m");
@@ -78,6 +88,10 @@ describe("serviço de previsão Open-Meteo", () => {
       time: "2026-06-05T00:00",
       temperature_2m: 20,
       precipitation: 0,
+      precipitation_probability: 0,
+      rain: 0,
+      showers: 0,
+      weather_code: 0,
       wind_speed_10m: 10,
       cloud_cover: 40,
       uv_index: 2,

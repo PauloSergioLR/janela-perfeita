@@ -6,6 +6,10 @@ const idealRunningWeather: HourlyWeather = {
   time: "2026-06-05T07:00",
   temperature_2m: 19,
   precipitation: 0,
+  precipitation_probability: 0,
+  rain: 0,
+  showers: 0,
+  weather_code: 0,
   wind_speed_10m: 8,
   cloud_cover: 30,
   uv_index: 2,
@@ -79,6 +83,108 @@ describe("regras das atividades", () => {
 
     expect(activity).toBeDefined();
     expect(calculateWeightedScore(activity!, rainyWeather)).toBeLessThan(75);
+  });
+
+  it("considera risco moderado mesmo sem chuva acumulada", () => {
+    const activity = getActivityById("caminhar");
+    const rainRiskWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      precipitation: 0,
+      precipitation_probability: 45,
+    };
+    const rainRule = activity?.rules.find((rule) => rule.factor === "chuva");
+    const result = rainRule?.evaluate(rainRiskWeather, baseContext);
+
+    expect(result?.score).toBe(60);
+    expect(result?.reason).toBe(
+      "Sem chuva prevista, mas há risco moderado de chuva.",
+    );
+  });
+
+  it("considera rain, showers e weather_code nas regras de chuva", () => {
+    for (const activity of ACTIVITIES) {
+      const rainRule = activity.rules.find((rule) => rule.factor === "chuva");
+
+      expect(rainRule, activity.id).toBeDefined();
+      expect(
+        rainRule?.evaluate(
+          {
+            ...idealRunningWeather,
+            precipitation: 0,
+            rain: 1.5,
+          },
+          baseContext,
+        ).score,
+      ).toBeLessThanOrEqual(30);
+      expect(
+        rainRule?.evaluate(
+          {
+            ...idealRunningWeather,
+            precipitation: 0,
+            showers: 0.4,
+          },
+          baseContext,
+        ).reason,
+      ).toBe("Condição ruim por previsão de pancadas de chuva.");
+      expect(
+        rainRule?.evaluate(
+          {
+            ...idealRunningWeather,
+            precipitation: 0,
+            weather_code: 80,
+          },
+          baseContext,
+        ).score,
+      ).toBeLessThanOrEqual(15);
+    }
+  });
+
+  it("explica diferentes níveis de risco de chuva", () => {
+    const rainRule = getActivityById("correr")?.rules.find(
+      (rule) => rule.factor === "chuva",
+    );
+    const scenarios = [
+      {
+        weather: { ...idealRunningWeather, weather_code: 95 },
+        reason: "Condição ruim por previsão de tempestade.",
+      },
+      {
+        weather: { ...idealRunningWeather, weather_code: 51 },
+        reason: "Garoa prevista reduz a qualidade da janela.",
+      },
+      {
+        weather: { ...idealRunningWeather, weather_code: 71 },
+        reason: "Condição ruim por previsão de precipitação congelada.",
+      },
+      {
+        weather: { ...idealRunningWeather, precipitation: 0.1 },
+        reason: "Chuva muito fraca pode aparecer, mas o risco ainda é baixo.",
+      },
+      {
+        weather: { ...idealRunningWeather, precipitation: 0.8 },
+        reason: "Chuva fraca reduz a qualidade da janela.",
+      },
+      {
+        weather: { ...idealRunningWeather, precipitation_probability: 25 },
+        reason: "Sem chuva prevista para este horário.",
+      },
+      {
+        weather: { ...idealRunningWeather, precipitation_probability: 75 },
+        reason: "Sem chuva prevista, mas há risco moderado de chuva.",
+      },
+      {
+        weather: { ...idealRunningWeather, precipitation_probability: 90 },
+        reason: "Sem chuva prevista, mas há risco moderado de chuva.",
+      },
+    ];
+
+    expect(rainRule).toBeDefined();
+
+    for (const scenario of scenarios) {
+      expect(rainRule?.evaluate(scenario.weather, baseContext).reason).toBe(
+        scenario.reason,
+      );
+    }
   });
 
   it("gera motivos em português e scores dentro de 0 a 100", () => {

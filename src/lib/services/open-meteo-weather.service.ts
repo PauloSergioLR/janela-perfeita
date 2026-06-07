@@ -22,6 +22,10 @@ export function buildForecastUrl(params: WeatherForecastParams): URL {
     [
       "temperature_2m",
       "precipitation",
+      "precipitation_probability",
+      "rain",
+      "showers",
+      "weather_code",
       "wind_speed_10m",
       "cloud_cover",
       "uv_index",
