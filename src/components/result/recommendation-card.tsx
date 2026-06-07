@@ -38,10 +38,10 @@ function RecommendationHighlights({
     ? bestWindow.highlights
     : fallbackScore
       ? [
-          `Nenhuma janela atingiu o minimo de ${recommendation.activity.minRecommendedScore}/100.`,
+          `Nenhuma janela atingiu o mínimo de ${recommendation.activity.minRecommendedScore}/100.`,
           getPrimaryReason(fallbackScore),
         ]
-      : ["Sem horarios avaliados para esta data."];
+      : ["Sem horários avaliados para esta data."];
 
   return (
     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -63,15 +63,15 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const timeLabel = bestWindow
     ? `${bestWindow.startLabel} - ${bestWindow.endLabel}`
     : fallbackScore
-      ? `${fallbackScore.hourLabel} foi o melhor horario isolado`
-      : "Sem horario avaliado";
+      ? `${fallbackScore.hourLabel} foi o melhor horário isolado`
+      : "Sem horário avaliado";
 
   return (
     <Card className="rounded-lg border-border/80 shadow-sm">
       <CardHeader className="gap-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle>Recomendacao</CardTitle>
+            <CardTitle>Recomendação</CardTitle>
             <CardDescription>
               {recommendation.activity.name} em{" "}
               {formatRecommendationLocation(recommendation)}
@@ -90,7 +90,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             ) : (
               <AlertTriangle className="size-3" />
             )}
-            {bestWindow ? "Boa janela" : "Sem janela boa"}
+            {bestWindow ? "Janela ideal" : "Sem janela ideal"}
           </Badge>
         </div>
       </CardHeader>
@@ -137,7 +137,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               <div className="flex items-start gap-2">
                 <Clock3 className="mt-0.5 size-4 shrink-0 text-violet-700" />
                 <div>
-                  <dt className="font-medium text-slate-950">Horario</dt>
+                  <dt className="font-medium text-slate-950">Horário</dt>
                   <dd className="text-muted-foreground">{timeLabel}</dd>
                 </div>
               </div>

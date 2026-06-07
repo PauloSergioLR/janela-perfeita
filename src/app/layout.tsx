@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Janela Perfeita",
   },
   description:
-    "Motor de recomendacao para encontrar a melhor janela de atividades ao ar livre.",
+    "Motor de recomendação para encontrar a melhor janela de atividades ao ar livre.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Janela Perfeita",
     description:
-      "Encontre a melhor janela do dia para atividades ao ar livre com base na previsao horaria.",
+      "Encontre a melhor janela do dia para atividades ao ar livre com base na previsão horária.",
     type: "website",
     locale: "pt_BR",
   },
