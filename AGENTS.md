@@ -81,7 +81,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #7 Interface de busca - concluída.
   - #8 Resultado visual e timeline - concluída.
   - #9 Testes e qualidade - concluída.
-  - #10 PWA, README e deploy - próxima etapa de produto.
+  - #10 PWA, README e deploy - em andamento; PR #25 aberta, deploy Vercel pendente.
 
 ## Validação obrigatória
 
@@ -299,6 +299,20 @@ Concluído:
 - Issue #9 concluída na branch `test/testes-qualidade`.
 - PR #23 (`test/testes-qualidade` -> `develop`) mergeada com CI verde.
 - Commit principal: `ad12a26 test: cobre engine de recomendacao`.
+- Issue #10 iniciada na branch `docs/pwa-ci-readme`.
+- PR #25 (`docs/pwa-ci-readme` -> `develop`) aberta com CI verde, ainda não
+  mergeada porque o deploy Vercel está pendente.
+- Commits da PR #25:
+  - `b8a3efb chore: revisa configuracao de pwa e ci`
+  - `5d61e7e docs: finaliza readme do portfolio`
+- PR #25 entrega:
+  - `public/manifest.json`
+  - ícones PWA em `public/icons/`
+  - metadata PWA em `src/app/layout.tsx`
+  - README final de portfólio
+  - screenshot em `docs/screenshot-home.png`
+- Issue #10 está com todos os checklists marcados, exceto
+  `Deploy na Vercel funcionando`.
 - Validações locais executadas:
   - `npm run lint`
   - `npm test`
@@ -307,37 +321,45 @@ Concluído:
 - No Windows local, `npm test` via PATH falhou por Volta procurar
   `npm-prefix.js`; executar via `C:\Program Files\Volta\npm.cmd` funcionou.
 - GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
-  registrada na PR antes do merge.
+  registrada nas PRs antes do merge ou antes de manter a PR aberta.
+- Deploy Vercel bloqueado no ambiente local:
+  - Vercel CLI não está instalado.
+  - `VERCEL_TOKEN` não existe no ambiente.
+  - `npx vercel@latest whoami` travou em fluxo interativo até timeout.
 
 ## Próxima etapa recomendada
 
-Issue #10: PWA, README e deploy.
+Concluir Issue #10: PWA, README e deploy.
 
-Branch sugerida:
+Branch atual:
 
 ```text
 docs/pwa-ci-readme
 ```
 
-Arquivos esperados:
+PR atual:
 
-- `public/manifest.json`
-- ícones PWA em `public/`
-- `README.md`
-- ajustes de CI/PWA se necessários
+```text
+https://github.com/PauloSergioLR/janela-perfeita/pull/25
+```
 
-Critérios principais:
+Pendência principal:
 
-- configurar `public/manifest.json`.
-- adicionar ícones PWA.
-- manter compatibilidade com Next.js 15.
-- confirmar GitHub Actions com lint, testes, cobertura e build.
-- fortalecer README com objetivo, demo, stack, arquitetura Mermaid, como rodar,
-  como testar, regras das atividades, atribuição Open-Meteo e uso não comercial.
-- explicar no README por que o produto não é apenas um app de clima.
-- preparar deploy na Vercel quando possível.
-- incluir screenshot ou GIF quando disponível.
-- não adicionar backend externo, banco, login, autenticação ou pagamento.
+- Fazer deploy Vercel funcionar.
+- Se o usuário fornecer `VERCEL_TOKEN`, usar Vercel CLI com token para deploy.
+- Se o usuário preferir painel Vercel, orientar conectar o repositório e usar:
+  - Framework: Next.js
+  - Install command: `npm ci`
+  - Build command: `npm run build`
+  - Variáveis: nenhuma obrigatória no MVP
+- Após deploy:
+  - atualizar README/PR com URL de produção se houver
+  - marcar checklist final da issue #10
+  - tentar aprovar a PR; se GitHub bloquear, comentar limitação
+  - mergear PR #25 para `develop` sem deletar branch
+  - fechar issue #10 e mover card para `Done`
+  - sincronizar `develop` local
+  - atualizar `AGENTS.md` novamente em `contexto-agents` com contexto final
 
 ## Observações importantes para novas sessões
 
