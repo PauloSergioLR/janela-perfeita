@@ -88,7 +88,7 @@ function makeRecommendation(
     scores,
     windows,
     bestWindow: windows[0] ?? null,
-    disclaimer: "Recomendacao estimada pela Open-Meteo.",
+    disclaimer: "Recomendação estimada pela Open-Meteo.",
   };
 }
 
@@ -102,7 +102,7 @@ describe("helpers da visualizacao de resultado", () => {
     expect(getPrimaryReason(score)).toBe("Temperatura limita a janela.");
   });
 
-  it("monta dados da timeline com referencia de recomendacao", () => {
+  it("monta dados da timeline com referência de recomendação", () => {
     const data = buildTimelineData(
       [makeScore("08:00", 59), makeScore("09:00", 60)],
       60,
@@ -144,12 +144,12 @@ describe("helpers da visualizacao de resultado", () => {
     expect(source.subtitle).toContain("92/100");
   });
 
-  it("explica o melhor horario disponivel quando nao ha janela boa", () => {
+  it("explica o melhor horário disponível quando não há janela boa", () => {
     const scores = [makeScore("08:00", 40), makeScore("09:00", 55)];
     const recommendation = makeRecommendation(scores, []);
     const source = getBreakdownSource(recommendation);
 
-    expect(source.title).toBe("Fatores do melhor horario disponivel");
+    expect(source.title).toBe("Fatores do melhor horário disponível");
     expect(source.score?.hourLabel).toBe("09:00");
   });
 

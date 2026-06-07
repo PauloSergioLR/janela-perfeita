@@ -58,7 +58,7 @@ export const ACTIVITIES = [
     id: "fotografar_por_do_sol",
     name: "Fotografar pôr do sol",
     shortDescription:
-      "Valoriza golden hour, nuvens interessantes, pouca chuva e umidade menor.",
+      "Valoriza a hora dourada, nuvens interessantes, pouca chuva e umidade menor.",
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [

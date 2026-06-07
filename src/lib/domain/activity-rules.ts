@@ -170,17 +170,17 @@ export function createUvRule(weight: number, idealMax: number): ActivityRule {
 export function createGoldenHourRule(weight: number): ActivityRule {
   return {
     factor: "golden_hour",
-    label: "Golden hour",
+    label: "Hora dourada",
     weight,
     evaluate: (_weather: HourlyWeather, ctx: WeatherContext) =>
       createRuleResult({
         factor: "golden_hour",
-        label: "Golden hour",
+        label: "Hora dourada",
         weight,
         score: ctx.isGoldenHour ? 100 : 25,
         reason: ctx.isGoldenHour
           ? "Horário dentro da janela de luz mais favorável ao pôr do sol."
-          : "Horário fora da golden hour calculada pelo pôr do sol local.",
+          : "Horário fora da hora dourada calculada pelo pôr do sol local.",
       }),
   };
 }

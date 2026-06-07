@@ -5,13 +5,13 @@ interface AttributionFooterProps {
 }
 
 const DEFAULT_DISCLAIMER =
-  "Recomendacao estimada com base em previsao meteorologica; confirme as condicoes locais antes de sair.";
+  "Recomendação estimada com base em previsão meteorológica; confirme as condições locais antes de sair.";
 
 export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
   return (
     <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
       <p>
-        Dados meteorologicos por{" "}
+        Dados meteorológicos por{" "}
         <a
           href="https://open-meteo.com/"
           target="_blank"

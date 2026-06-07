@@ -32,7 +32,7 @@ export function getPrimaryReason(score: HourScore): string {
     score.score >= 70 ? compareRulesByPositiveImpact : compareRulesByPenalty,
   );
 
-  return orderedRules[0]?.reason ?? "Sem detalhamento para este horario.";
+  return orderedRules[0]?.reason ?? "Sem detalhamento para este horário.";
 }
 
 export function buildTimelineData(
@@ -68,10 +68,10 @@ export function getBreakdownSource(
   return {
     title: bestWindowPeak
       ? "Fatores da melhor janela"
-      : "Fatores do melhor horario disponivel",
+      : "Fatores do melhor horário disponível",
     subtitle: score
       ? `${score.hourLabel} com score ${score.score}/100`
-      : "Sem horarios avaliados para esta data",
+      : "Sem horários avaliados para esta data",
     score,
   };
 }

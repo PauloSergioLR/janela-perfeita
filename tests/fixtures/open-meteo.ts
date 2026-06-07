@@ -56,5 +56,5 @@ export const invalidOpenMeteoGeocodingFixture = {
 
 export const openMeteoErrorFixture = {
   error: true,
-  reason: "Parametro invalido.",
+  reason: "Parâmetro inválido.",
 };
