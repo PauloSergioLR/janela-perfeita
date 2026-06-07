@@ -85,7 +85,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #9 Testes e qualidade - concluída.
   - #10 PWA, README e deploy - concluída.
   - #32 T11 - Polimento de textos em PT-BR - concluída.
-  - #33 T12 - Adicionar probabilidade de chuva e weather code - aberta em `Todo`.
+  - #33 T12 - Adicionar probabilidade de chuva e weather code - concluída.
   - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - aberta em `Todo`.
   - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
   - #36 T15 - Melhorar score de fotografia de pôr do sol - aberta em `Todo`.
@@ -390,10 +390,30 @@ Concluído:
   - `npm test`
   - `npm run test:coverage`
   - `npm run build`
+- Issue #33 concluída na branch `feature/11-precipitation-probability`.
+- PR #61 (`feature/11-precipitation-probability` -> `develop`) mergeada com CI
+  verde.
+- Commit principal da T12:
+  - `8fc84ad feat: considera probabilidade de chuva nas recomendações`
+- Entrega da T12:
+  - `HourlyWeather`, schemas e serviço Open-Meteo atualizados com
+    `precipitation_probability`, `rain`, `showers` e `weather_code`;
+  - regras de chuva passam a considerar acumulado, probabilidade, chuva,
+    pancadas e códigos meteorológicos;
+  - motivos em português cobrem risco moderado, pancadas, garoa, tempestade e
+    precipitação congelada;
+  - fixtures e testes atualizados; cobertura subiu para Statements 95.62%,
+    Branches 83.76%, Functions 93.4%, Lines 96.21%.
+- Issue #33 fechada e card movido para `Done`.
+- Validações locais executadas na T12:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
 
 ## Próxima etapa recomendada
 
-MVP concluído. Continuação pós-MVP em andamento com issues #33 a #57 abertas no
+MVP concluído. Continuação pós-MVP em andamento com issues #34 a #57 abertas no
 Project.
 
 Branches principais:
@@ -411,7 +431,8 @@ https://janela-perfeita.vercel.app
 
 Próximos passos recomendados:
 
-- Iniciar pela issue #33, T12 - Adicionar probabilidade de chuva e weather code.
+- Iniciar pela issue #34, T13 - Melhorar regra de lavar carro olhando próximas
+  horas.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
