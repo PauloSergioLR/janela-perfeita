@@ -28,6 +28,10 @@ export interface HourlyWeather {
   time: string;
   temperature_2m: number;
   precipitation: number;
+  precipitation_probability: number;
+  rain: number;
+  showers: number;
+  weather_code: number;
   wind_speed_10m: number;
   cloud_cover: number;
   uv_index: number;

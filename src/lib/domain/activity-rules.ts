@@ -13,6 +13,20 @@ type RuleInput = {
   reason: string;
 };
 
+type RainAssessment = {
+  score: number;
+  reason: string;
+};
+
+const MODERATE_RAIN_PROBABILITY = 40;
+const HIGH_RAIN_PROBABILITY = 60;
+const VERY_HIGH_RAIN_PROBABILITY = 80;
+const DRIZZLE_CODES = new Set([51, 53, 55, 56, 57]);
+const RAIN_CODES = new Set([61, 63, 65, 66, 67]);
+const SHOWER_CODES = new Set([80, 81, 82]);
+const THUNDERSTORM_CODES = new Set([95, 96, 99]);
+const SNOW_CODES = new Set([71, 73, 75, 77, 85, 86]);
+
 function clampScore(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
@@ -54,7 +68,7 @@ function scoreMinimum(value: number, idealMin: number, limitMin: number): number
   return clampScore(((value - limitMin) / (idealMin - limitMin)) * 100);
 }
 
-function precipitationScore(precipitation: number): number {
+function precipitationAmountScore(precipitation: number): number {
   if (precipitation <= 0) {
     return 100;
   }
@@ -74,20 +88,128 @@ function precipitationScore(precipitation: number): number {
   return 0;
 }
 
-function precipitationReason(precipitation: number): string {
-  if (precipitation <= 0) {
-    return "Sem chuva prevista para este horário.";
+function precipitationProbabilityScore(probability: number): number {
+  if (probability >= VERY_HIGH_RAIN_PROBABILITY) {
+    return 10;
   }
 
-  if (precipitation <= 0.2) {
-    return "Chuva muito fraca pode aparecer, mas o risco ainda é baixo.";
+  if (probability >= HIGH_RAIN_PROBABILITY) {
+    return 25;
   }
 
-  if (precipitation <= 1) {
-    return "Chuva fraca reduz a qualidade da janela.";
+  if (probability >= MODERATE_RAIN_PROBABILITY) {
+    return 60;
   }
 
-  return "Chuva prevista torna este horário pouco recomendado.";
+  if (probability >= 20) {
+    return 80;
+  }
+
+  return 100;
+}
+
+function weatherCodePrecipitationScore(weatherCode: number): number {
+  if (THUNDERSTORM_CODES.has(weatherCode)) {
+    return 0;
+  }
+
+  if (SHOWER_CODES.has(weatherCode) || SNOW_CODES.has(weatherCode)) {
+    return 15;
+  }
+
+  if (RAIN_CODES.has(weatherCode)) {
+    return 30;
+  }
+
+  if (DRIZZLE_CODES.has(weatherCode)) {
+    return 60;
+  }
+
+  return 100;
+}
+
+function assessRain(weather: HourlyWeather): RainAssessment {
+  const precipitationAmount = Math.max(
+    weather.precipitation,
+    weather.rain,
+    weather.showers,
+  );
+  const score = Math.min(
+    precipitationAmountScore(precipitationAmount),
+    precipitationProbabilityScore(weather.precipitation_probability),
+    weatherCodePrecipitationScore(weather.weather_code),
+  );
+
+  if (THUNDERSTORM_CODES.has(weather.weather_code)) {
+    return {
+      score,
+      reason: "Condição ruim por previsão de tempestade.",
+    };
+  }
+
+  if (weather.showers > 0 || SHOWER_CODES.has(weather.weather_code)) {
+    return {
+      score,
+      reason: "Condição ruim por previsão de pancadas de chuva.",
+    };
+  }
+
+  if (weather.rain > 0 || RAIN_CODES.has(weather.weather_code)) {
+    return {
+      score,
+      reason: "Chuva prevista torna este horário pouco recomendado.",
+    };
+  }
+
+  if (DRIZZLE_CODES.has(weather.weather_code)) {
+    return {
+      score,
+      reason: "Garoa prevista reduz a qualidade da janela.",
+    };
+  }
+
+  if (SNOW_CODES.has(weather.weather_code)) {
+    return {
+      score,
+      reason: "Condição ruim por previsão de precipitação congelada.",
+    };
+  }
+
+  if (
+    precipitationAmount <= 0 &&
+    weather.precipitation_probability >= MODERATE_RAIN_PROBABILITY
+  ) {
+    return {
+      score,
+      reason: "Sem chuva prevista, mas há risco moderado de chuva.",
+    };
+  }
+
+  if (precipitationAmount <= 0) {
+    return {
+      score,
+      reason: "Sem chuva prevista para este horário.",
+    };
+  }
+
+  if (precipitationAmount <= 0.2) {
+    return {
+      score,
+      reason: "Chuva muito fraca pode aparecer, mas o risco ainda é baixo.",
+    };
+  }
+
+  if (precipitationAmount <= 1) {
+    return {
+      score,
+      reason: "Chuva fraca reduz a qualidade da janela.",
+    };
+  }
+
+  return {
+    score,
+    reason: "Chuva prevista torna este horário pouco recomendado.",
+  };
 }
 
 export function createTemperatureRule(
@@ -118,14 +240,17 @@ export function createPrecipitationRule(weight: number): ActivityRule {
     factor: "chuva",
     label: "Chuva",
     weight,
-    evaluate: (weather: HourlyWeather) =>
-      createRuleResult({
+    evaluate: (weather: HourlyWeather) => {
+      const rain = assessRain(weather);
+
+      return createRuleResult({
         factor: "chuva",
         label: "Chuva",
         weight,
-        score: precipitationScore(weather.precipitation),
-        reason: precipitationReason(weather.precipitation),
-      }),
+        score: rain.score,
+        reason: rain.reason,
+      });
+    },
   };
 }
 
