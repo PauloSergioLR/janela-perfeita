@@ -76,12 +76,12 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #2 Tipos centrais do domínio - concluída.
   - #3 Regras das atividades - concluída.
   - #4 Serviços Open-Meteo - concluída.
-  - #5 Motor de score e janelas - próxima etapa de produto.
-  - #6 Rotas internas da API.
-  - #7 Interface de busca.
-  - #8 Resultado visual e timeline.
-  - #9 Testes e qualidade - aberta; já recebeu base de cobertura.
-  - #10 PWA, README e deploy - aberta; já recebeu documentação inicial.
+  - #5 Motor de score e janelas - concluída.
+  - #6 Rotas internas da API - concluída.
+  - #7 Interface de busca - concluída.
+  - #8 Resultado visual e timeline - concluída.
+  - #9 Testes e qualidade - concluída.
+  - #10 PWA, README e deploy - próxima etapa de produto.
 
 ## Validação obrigatória
 
@@ -123,11 +123,11 @@ coverage/index.html
 ```
 
 - `coverage/` não deve ser commitado.
-- Cobertura registrada após a issue #4:
-  - Statements: 89.25%
-  - Branches: 63.41%
-  - Functions: 92.85%
-  - Lines: 90.51%
+- Cobertura registrada após a issue #9:
+  - Statements: 93.13%
+  - Branches: 78.91%
+  - Functions: 93.25%
+  - Lines: 93.72%
 - Regra do projeto: toda nova funcionalidade deve vir acompanhada de teste.
 - Testes não devem depender de chamadas reais de rede; usar mocks quando
   envolver serviços externos.
@@ -261,54 +261,83 @@ Concluído:
   - `src/lib/services/open-meteo.schemas.ts`
   - `src/lib/services/open-meteo-weather.service.ts`
   - `src/lib/services/open-meteo-geocoding.service.ts`
+- Engine de recomendação em:
+  - `src/lib/engine/weather-context.ts`
+  - `src/lib/engine/score-calculator.ts`
+  - `src/lib/engine/window-finder.ts`
+- Rotas internas em:
+  - `src/app/api/geocoding/route.ts`
+  - `src/app/api/recommendation/route.ts`
+- UI principal e resultado em:
+  - `src/app/page.tsx`
+  - `src/lib/ui/search-page.ts`
+  - `src/lib/ui/recommendation-result.ts`
+  - `src/components/result/recommendation-card.tsx`
+  - `src/components/result/score-timeline.tsx`
+  - `src/components/result/score-breakdown.tsx`
+  - `src/components/result/attribution-footer.tsx`
 - Testes atuais:
   - `tests/configuracao-inicial.test.ts`
   - `tests/tipos-dominio.test.ts`
   - `tests/activity-rules.test.ts`
+  - `tests/weather-context.test.ts`
+  - `tests/score-calculator.test.ts`
+  - `tests/window-finder.test.ts`
+  - `tests/api-routes.test.ts`
+  - `tests/search-page-ui.test.ts`
+  - `tests/recommendation-result-ui.test.ts`
   - `tests/open-meteo-services.test.ts`
+  - `tests/api-schema.test.ts`
+  - `tests/fixtures/`
 - Documentação inicial:
   - `README.md`
   - `CONTRIBUTING.md`
   - `.nvmrc`
 
+Última sessão registrada:
+
+- Issue #9 concluída na branch `test/testes-qualidade`.
+- PR #23 (`test/testes-qualidade` -> `develop`) mergeada com CI verde.
+- Commit principal: `ad12a26 test: cobre engine de recomendacao`.
+- Validações locais executadas:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
+- No Windows local, `npm test` via PATH falhou por Volta procurar
+  `npm-prefix.js`; executar via `C:\Program Files\Volta\npm.cmd` funcionou.
+- GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
+  registrada na PR antes do merge.
+
 ## Próxima etapa recomendada
 
-Issue #5: Motor de score e janelas.
+Issue #10: PWA, README e deploy.
 
 Branch sugerida:
 
 ```text
-feature/engine-score-janelas
+docs/pwa-ci-readme
 ```
 
 Arquivos esperados:
 
-- `src/lib/engine/weather-context.ts`
-- `src/lib/engine/score-calculator.ts`
-- `src/lib/engine/window-finder.ts`
-- testes correspondentes em `tests/`
+- `public/manifest.json`
+- ícones PWA em `public/`
+- `README.md`
+- ajustes de CI/PWA se necessários
 
 Critérios principais:
 
-- `buildWeatherContext` calcula:
-  - hora local
-  - se a data é hoje
-  - se a hora já passou
-  - noite
-  - golden hour usando `sunset` real
-  - minutos em relação ao pôr do sol
-- `calculateHourScore` aplica regras ponderadas.
-- `calculateDayScores` retorna até 24 scores.
-- Horários passados devem ser ignorados ou zerados quando a data for hoje.
-- `findBestWindows` agrupa horas consecutivas com score mínimo.
-- Janelas menores que `minDurationHours` devem ser removidas.
-- Ordenação por:
-  - maior `avgScore`
-  - maior `peakScore`
-  - maior duração
-- Retornar top 3 janelas.
-- Sem `fetch` dentro da engine.
-- Funções puras e testáveis.
+- configurar `public/manifest.json`.
+- adicionar ícones PWA.
+- manter compatibilidade com Next.js 15.
+- confirmar GitHub Actions com lint, testes, cobertura e build.
+- fortalecer README com objetivo, demo, stack, arquitetura Mermaid, como rodar,
+  como testar, regras das atividades, atribuição Open-Meteo e uso não comercial.
+- explicar no README por que o produto não é apenas um app de clima.
+- preparar deploy na Vercel quando possível.
+- incluir screenshot ou GIF quando disponível.
+- não adicionar backend externo, banco, login, autenticação ou pagamento.
 
 ## Observações importantes para novas sessões
 
