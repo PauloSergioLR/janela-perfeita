@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -14,9 +14,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Janela Perfeita",
+  applicationName: "Janela Perfeita",
+  title: {
+    default: "Janela Perfeita",
+    template: "%s | Janela Perfeita",
+  },
   description:
     "Motor de recomendacao para encontrar a melhor janela de atividades ao ar livre.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Janela Perfeita",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      {
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  openGraph: {
+    title: "Janela Perfeita",
+    description:
+      "Encontre a melhor janela do dia para atividades ao ar livre com base na previsao horaria.",
+    type: "website",
+    locale: "pt_BR",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f766e",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
