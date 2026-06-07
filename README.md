@@ -11,7 +11,7 @@ vale a pena fazer esta atividade hoje?".
 ## Demo
 
 - Local: `http://localhost:3000`, apos `npm run dev`.
-- Producao: preparada para deploy na Vercel com Next.js 15.
+- Producao: https://janela-perfeita.vercel.app
 
 ![Tela inicial do Janela Perfeita](docs/screenshot-home.png)
 
@@ -194,6 +194,12 @@ Configuracao recomendada na Vercel:
 - Build command: `npm run build`
 - Output: padrao do Next.js
 - Variaveis de ambiente: nenhuma obrigatoria no MVP
+
+Deploy atual:
+
+```text
+https://janela-perfeita.vercel.app
+```
 
 O MVP nao precisa de banco, backend externo separado, login, autenticacao,
 pagamento, anuncios ou marketplace.
