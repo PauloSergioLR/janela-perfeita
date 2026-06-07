@@ -328,6 +328,9 @@ Concluído:
   - proteções SSO/git fork desativadas para liberar acesso público
 - Issue #10 fechada e card movido para `Done`.
 - Não há issues abertas no momento.
+- PR #29 (`develop` -> `main`) mergeada com CI verde.
+- MVP integrado em `main`.
+- Branches locais `develop` e `main` sincronizadas após o merge.
 - Validações locais executadas:
   - `npm run lint`
   - `npm test`
@@ -341,11 +344,12 @@ Concluído:
 
 ## Próxima etapa recomendada
 
-Encerrar o MVP integrando `develop` em `main`.
+MVP concluído.
 
-Branch atual de integração:
+Branches principais:
 
 ```text
+main
 develop
 ```
 
@@ -355,14 +359,11 @@ Produção atual:
 https://janela-perfeita.vercel.app
 ```
 
-Próximos passos:
+Próximos passos possíveis:
 
-- Conferir `develop` sincronizada e CI verde.
-- Abrir PR de `develop` para `main`.
-- Aguardar CI verde.
-- Tentar aprovar; se GitHub bloquear autoaprovação, registrar comentário.
-- Fazer merge para `main`.
-- Sincronizar `main` e `develop` locais.
+- Fazer revisão manual final no deploy público.
+- Criar novas issues apenas se surgirem ajustes pós-MVP.
+- Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
 ## Observações importantes para novas sessões
