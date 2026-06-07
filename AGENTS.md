@@ -60,6 +60,8 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
 - Usar commit Conventional Commit, por exemplo:
   `docs: atualiza contexto agents`.
 - Não misturar atualização de contexto com commits de feature, teste ou correção.
+- Qualquer regra nova dita pelo usuário durante a sessão deve ser registrada no
+  `AGENTS.md` para continuidade em sessões futuras.
 
 ## GitHub
 
@@ -82,6 +84,32 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #8 Resultado visual e timeline - concluída.
   - #9 Testes e qualidade - concluída.
   - #10 PWA, README e deploy - concluída.
+  - #32 T11 - Polimento de textos em PT-BR - aberta em `Todo`.
+  - #33 T12 - Adicionar probabilidade de chuva e weather code - aberta em `Todo`.
+  - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - aberta em `Todo`.
+  - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
+  - #36 T15 - Melhorar score de fotografia de pôr do sol - aberta em `Todo`.
+  - #37 T16 - Melhorar score de observar estrelas - aberta em `Todo`.
+  - #38 T17 - Criar score de confiança da previsão - aberta em `Todo`.
+  - #39 T18 - Criar design direction com Taste Skill - aberta em `Todo`.
+  - #40 T19 - Redesign da home com Taste Skill - aberta em `Todo`.
+  - #41 T20 - Redesign do card de resultado - aberta em `Todo`.
+  - #42 T21 - Melhorar timeline de score - aberta em `Todo`.
+  - #43 T22 - Melhorar estados de loading, empty e error - aberta em `Todo`.
+  - #44 T23 - Polimento mobile e acessibilidade - aberta em `Todo`.
+  - #45 T24 - Tema visual claro/escuro - aberta em `Todo`.
+  - #46 T25 - Modo inverso: o que fazer hoje? - aberta em `Todo`.
+  - #47 T26 - Comparar melhores dias da semana - aberta em `Todo`.
+  - #48 T27 - Compartilhar resultado - aberta em `Todo`.
+  - #49 T28 - Histórico local de buscas - aberta em `Todo`.
+  - #50 T29 - Criar camada WeatherProvider - aberta em `Todo`.
+  - #51 T30 - Comparar modelos da Open-Meteo - aberta em `Todo`.
+  - #52 T31 - Adicionar segunda API meteorológica opcional - aberta em `Todo`.
+  - #53 T32 - Backtesting de acurácia - aberta em `Todo`.
+  - #54 T33 - Playwright para fluxo principal - aberta em `Todo`.
+  - #55 T34 - Modo demo com fixtures - aberta em `Todo`.
+  - #56 T35 - Página técnica explicando o score - aberta em `Todo`.
+  - #57 T36 - Atualizar README com evolução do projeto - aberta em `Todo`.
 
 ## Validação obrigatória
 
@@ -341,10 +369,15 @@ Concluído:
 - GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
   registrada nas PRs antes do merge ou antes de manter a PR aberta.
 - Vercel CLI usado via `C:\Program Files\Volta\npx.cmd --yes vercel@latest`.
+- Roteiro de continuação recebido em
+  `C:\Users\lll\Downloads\Janela_Perfeita_Roteiro_Continuacao_Melhorias.md`.
+- Issues pós-MVP #32 a #57 criadas a partir do roteiro e adicionadas ao Project
+  `Janela Perfeita` com status `Todo`.
+- Nenhuma issue pós-MVP foi iniciada ainda.
 
 ## Próxima etapa recomendada
 
-MVP concluído.
+MVP concluído. Continuação pós-MVP aberta com issues #32 a #57 no Project.
 
 Branches principais:
 
@@ -359,10 +392,9 @@ Produção atual:
 https://janela-perfeita.vercel.app
 ```
 
-Próximos passos possíveis:
+Próximos passos recomendados:
 
-- Fazer revisão manual final no deploy público.
-- Criar novas issues apenas se surgirem ajustes pós-MVP.
+- Iniciar pela issue #32, T11 - Polimento de textos em PT-BR.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
