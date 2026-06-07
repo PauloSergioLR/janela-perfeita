@@ -81,7 +81,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #7 Interface de busca - concluída.
   - #8 Resultado visual e timeline - concluída.
   - #9 Testes e qualidade - concluída.
-  - #10 PWA, README e deploy - em andamento; PR #25 aberta, deploy Vercel pendente.
+  - #10 PWA, README e deploy - concluída.
 
 ## Validação obrigatória
 
@@ -300,19 +300,34 @@ Concluído:
 - PR #23 (`test/testes-qualidade` -> `develop`) mergeada com CI verde.
 - Commit principal: `ad12a26 test: cobre engine de recomendacao`.
 - Issue #10 iniciada na branch `docs/pwa-ci-readme`.
-- PR #25 (`docs/pwa-ci-readme` -> `develop`) aberta com CI verde, ainda não
-  mergeada porque o deploy Vercel está pendente.
+- PR #25 (`docs/pwa-ci-readme` -> `develop`) mergeada com CI verde.
+- PR #27 (`docs/pwa-ci-readme` -> `develop`) mergeada com CI verde para incluir
+  a URL final do deploy no README.
 - Commits da PR #25:
   - `b8a3efb chore: revisa configuracao de pwa e ci`
   - `5d61e7e docs: finaliza readme do portfolio`
+- Commit da PR #27:
+  - `be0571d docs: adiciona url de deploy ao readme`
 - PR #25 entrega:
   - `public/manifest.json`
   - ícones PWA em `public/icons/`
   - metadata PWA em `src/app/layout.tsx`
   - README final de portfólio
   - screenshot em `docs/screenshot-home.png`
-- Issue #10 está com todos os checklists marcados, exceto
-  `Deploy na Vercel funcionando`.
+- Deploy Vercel concluído e verificado:
+  - produção: `https://janela-perfeita.vercel.app`
+  - raiz retornou HTTP 200
+  - `/manifest.json` retornou HTTP 200
+- Configuração Vercel ajustada via CLI/API:
+  - projeto `janela-perfeita` criado na conta `paulosergiolr`
+  - `framework=nextjs`
+  - `installCommand=npm ci`
+  - `buildCommand=npm run build`
+  - `devCommand=npm run dev`
+  - `nodeVersion=20.x`
+  - proteções SSO/git fork desativadas para liberar acesso público
+- Issue #10 fechada e card movido para `Done`.
+- Não há issues abertas no momento.
 - Validações locais executadas:
   - `npm run lint`
   - `npm test`
@@ -322,44 +337,33 @@ Concluído:
   `npm-prefix.js`; executar via `C:\Program Files\Volta\npm.cmd` funcionou.
 - GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
   registrada nas PRs antes do merge ou antes de manter a PR aberta.
-- Deploy Vercel bloqueado no ambiente local:
-  - Vercel CLI não está instalado.
-  - `VERCEL_TOKEN` não existe no ambiente.
-  - `npx vercel@latest whoami` travou em fluxo interativo até timeout.
+- Vercel CLI usado via `C:\Program Files\Volta\npx.cmd --yes vercel@latest`.
 
 ## Próxima etapa recomendada
 
-Concluir Issue #10: PWA, README e deploy.
+Encerrar o MVP integrando `develop` em `main`.
 
-Branch atual:
-
-```text
-docs/pwa-ci-readme
-```
-
-PR atual:
+Branch atual de integração:
 
 ```text
-https://github.com/PauloSergioLR/janela-perfeita/pull/25
+develop
 ```
 
-Pendência principal:
+Produção atual:
 
-- Fazer deploy Vercel funcionar.
-- Se o usuário fornecer `VERCEL_TOKEN`, usar Vercel CLI com token para deploy.
-- Se o usuário preferir painel Vercel, orientar conectar o repositório e usar:
-  - Framework: Next.js
-  - Install command: `npm ci`
-  - Build command: `npm run build`
-  - Variáveis: nenhuma obrigatória no MVP
-- Após deploy:
-  - atualizar README/PR com URL de produção se houver
-  - marcar checklist final da issue #10
-  - tentar aprovar a PR; se GitHub bloquear, comentar limitação
-  - mergear PR #25 para `develop` sem deletar branch
-  - fechar issue #10 e mover card para `Done`
-  - sincronizar `develop` local
-  - atualizar `AGENTS.md` novamente em `contexto-agents` com contexto final
+```text
+https://janela-perfeita.vercel.app
+```
+
+Próximos passos:
+
+- Conferir `develop` sincronizada e CI verde.
+- Abrir PR de `develop` para `main`.
+- Aguardar CI verde.
+- Tentar aprovar; se GitHub bloquear autoaprovação, registrar comentário.
+- Fazer merge para `main`.
+- Sincronizar `main` e `develop` locais.
+- Preservar branches remotas de feature, teste, docs e contexto.
 
 ## Observações importantes para novas sessões
 
