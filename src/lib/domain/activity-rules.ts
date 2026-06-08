@@ -216,6 +216,57 @@ function assessRain(weather: HourlyWeather): RainAssessment {
   };
 }
 
+function assessSunsetClouds(weather: HourlyWeather): {
+  score: number;
+  reason: string;
+} {
+  const layeredClouds = Math.round(
+    (weather.cloud_cover_mid + weather.cloud_cover_high) / 2,
+  );
+
+  if (weather.cloud_cover >= 90 || weather.cloud_cover_low >= 80) {
+    return {
+      score: 20,
+      reason: "Céu muito fechado reduz cor, contraste e textura do pôr do sol.",
+    };
+  }
+
+  if (weather.cloud_cover <= 8 && layeredClouds <= 8) {
+    return {
+      score: 70,
+      reason: "Céu totalmente limpo é bom, mas tende a render menos textura.",
+    };
+  }
+
+  if (weather.cloud_cover_low > 60) {
+    return {
+      score: 45,
+      reason: "Muita nuvem baixa pode bloquear a luz perto do horizonte.",
+    };
+  }
+
+  if (
+    layeredClouds >= 25 &&
+    layeredClouds <= 70 &&
+    weather.cloud_cover_low <= 45
+  ) {
+    return {
+      score: 100,
+      reason:
+        "Nuvens médias e altas moderadas favorecem cor e textura no pôr do sol.",
+    };
+  }
+
+  return {
+    score: Math.round(
+      scoreIdealRange(weather.cloud_cover, 15, 70) * 0.45 +
+        scoreIdealRange(layeredClouds, 25, 70) * 0.4 +
+        scoreMaximum(weather.cloud_cover_low, 45, 85) * 0.15,
+    ),
+    reason: `Distribuição de nuvens razoável: ${weather.cloud_cover}% total, ${weather.cloud_cover_low}% baixas e ${layeredClouds}% médias/altas.`,
+  };
+}
+
 export function createTemperatureRule(
   weight: number,
   min: number,
@@ -368,6 +419,63 @@ export function createCloudCoverRangeRule(
           weather.cloud_cover >= min && weather.cloud_cover <= max
             ? `Cobertura de nuvens em ${weather.cloud_cover}% favorece a composição.`
             : `Cobertura de nuvens em ${weather.cloud_cover}% foge da faixa ideal de ${min}% a ${max}%.`,
+      }),
+  };
+}
+
+export function createSunsetCloudRule(weight: number): ActivityRule {
+  return {
+    factor: "nuvens_por_do_sol",
+    label: "Nuvens do pôr do sol",
+    weight,
+    evaluate: (weather: HourlyWeather) => {
+      const clouds = assessSunsetClouds(weather);
+
+      return createRuleResult({
+        factor: "nuvens_por_do_sol",
+        label: "Nuvens do pôr do sol",
+        weight,
+        score: clouds.score,
+        reason: clouds.reason,
+      });
+    },
+  };
+}
+
+export function createVisibilityRule(weight: number): ActivityRule {
+  return {
+    factor: "visibilidade",
+    label: "Visibilidade",
+    weight,
+    evaluate: (weather: HourlyWeather) =>
+      createRuleResult({
+        factor: "visibilidade",
+        label: "Visibilidade",
+        weight,
+        score: scoreMinimum(weather.visibility, 10000, 1000),
+        reason:
+          weather.visibility >= 10000
+            ? `Visibilidade de ${Math.round(weather.visibility / 1000)} km favorece fotos mais limpas.`
+            : `Visibilidade de ${Math.round(weather.visibility / 1000)} km reduz nitidez e alcance da cena.`,
+      }),
+  };
+}
+
+export function createSunshineRule(weight: number): ActivityRule {
+  return {
+    factor: "luminosidade",
+    label: "Luminosidade",
+    weight,
+    evaluate: (weather: HourlyWeather) =>
+      createRuleResult({
+        factor: "luminosidade",
+        label: "Luminosidade",
+        weight,
+        score: scoreMinimum(weather.sunshine_duration, 1200, 0),
+        reason:
+          weather.sunshine_duration >= 1200
+            ? "Luminosidade disponível favorece a cena do pôr do sol."
+            : "Pouca luz direta prevista reduz cor e contraste da cena.",
       }),
   };
 }

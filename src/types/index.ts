@@ -36,6 +36,11 @@ export interface HourlyWeather {
   wind_speed_10m: number;
   wind_gusts_10m: number;
   cloud_cover: number;
+  cloud_cover_low: number;
+  cloud_cover_mid: number;
+  cloud_cover_high: number;
+  visibility: number;
+  sunshine_duration: number;
   uv_index: number;
   relative_humidity_2m: number;
 }

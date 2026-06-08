@@ -14,6 +14,11 @@ const idealRunningWeather: HourlyWeather = {
   wind_speed_10m: 8,
   wind_gusts_10m: 12,
   cloud_cover: 30,
+  cloud_cover_low: 10,
+  cloud_cover_mid: 35,
+  cloud_cover_high: 35,
+  visibility: 15000,
+  sunshine_duration: 2400,
   uv_index: 2,
   relative_humidity_2m: 60,
 };
@@ -29,10 +34,21 @@ const baseContext: WeatherContext = {
   sunset: "2026-06-05T18:00",
 };
 
-function calculateWeightedScore(activity: Activity, weather: HourlyWeather) {
+const goldenHourContext: WeatherContext = {
+  ...baseContext,
+  localHour: 17,
+  isGoldenHour: true,
+  minutesFromSunset: -30,
+};
+
+function calculateWeightedScore(
+  activity: Activity,
+  weather: HourlyWeather,
+  context = baseContext,
+) {
   const totalWeight = activity.rules.reduce((sum, rule) => sum + rule.weight, 0);
   const weightedScore = activity.rules.reduce((sum, rule) => {
-    const result = rule.evaluate(weather, baseContext);
+    const result = rule.evaluate(weather, context);
     return sum + result.score * result.weight;
   }, 0);
 
@@ -152,6 +168,104 @@ describe("regras das atividades", () => {
     expect(result?.reason).toBe(
       "Sem chuva prevista, mas há risco moderado de chuva.",
     );
+  });
+
+  it("valoriza golden hour com nuvens medias e altas moderadas", () => {
+    const activity = getActivityById("fotografar_por_do_sol");
+    const goodCloudsWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T17:30",
+      cloud_cover: 45,
+      cloud_cover_low: 20,
+      cloud_cover_mid: 50,
+      cloud_cover_high: 45,
+    };
+    const cloudRule = activity?.rules.find(
+      (rule) => rule.factor === "nuvens_por_do_sol",
+    );
+    const result = cloudRule?.evaluate(goodCloudsWeather, goldenHourContext);
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, goodCloudsWeather, goldenHourContext),
+    ).toBeGreaterThanOrEqual(95);
+    expect(result?.score).toBe(100);
+    expect(result?.reason).toContain("Nuvens médias e altas moderadas");
+  });
+
+  it("penaliza fotografia de por do sol com ceu fechado", () => {
+    const activity = getActivityById("fotografar_por_do_sol");
+    const overcastWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T17:30",
+      cloud_cover: 98,
+      cloud_cover_low: 85,
+      cloud_cover_mid: 90,
+      cloud_cover_high: 90,
+      sunshine_duration: 0,
+    };
+    const cloudRule = activity?.rules.find(
+      (rule) => rule.factor === "nuvens_por_do_sol",
+    );
+    const result = cloudRule?.evaluate(overcastWeather, goldenHourContext);
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, overcastWeather, goldenHourContext),
+    ).toBeLessThan(80);
+    expect(result?.score).toBe(20);
+    expect(result?.reason).toContain("Céu muito fechado");
+  });
+
+  it("penaliza fotografia fora da golden hour", () => {
+    const activity = getActivityById("fotografar_por_do_sol");
+    const goodCloudsWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      cloud_cover: 45,
+      cloud_cover_low: 20,
+      cloud_cover_mid: 50,
+      cloud_cover_high: 45,
+    };
+    const goldenScore = calculateWeightedScore(
+      activity!,
+      goodCloudsWeather,
+      goldenHourContext,
+    );
+    const outsideScore = calculateWeightedScore(activity!, goodCloudsWeather);
+    const goldenRule = activity?.rules.find(
+      (rule) => rule.factor === "golden_hour",
+    );
+
+    expect(activity).toBeDefined();
+    expect(outsideScore).toBeLessThan(goldenScore);
+    expect(goldenRule?.evaluate(goodCloudsWeather, baseContext).score).toBe(25);
+  });
+
+  it("penaliza fotografia com baixa visibilidade", () => {
+    const activity = getActivityById("fotografar_por_do_sol");
+    const lowVisibilityWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T17:30",
+      cloud_cover: 45,
+      cloud_cover_low: 20,
+      cloud_cover_mid: 50,
+      cloud_cover_high: 45,
+      visibility: 1000,
+    };
+    const visibilityRule = activity?.rules.find(
+      (rule) => rule.factor === "visibilidade",
+    );
+    const result = visibilityRule?.evaluate(
+      lowVisibilityWeather,
+      goldenHourContext,
+    );
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, lowVisibilityWeather, goldenHourContext),
+    ).toBeLessThan(95);
+    expect(result?.score).toBe(0);
+    expect(result?.reason).toContain("reduz nitidez");
   });
 
   it("considera rain, showers e weather_code nas regras de chuva", () => {

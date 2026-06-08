@@ -13,6 +13,11 @@ const hourlyWeatherSchema = z.object({
   wind_speed_10m: z.array(z.number()),
   wind_gusts_10m: z.array(z.number()),
   cloud_cover: z.array(z.number()),
+  cloud_cover_low: z.array(z.number()),
+  cloud_cover_mid: z.array(z.number()),
+  cloud_cover_high: z.array(z.number()),
+  visibility: z.array(z.number()),
+  sunshine_duration: z.array(z.number()),
   uv_index: z.array(z.number()),
   relative_humidity_2m: z.array(z.number()),
 });
@@ -69,6 +74,11 @@ export function parseForecastResponse(payload: unknown): {
     wind_speed_10m: response.hourly.wind_speed_10m[index] ?? 0,
     wind_gusts_10m: response.hourly.wind_gusts_10m[index] ?? 0,
     cloud_cover: response.hourly.cloud_cover[index] ?? 0,
+    cloud_cover_low: response.hourly.cloud_cover_low[index] ?? 0,
+    cloud_cover_mid: response.hourly.cloud_cover_mid[index] ?? 0,
+    cloud_cover_high: response.hourly.cloud_cover_high[index] ?? 0,
+    visibility: response.hourly.visibility[index] ?? 0,
+    sunshine_duration: response.hourly.sunshine_duration[index] ?? 0,
     uv_index: response.hourly.uv_index[index] ?? 0,
     relative_humidity_2m: response.hourly.relative_humidity_2m[index] ?? 0,
   }));
