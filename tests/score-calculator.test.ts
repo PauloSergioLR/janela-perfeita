@@ -5,6 +5,7 @@ import {
   calculateHourScore,
 } from "@/lib/engine/score-calculator";
 import { buildWeatherContext } from "@/lib/engine/weather-context";
+import { findBestWindows } from "@/lib/engine/window-finder";
 import { baseAstronomy, makeDailyHourlyWeather, makeHourlyWeather } from "./fixtures/weather";
 
 describe("calculadora de score", () => {
@@ -148,6 +149,41 @@ describe("calculadora de score", () => {
       outsideScore.breakdown.find((rule) => rule.factor === "golden_hour")?.score,
     ).toBe(25);
     expect(goldenScore.score).toBeGreaterThan(outsideScore.score);
+  });
+
+  it("não recomenda lavar carro quando chuva forte vem logo depois", () => {
+    const activity = getActivityById("lavar_carro")!;
+    const hourly = [
+      makeHourlyWeather("2026-06-05T14:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T15:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T16:00", {
+        precipitation: 5,
+        rain: 5,
+        weather_code: 63,
+      }),
+      makeHourlyWeather("2026-06-05T17:00", { precipitation: 0 }),
+    ];
+    const scores = calculateDayScores({
+      activity,
+      hourly,
+      astronomy: baseAstronomy,
+      now: "2026-06-05T13:00",
+    });
+    const windows = findBestWindows(scores, activity);
+    const score14h = scores.find((score) => score.hourLabel === "14:00");
+
+    expect(score14h?.score).toBeLessThan(activity.minRecommendedScore);
+    expect(
+      score14h?.breakdown.find((rule) => rule.factor === "chuva_futura")
+        ?.reason,
+    ).toBe("Chuva relevante às 16:00 pode comprometer a lavagem do carro.");
+    expect(
+      windows.some(
+        (window) =>
+          window.startTime === "2026-06-05T14:00" &&
+          window.endTime === "2026-06-05T16:00",
+      ),
+    ).toBe(false);
   });
 
   it("mantem scores e breakdowns dentro de 0 a 100", () => {
