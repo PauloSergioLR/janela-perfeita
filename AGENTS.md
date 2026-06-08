@@ -86,7 +86,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #10 PWA, README e deploy - concluída.
   - #32 T11 - Polimento de textos em PT-BR - concluída.
   - #33 T12 - Adicionar probabilidade de chuva e weather code - concluída.
-  - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - aberta em `Todo`.
+  - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - concluída.
   - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
   - #36 T15 - Melhorar score de fotografia de pôr do sol - aberta em `Todo`.
   - #37 T16 - Melhorar score de observar estrelas - aberta em `Todo`.
@@ -410,10 +410,27 @@ Concluído:
   - `npm test`
   - `npm run test:coverage`
   - `npm run build`
+- Issue #34 concluída na branch `feature/12-lavar-carro-janela-seca`.
+- PR #63 (`feature/12-lavar-carro-janela-seca` -> `develop`) mergeada com CI
+  verde.
+- Commit principal da T13:
+  - `835e591 feat: avalia chuva futura para lavar carro`
+- Entrega da T13:
+  - `calculateDayScores` aplica penalidade específica para `lavar_carro` quando
+    a regra de chuva detecta risco relevante nas próximas 3 horas;
+  - breakdown recebe fator `chuva_futura` com motivo em português;
+  - cenário 14h/15h seco e 16h chuva forte coberto por teste, sem recomendar
+    janela 14h-16h como ideal.
+- Issue #34 fechada e card movido para `Done`.
+- Validações locais executadas na T13:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
 
 ## Próxima etapa recomendada
 
-MVP concluído. Continuação pós-MVP em andamento com issues #34 a #57 abertas no
+MVP concluído. Continuação pós-MVP em andamento com issues #35 a #57 abertas no
 Project.
 
 Branches principais:
@@ -431,8 +448,7 @@ https://janela-perfeita.vercel.app
 
 Próximos passos recomendados:
 
-- Iniciar pela issue #34, T13 - Melhorar regra de lavar carro olhando próximas
-  horas.
+- Iniciar pela issue #35, T14 - Adicionar sensação térmica e rajadas de vento.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
