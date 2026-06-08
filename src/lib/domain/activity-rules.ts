@@ -18,6 +18,10 @@ type RainAssessment = {
   reason: string;
 };
 
+type TemperatureRuleOptions = {
+  useApparentTemperature?: boolean;
+};
+
 const MODERATE_RAIN_PROBABILITY = 40;
 const HIGH_RAIN_PROBABILITY = 60;
 const VERY_HIGH_RAIN_PROBABILITY = 80;
@@ -216,22 +220,35 @@ export function createTemperatureRule(
   weight: number,
   min: number,
   max: number,
+  options: TemperatureRuleOptions = {},
 ): ActivityRule {
+  const factor = options.useApparentTemperature
+    ? "sensacao_termica"
+    : "temperatura";
+  const label = options.useApparentTemperature
+    ? "Sensação térmica"
+    : "Temperatura";
+
   return {
-    factor: "temperatura",
-    label: "Temperatura",
+    factor,
+    label,
     weight,
-    evaluate: (weather: HourlyWeather) =>
-      createRuleResult({
-        factor: "temperatura",
-        label: "Temperatura",
+    evaluate: (weather: HourlyWeather) => {
+      const value = options.useApparentTemperature
+        ? weather.apparent_temperature
+        : weather.temperature_2m;
+
+      return createRuleResult({
+        factor,
+        label,
         weight,
-        score: scoreIdealRange(weather.temperature_2m, min, max),
+        score: scoreIdealRange(value, min, max),
         reason:
-          weather.temperature_2m >= min && weather.temperature_2m <= max
-            ? `Temperatura de ${weather.temperature_2m}°C está dentro da faixa ideal.`
-            : `Temperatura de ${weather.temperature_2m}°C está fora da faixa ideal de ${min}°C a ${max}°C.`,
-      }),
+          value >= min && value <= max
+            ? `${label} de ${value}°C está dentro da faixa ideal.`
+            : `${label} de ${value}°C está fora da faixa ideal de ${min}°C a ${max}°C.`,
+      });
+    },
   };
 }
 
@@ -269,6 +286,28 @@ export function createWindRule(weight: number, idealMax: number): ActivityRule {
           weather.wind_speed_10m <= idealMax
             ? `Vento de ${weather.wind_speed_10m} km/h está confortável.`
             : `Vento de ${weather.wind_speed_10m} km/h pode atrapalhar a atividade.`,
+      }),
+  };
+}
+
+export function createWindGustRule(
+  weight: number,
+  idealMax: number,
+): ActivityRule {
+  return {
+    factor: "rajadas",
+    label: "Rajadas",
+    weight,
+    evaluate: (weather: HourlyWeather) =>
+      createRuleResult({
+        factor: "rajadas",
+        label: "Rajadas",
+        weight,
+        score: scoreMaximum(weather.wind_gusts_10m, idealMax, idealMax + 30),
+        reason:
+          weather.wind_gusts_10m <= idealMax
+            ? `Rajadas de ${weather.wind_gusts_10m} km/h estão dentro do limite recomendado.`
+            : `Rajadas de ${weather.wind_gusts_10m} km/h podem deixar a atividade instável.`,
       }),
   };
 }

@@ -5,12 +5,14 @@ import type { Activity, HourlyWeather, WeatherContext } from "@/types";
 const idealRunningWeather: HourlyWeather = {
   time: "2026-06-05T07:00",
   temperature_2m: 19,
+  apparent_temperature: 19,
   precipitation: 0,
   precipitation_probability: 0,
   rain: 0,
   showers: 0,
   weather_code: 0,
   wind_speed_10m: 8,
+  wind_gusts_10m: 12,
   cloud_cover: 30,
   uv_index: 2,
   relative_humidity_2m: 60,
@@ -83,6 +85,57 @@ describe("regras das atividades", () => {
 
     expect(activity).toBeDefined();
     expect(calculateWeightedScore(activity!, rainyWeather)).toBeLessThan(75);
+  });
+
+  it("usa sensação térmica para penalizar corrida", () => {
+    const activity = getActivityById("correr");
+    const hotFeelingWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      temperature_2m: 19,
+      apparent_temperature: 35,
+    };
+    const thermalRule = activity?.rules.find(
+      (rule) => rule.factor === "sensacao_termica",
+    );
+    const result = thermalRule?.evaluate(hotFeelingWeather, baseContext);
+
+    expect(activity).toBeDefined();
+    expect(calculateWeightedScore(activity!, hotFeelingWeather)).toBeLessThan(
+      75,
+    );
+    expect(result?.score).toBe(0);
+    expect(result?.reason).toBe(
+      "Sensação térmica de 35°C está fora da faixa ideal de 16°C a 22°C.",
+    );
+  });
+
+  it("usa sensação térmica para caminhada", () => {
+    const activity = getActivityById("caminhar");
+    const thermalRule = activity?.rules.find(
+      (rule) => rule.factor === "sensacao_termica",
+    );
+
+    expect(thermalRule?.label).toBe("Sensação térmica");
+  });
+
+  it("penaliza pedal com rajadas fortes de vento", () => {
+    const activity = getActivityById("pedalar");
+    const gustyWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      wind_speed_10m: 10,
+      wind_gusts_10m: 70,
+    };
+    const gustRule = activity?.rules.find((rule) => rule.factor === "rajadas");
+    const idealScore = calculateWeightedScore(activity!, idealRunningWeather);
+    const gustyScore = calculateWeightedScore(activity!, gustyWeather);
+    const result = gustRule?.evaluate(gustyWeather, baseContext);
+
+    expect(activity).toBeDefined();
+    expect(gustyScore).toBeLessThan(idealScore);
+    expect(result?.score).toBe(0);
+    expect(result?.reason).toBe(
+      "Rajadas de 70 km/h podem deixar a atividade instável.",
+    );
   });
 
   it("considera risco moderado mesmo sem chuva acumulada", () => {
