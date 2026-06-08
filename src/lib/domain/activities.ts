@@ -1,14 +1,16 @@
 import type { Activity, ActivityId } from "@/types";
 import {
   createClearSkyRule,
-  createCloudCoverRangeRule,
   createGoldenHourRule,
   createHumidityRule,
   createMinimumTemperatureRule,
   createNightRule,
   createPrecipitationRule,
+  createSunsetCloudRule,
+  createSunshineRule,
   createTemperatureRule,
   createUvRule,
+  createVisibilityRule,
   createWindGustRule,
   createWindRule,
 } from "./activity-rules";
@@ -60,14 +62,15 @@ export const ACTIVITIES = [
     id: "fotografar_por_do_sol",
     name: "Fotografar pôr do sol",
     shortDescription:
-      "Valoriza a hora dourada, nuvens interessantes, pouca chuva e umidade menor.",
+      "Valoriza a hora dourada, nuvens interessantes, pouca chuva e boa visibilidade.",
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createGoldenHourRule(40),
-      createCloudCoverRangeRule(30, 20, 60),
-      createPrecipitationRule(20),
-      createHumidityRule(10),
+      createGoldenHourRule(35),
+      createSunsetCloudRule(25),
+      createVisibilityRule(20),
+      createPrecipitationRule(15),
+      createSunshineRule(5),
     ],
   },
   {

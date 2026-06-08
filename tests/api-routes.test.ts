@@ -43,6 +43,11 @@ function makeWeather(time: string): HourlyWeather {
     wind_speed_10m: 8,
     wind_gusts_10m: 12,
     cloud_cover: 30,
+    cloud_cover_low: 10,
+    cloud_cover_mid: 35,
+    cloud_cover_high: 35,
+    visibility: 15000,
+    sunshine_duration: 2400,
     uv_index: 2,
     relative_humidity_2m: 60,
   };

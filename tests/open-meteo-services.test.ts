@@ -31,6 +31,11 @@ function createForecastFixture() {
       wind_speed_10m: hours.map(() => 10),
       wind_gusts_10m: hours.map(() => 14),
       cloud_cover: hours.map(() => 40),
+      cloud_cover_low: hours.map(() => 15),
+      cloud_cover_mid: hours.map(() => 45),
+      cloud_cover_high: hours.map(() => 45),
+      visibility: hours.map(() => 15000),
+      sunshine_duration: hours.map(() => 2400),
       uv_index: hours.map(() => 2),
       relative_humidity_2m: hours.map(() => 60),
     },
@@ -81,6 +86,11 @@ describe("serviço de previsão Open-Meteo", () => {
     expect(url.searchParams.get("hourly")).toContain("wind_speed_10m");
     expect(url.searchParams.get("hourly")).toContain("wind_gusts_10m");
     expect(url.searchParams.get("hourly")).toContain("cloud_cover");
+    expect(url.searchParams.get("hourly")).toContain("cloud_cover_low");
+    expect(url.searchParams.get("hourly")).toContain("cloud_cover_mid");
+    expect(url.searchParams.get("hourly")).toContain("cloud_cover_high");
+    expect(url.searchParams.get("hourly")).toContain("visibility");
+    expect(url.searchParams.get("hourly")).toContain("sunshine_duration");
     expect(url.searchParams.get("hourly")).toContain("relative_humidity_2m");
   });
 
@@ -100,6 +110,11 @@ describe("serviço de previsão Open-Meteo", () => {
       wind_speed_10m: 10,
       wind_gusts_10m: 14,
       cloud_cover: 40,
+      cloud_cover_low: 15,
+      cloud_cover_mid: 45,
+      cloud_cover_high: 45,
+      visibility: 15000,
+      sunshine_duration: 2400,
       uv_index: 2,
       relative_humidity_2m: 60,
     });

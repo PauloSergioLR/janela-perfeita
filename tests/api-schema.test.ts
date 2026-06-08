@@ -35,6 +35,11 @@ describe("schemas da API Open-Meteo", () => {
       wind_speed_10m: 10,
       wind_gusts_10m: 14,
       cloud_cover: 40,
+      cloud_cover_low: 15,
+      cloud_cover_mid: 45,
+      cloud_cover_high: 45,
+      visibility: 15000,
+      sunshine_duration: 2400,
       uv_index: 2,
       relative_humidity_2m: 60,
     });
