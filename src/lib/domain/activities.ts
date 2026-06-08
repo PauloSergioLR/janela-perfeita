@@ -9,6 +9,7 @@ import {
   createPrecipitationRule,
   createTemperatureRule,
   createUvRule,
+  createWindGustRule,
   createWindRule,
 } from "./activity-rules";
 
@@ -21,7 +22,7 @@ export const ACTIVITIES = [
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createTemperatureRule(40, 16, 22),
+      createTemperatureRule(40, 16, 22, { useApparentTemperature: true }),
       createPrecipitationRule(30),
       createWindRule(20, 15),
       createUvRule(10, 3),
@@ -35,7 +36,7 @@ export const ACTIVITIES = [
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createTemperatureRule(40, 15, 25),
+      createTemperatureRule(40, 15, 25, { useApparentTemperature: true }),
       createPrecipitationRule(35),
       createWindRule(25, 25),
     ],
@@ -49,8 +50,9 @@ export const ACTIVITIES = [
     minDurationHours: 1,
     rules: [
       createPrecipitationRule(35),
-      createTemperatureRule(30, 15, 25),
-      createWindRule(25, 20),
+      createTemperatureRule(25, 15, 25),
+      createWindRule(15, 20),
+      createWindGustRule(15, 30),
       createUvRule(10, 5),
     ],
   },
