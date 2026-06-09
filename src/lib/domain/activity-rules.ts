@@ -267,6 +267,104 @@ function assessSunsetClouds(weather: HourlyWeather): {
   };
 }
 
+function assessStargazingClouds(weather: HourlyWeather): {
+  score: number;
+  reason: string;
+} {
+  if (weather.cloud_cover >= 90 || weather.cloud_cover_low >= 75) {
+    return {
+      score: 5,
+      reason: "Nuvens baixas ou céu muito fechado bloqueiam a observação das estrelas.",
+    };
+  }
+
+  const lowCloudScore = scoreMaximum(weather.cloud_cover_low, 10, 60);
+  const midCloudScore = scoreMaximum(weather.cloud_cover_mid, 20, 80);
+  const highCloudScore = scoreMaximum(weather.cloud_cover_high, 40, 100);
+  const totalCloudScore = scoreMaximum(weather.cloud_cover, 25, 90);
+  const score = Math.round(
+    lowCloudScore * 0.45 +
+      midCloudScore * 0.25 +
+      highCloudScore * 0.15 +
+      totalCloudScore * 0.15,
+  );
+
+  if (score >= 85) {
+    return {
+      score,
+      reason: "Poucas nuvens, principalmente baixas, deixam o céu mais aberto.",
+    };
+  }
+
+  if (weather.cloud_cover_low > 35) {
+    return {
+      score,
+      reason: `Nuvens baixas em ${weather.cloud_cover_low}% atrapalham mais a visão do céu.`,
+    };
+  }
+
+  return {
+    score,
+    reason: `Nuvens em ${weather.cloud_cover}% reduzem parte da visibilidade do céu.`,
+  };
+}
+
+function assessStargazingQuality(weather: HourlyWeather): {
+  score: number;
+  reason: string;
+} {
+  const clouds = assessStargazingClouds(weather);
+  const rain = assessRain(weather);
+  const visibilityScore = scoreMinimum(weather.visibility, 20000, 3000);
+  const humidityScore = scoreMaximum(weather.relative_humidity_2m, 65, 95);
+  const temperatureScore = scoreMinimum(weather.temperature_2m, 10, -5);
+  const scores = [
+    clouds.score,
+    rain.score,
+    visibilityScore,
+    humidityScore,
+    temperatureScore,
+  ];
+  const score = Math.min(...scores);
+
+  if (score === rain.score && rain.score < 80) {
+    return {
+      score,
+      reason: rain.reason,
+    };
+  }
+
+  if (score === visibilityScore && visibilityScore < 80) {
+    return {
+      score,
+      reason: `Baixa visibilidade de ${Math.round(weather.visibility / 1000)} km reduz a leitura do céu.`,
+    };
+  }
+
+  if (score === clouds.score && clouds.score < 85) {
+    return clouds;
+  }
+
+  if (score === humidityScore && humidityScore < 85) {
+    return {
+      score,
+      reason: `Umidade de ${weather.relative_humidity_2m}% pode deixar o céu menos transparente.`,
+    };
+  }
+
+  if (score === temperatureScore && temperatureScore < 85) {
+    return {
+      score,
+      reason: `Temperatura de ${weather.temperature_2m}°C pode deixar a permanência ao ar livre desconfortável.`,
+    };
+  }
+
+  return {
+    score,
+    reason: "Noite seca, sem chuva, com boa visibilidade e poucas nuvens.",
+  };
+}
+
 export function createTemperatureRule(
   weight: number,
   min: number,
@@ -477,6 +575,25 @@ export function createSunshineRule(weight: number): ActivityRule {
             ? "Luminosidade disponível favorece a cena do pôr do sol."
             : "Pouca luz direta prevista reduz cor e contraste da cena.",
       }),
+  };
+}
+
+export function createStargazingQualityRule(weight: number): ActivityRule {
+  return {
+    factor: "qualidade_do_ceu",
+    label: "Qualidade do céu",
+    weight,
+    evaluate: (weather: HourlyWeather) => {
+      const quality = assessStargazingQuality(weather);
+
+      return createRuleResult({
+        factor: "qualidade_do_ceu",
+        label: "Qualidade do céu",
+        weight,
+        score: quality.score,
+        reason: quality.reason,
+      });
+    },
   };
 }
 
