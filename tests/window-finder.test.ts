@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findBestWindows } from "@/lib/engine/window-finder";
 import type { HourScore } from "@/types";
+import { makeHourlyWeather } from "./fixtures/weather";
 
 const activity = {
   minRecommendedScore: 60,
@@ -12,6 +13,7 @@ function makeScore(time: string, score: number, reason = "Janela favoravel") {
     time,
     hourLabel: time.slice(11, 16),
     score,
+    weather: makeHourlyWeather(time),
     breakdown: [
       {
         factor: "tempo",
@@ -47,6 +49,9 @@ describe("buscador de janelas", () => {
       durationHours: 3,
       avgScore: 85,
       peakScore: 92,
+      confidence: expect.objectContaining({
+        level: "alta",
+      }),
     });
     expect(windows[1].startTime).toBe("2026-06-05T08:00");
   });

@@ -81,6 +81,15 @@ export interface ActivityRule {
   evaluate: (weather: HourlyWeather, ctx: WeatherContext) => RuleResult;
 }
 
+export type ForecastConfidenceLevel = "alta" | "media" | "baixa";
+
+/** Estimativa de estabilidade da previsão dentro de uma janela recomendada. */
+export interface ForecastConfidence {
+  level: ForecastConfidenceLevel;
+  score: number;
+  reason: string;
+}
+
 /** Atividade disponível para recomendação. */
 export interface Activity {
   id: ActivityId;
@@ -96,6 +105,7 @@ export interface HourScore {
   time: string;
   hourLabel: string;
   score: number;
+  weather: HourlyWeather;
   breakdown: RuleResult[];
 }
 
@@ -108,6 +118,7 @@ export interface WindowResult {
   durationHours: number;
   avgScore: number;
   peakScore: number;
+  confidence: ForecastConfidence;
   highlights: string[];
   scores: HourScore[];
 }
