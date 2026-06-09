@@ -116,6 +116,7 @@ export function calculateHourScore({
     time: weather.time,
     hourLabel: formatHourLabel(weather.time),
     score: context.isPastHour ? 0 : clampScore(weightedScore),
+    weather,
     breakdown,
   };
 }

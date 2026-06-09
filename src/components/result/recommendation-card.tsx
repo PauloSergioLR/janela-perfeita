@@ -5,6 +5,7 @@ import {
   Clock3,
   Gauge,
   MapPin,
+  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import {
   formatDurationHours,
+  formatForecastConfidenceLevel,
   formatRecommendationDate,
   formatRecommendationLocation,
   getAlternativeWindows,
@@ -142,6 +144,19 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 </div>
               </div>
             </div>
+            {bestWindow ? (
+              <div className="flex items-start gap-2">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-700" />
+                <div>
+                  <dt className="font-medium text-slate-950">Confiança</dt>
+                  <dd className="text-muted-foreground">
+                    {formatForecastConfidenceLevel(bestWindow.confidence.level)}
+                    {" - "}
+                    {bestWindow.confidence.reason}
+                  </dd>
+                </div>
+              </div>
+            ) : null}
           </dl>
         </div>
 
@@ -171,6 +186,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                     <p className="truncate text-muted-foreground">
                       {formatDurationHours(window.durationHours)}
                       {window.highlights[0] ? ` - ${window.highlights[0]}` : ""}
+                    </p>
+                    <p className="text-muted-foreground">
+                      Confiança{" "}
+                      {formatForecastConfidenceLevel(
+                        window.confidence.level,
+                      ).toLowerCase()}
                     </p>
                   </div>
                   <Badge

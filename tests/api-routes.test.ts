@@ -195,6 +195,12 @@ describe("rotas internas da API", () => {
     expect(payload.recommendation.bestWindow.startTime).toBe(
       "2030-06-05T07:00",
     );
+    expect(payload.recommendation.bestWindow.confidence).toEqual(
+      expect.objectContaining({
+        level: "alta",
+        score: expect.any(Number),
+      }),
+    );
     expect(payload.recommendation.disclaimer).toContain("Open-Meteo");
     expect(payload.stack).toBeUndefined();
   });

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getActivityById } from "@/lib/domain/activities";
 import {
   buildTimelineData,
+  formatForecastConfidenceLevel,
   formatDurationHours,
   getAlternativeWindows,
   getBreakdownSource,
@@ -14,6 +15,7 @@ import type {
   RuleResult,
   WindowResult,
 } from "@/types";
+import { makeHourlyWeather } from "./fixtures/weather";
 
 const activity = getActivityById("correr")!;
 
@@ -53,6 +55,7 @@ function makeScore(
     time: `2030-06-05T${hourLabel}`,
     hourLabel,
     score,
+    weather: makeHourlyWeather(`2030-06-05T${hourLabel}`),
     breakdown,
   };
 }
@@ -71,6 +74,11 @@ function makeWindow(scores: HourScore[]): WindowResult {
       scores.reduce((sum, current) => sum + current.score, 0) / scores.length,
     ),
     peakScore: Math.max(...scores.map((current) => current.score)),
+    confidence: {
+      level: "alta",
+      score: 100,
+      reason: "Confiança alta: baixa chance de chuva.",
+    },
     highlights: ["Janela com bom score."],
     scores,
   };
@@ -156,5 +164,11 @@ describe("helpers da visualizacao de resultado", () => {
   it("formata duracao de janela no singular e plural", () => {
     expect(formatDurationHours(1)).toBe("1 hora");
     expect(formatDurationHours(2)).toBe("2 horas");
+  });
+
+  it("formata nivel de confianca da previsao", () => {
+    expect(formatForecastConfidenceLevel("alta")).toBe("Alta");
+    expect(formatForecastConfidenceLevel("media")).toBe("Média");
+    expect(formatForecastConfidenceLevel("baixa")).toBe("Baixa");
   });
 });
