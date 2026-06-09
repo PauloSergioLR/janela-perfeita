@@ -41,6 +41,13 @@ const goldenHourContext: WeatherContext = {
   minutesFromSunset: -30,
 };
 
+const nightContext: WeatherContext = {
+  ...baseContext,
+  localHour: 21,
+  isNight: true,
+  minutesFromSunset: 180,
+};
+
 function calculateWeightedScore(
   activity: Activity,
   weather: HourlyWeather,
@@ -266,6 +273,142 @@ describe("regras das atividades", () => {
     ).toBeLessThan(95);
     expect(result?.score).toBe(0);
     expect(result?.reason).toContain("reduz nitidez");
+  });
+
+  it("valoriza observar estrelas em noite limpa com boa visibilidade", () => {
+    const activity = getActivityById("observar_estrelas");
+    const clearNightWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T21:00",
+      temperature_2m: 18,
+      cloud_cover: 5,
+      cloud_cover_low: 0,
+      cloud_cover_mid: 5,
+      cloud_cover_high: 10,
+      visibility: 25000,
+      relative_humidity_2m: 50,
+    };
+    const qualityRule = activity?.rules.find(
+      (rule) => rule.factor === "qualidade_do_ceu",
+    );
+    const result = qualityRule?.evaluate(clearNightWeather, nightContext);
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, clearNightWeather, nightContext),
+    ).toBeGreaterThanOrEqual(95);
+    expect(result?.score).toBe(100);
+    expect(result?.reason).toContain("boa visibilidade");
+  });
+
+  it("penaliza observar estrelas durante o dia", () => {
+    const activity = getActivityById("observar_estrelas");
+    const clearWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      cloud_cover: 5,
+      cloud_cover_low: 0,
+      cloud_cover_mid: 5,
+      cloud_cover_high: 10,
+      visibility: 25000,
+      relative_humidity_2m: 50,
+    };
+    const nightScore = calculateWeightedScore(
+      activity!,
+      clearWeather,
+      nightContext,
+    );
+    const dayScore = calculateWeightedScore(activity!, clearWeather);
+
+    expect(activity).toBeDefined();
+    expect(dayScore).toBeLessThan(70);
+    expect(dayScore).toBeLessThan(nightScore);
+  });
+
+  it("penaliza observar estrelas com muita nuvem baixa", () => {
+    const activity = getActivityById("observar_estrelas");
+    const lowCloudWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T21:00",
+      cloud_cover: 90,
+      cloud_cover_low: 80,
+      cloud_cover_mid: 10,
+      cloud_cover_high: 10,
+      visibility: 25000,
+      relative_humidity_2m: 50,
+    };
+    const qualityRule = activity?.rules.find(
+      (rule) => rule.factor === "qualidade_do_ceu",
+    );
+    const result = qualityRule?.evaluate(lowCloudWeather, nightContext);
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, lowCloudWeather, nightContext),
+    ).toBeLessThan(70);
+    expect(result?.score).toBe(5);
+    expect(result?.reason).toContain("Nuvens baixas");
+  });
+
+  it("penaliza observar estrelas com baixa visibilidade", () => {
+    const activity = getActivityById("observar_estrelas");
+    const lowVisibilityWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T21:00",
+      cloud_cover: 5,
+      cloud_cover_low: 0,
+      cloud_cover_mid: 5,
+      cloud_cover_high: 10,
+      visibility: 1000,
+      relative_humidity_2m: 50,
+    };
+    const qualityRule = activity?.rules.find(
+      (rule) => rule.factor === "qualidade_do_ceu",
+    );
+    const result = qualityRule?.evaluate(lowVisibilityWeather, nightContext);
+
+    expect(activity).toBeDefined();
+    expect(
+      calculateWeightedScore(activity!, lowVisibilityWeather, nightContext),
+    ).toBeLessThan(70);
+    expect(result?.score).toBe(0);
+    expect(result?.reason).toContain("Baixa visibilidade");
+  });
+
+  it("penaliza observar estrelas com alta umidade e chuva", () => {
+    const activity = getActivityById("observar_estrelas");
+    const humidWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      time: "2026-06-05T21:00",
+      cloud_cover: 5,
+      cloud_cover_low: 0,
+      cloud_cover_mid: 5,
+      cloud_cover_high: 10,
+      visibility: 25000,
+      relative_humidity_2m: 92,
+    };
+    const rainyWeather: HourlyWeather = {
+      ...humidWeather,
+      relative_humidity_2m: 50,
+      precipitation: 2,
+      rain: 2,
+      weather_code: 63,
+    };
+    const qualityRule = activity?.rules.find(
+      (rule) => rule.factor === "qualidade_do_ceu",
+    );
+
+    expect(
+      calculateWeightedScore(activity!, humidWeather, nightContext),
+    ).toBeLessThan(75);
+    expect(qualityRule?.evaluate(humidWeather, nightContext).reason).toContain(
+      "Umidade",
+    );
+    expect(
+      calculateWeightedScore(activity!, rainyWeather, nightContext),
+    ).toBeLessThan(70);
+    expect(qualityRule?.evaluate(rainyWeather, nightContext).reason).toContain(
+      "Chuva prevista",
+    );
   });
 
   it("considera rain, showers e weather_code nas regras de chuva", () => {

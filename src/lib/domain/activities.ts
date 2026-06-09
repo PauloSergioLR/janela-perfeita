@@ -1,11 +1,10 @@
 import type { Activity, ActivityId } from "@/types";
 import {
-  createClearSkyRule,
   createGoldenHourRule,
   createHumidityRule,
-  createMinimumTemperatureRule,
   createNightRule,
   createPrecipitationRule,
+  createStargazingQualityRule,
   createSunsetCloudRule,
   createSunshineRule,
   createTemperatureRule,
@@ -77,14 +76,13 @@ export const ACTIVITIES = [
     id: "observar_estrelas",
     name: "Observar estrelas",
     shortDescription:
-      "Procura noite, céu limpo, ausência de chuva e temperatura mínima confortável.",
+      "Procura noite, boa visibilidade, poucas nuvens baixas e baixa umidade.",
     minRecommendedScore: 70,
     minDurationHours: 2,
     rules: [
-      createClearSkyRule(50),
-      createNightRule(20),
-      createPrecipitationRule(20),
-      createMinimumTemperatureRule(10, 12),
+      createNightRule(45),
+      createStargazingQualityRule(45),
+      createPrecipitationRule(10),
     ],
   },
   {
