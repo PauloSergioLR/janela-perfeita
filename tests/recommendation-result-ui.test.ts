@@ -111,9 +111,18 @@ describe("helpers da visualizacao de resultado", () => {
   });
 
   it("monta dados da timeline com referência de recomendação", () => {
+    const bestWindow = makeWindow([
+      makeScore("09:00", 60, [
+        makeRule("chuva", 60, 30, "Sem chuva prevista, mas há risco moderado."),
+      ]),
+    ]);
+    bestWindow.scores[0].weather = makeHourlyWeather("2030-06-05T09:00", {
+      precipitation_probability: 45,
+    });
     const data = buildTimelineData(
-      [makeScore("08:00", 59), makeScore("09:00", 60)],
+      [makeScore("08:00", 59), bestWindow.scores[0]],
       60,
+      bestWindow,
     );
 
     expect(data).toEqual([
@@ -126,6 +135,9 @@ describe("helpers da visualizacao de resultado", () => {
         hourLabel: "09:00",
         score: 60,
         isRecommended: true,
+        isBestWindow: true,
+        rainRisk: "Risco de chuva: 45%",
+        confidenceLevel: "alta",
       }),
     ]);
   });

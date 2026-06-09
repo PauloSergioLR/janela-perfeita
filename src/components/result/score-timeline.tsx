@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import {
   buildTimelineData,
+  formatForecastConfidenceLevel,
   type TimelineDatum,
 } from "@/lib/ui/recommendation-result";
 import type { Recommendation } from "@/types";
@@ -31,6 +32,10 @@ interface ScoreTimelineProps {
 }
 
 function getBarColor(datum: TimelineDatum): string {
+  if (datum.isBestWindow) {
+    return "#0f766e";
+  }
+
   if (datum.isRecommended) {
     return "#059669";
   }
@@ -57,7 +62,7 @@ function TimelineTooltip({
   }
 
   return (
-    <div className="max-w-72 rounded-lg border border-border bg-background p-3 text-sm shadow-lg">
+    <div className="max-w-80 rounded-lg border border-border bg-background p-3 text-sm shadow-lg">
       <div className="flex items-center justify-between gap-4">
         <p className="font-medium text-slate-950">{datum.hourLabel}</p>
         <Badge
@@ -68,6 +73,17 @@ function TimelineTooltip({
         </Badge>
       </div>
       <p className="mt-2 leading-5 text-muted-foreground">{datum.reason}</p>
+      <div className="mt-3 grid gap-1 text-xs text-slate-600">
+        {datum.rainRisk ? <p>{datum.rainRisk}</p> : null}
+        {datum.confidenceLevel ? (
+          <p>
+            Confiança{" "}
+            {formatForecastConfidenceLevel(
+              datum.confidenceLevel,
+            ).toLowerCase()}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -77,27 +93,42 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
   const data = buildTimelineData(
     recommendation.scores,
     minRecommendedScore,
+    recommendation.bestWindow,
   );
+  const bestWindowLabel = recommendation.bestWindow
+    ? `${recommendation.bestWindow.startLabel} - ${recommendation.bestWindow.endLabel}`
+    : null;
 
   return (
-    <Card className="rounded-lg border-border/80 shadow-sm">
+    <Card className="rounded-lg border-border/80 bg-white shadow-sm">
       <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <CardTitle>Timeline de scores</CardTitle>
           <CardDescription>
-            Avaliação hora a hora para {recommendation.activity.name}.
+            Avaliação hora a hora para {recommendation.activity.name}, com
+            referência do mínimo recomendado.
           </CardDescription>
         </div>
-        <Badge
-          variant="outline"
-          className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
-        >
-          Mínimo {minRecommendedScore}/100
-        </Badge>
+        <div className="flex flex-wrap gap-2">
+          <Badge
+            variant="outline"
+            className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
+          >
+            Mínimo {minRecommendedScore}/100
+          </Badge>
+          {bestWindowLabel ? (
+            <Badge
+              variant="outline"
+              className="h-7 border-sky-200 bg-sky-50 px-3 text-sky-900"
+            >
+              Melhor {bestWindowLabel}
+            </Badge>
+          ) : null}
+        </div>
       </CardHeader>
       <CardContent>
         {data.length > 0 ? (
-          <div className="h-72 w-full min-w-0">
+          <div className="h-80 w-full min-w-0 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
@@ -130,7 +161,11 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                   strokeDasharray="4 4"
                   ifOverflow="extendDomain"
                 />
-                <Bar dataKey="score" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+                <Bar
+                  dataKey="score"
+                  radius={[5, 5, 0, 0]}
+                  isAnimationActive={false}
+                >
                   {data.map((datum) => (
                     <Cell key={datum.time} fill={getBarColor(datum)} />
                   ))}
