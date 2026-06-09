@@ -1,4 +1,10 @@
-import type { HourScore, Recommendation, RuleResult, WindowResult } from "@/types";
+import type {
+  ForecastConfidenceLevel,
+  HourScore,
+  Recommendation,
+  RuleResult,
+  WindowResult,
+} from "@/types";
 import { formatCityLabel } from "./search-page";
 
 export interface TimelineDatum {
@@ -50,6 +56,18 @@ export function buildTimelineData(
 
 export function getAlternativeWindows(windows: WindowResult[]): WindowResult[] {
   return windows.slice(1);
+}
+
+export function formatForecastConfidenceLevel(
+  level: ForecastConfidenceLevel,
+): string {
+  const labels: Record<ForecastConfidenceLevel, string> = {
+    alta: "Alta",
+    media: "Média",
+    baixa: "Baixa",
+  };
+
+  return labels[level];
 }
 
 export function getPeakHourScore(scores: HourScore[]): HourScore | null {

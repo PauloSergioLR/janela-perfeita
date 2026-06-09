@@ -102,6 +102,7 @@ describe("tipos centrais do domínio", () => {
       time: weather.time,
       hourLabel: "10:00",
       score: 95,
+      weather,
       breakdown: [rule.evaluate(weather, context)],
     };
 
@@ -113,6 +114,11 @@ describe("tipos centrais do domínio", () => {
       durationHours: 1,
       avgScore: 95,
       peakScore: 95,
+      confidence: {
+        level: "alta",
+        score: 100,
+        reason: "Confiança alta: baixa chance de chuva.",
+      },
       highlights: ["Temperatura agradável"],
       scores: [hourScore],
     };

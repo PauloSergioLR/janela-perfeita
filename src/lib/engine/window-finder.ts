@@ -1,4 +1,5 @@
 import type { Activity, HourScore, RuleResult, WindowResult } from "@/types";
+import { calculateForecastConfidence } from "./forecast-confidence";
 import {
   addHoursToLocalIso,
   formatHourLabel,
@@ -54,6 +55,7 @@ function buildWindowResult(scores: HourScore[]): WindowResult {
     durationHours: scores.length,
     avgScore,
     peakScore,
+    confidence: calculateForecastConfidence(scores),
     highlights: buildHighlights(scores),
     scores,
   };
