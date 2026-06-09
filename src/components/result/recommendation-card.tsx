@@ -36,26 +36,26 @@ interface RecommendationCardProps {
 
 function getScoreTone(score: number): string {
   if (score >= 75) {
-    return "border-emerald-200 bg-emerald-50 text-emerald-950";
+    return "border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-50";
   }
 
   if (score >= 55) {
-    return "border-amber-200 bg-amber-50 text-amber-950";
+    return "border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-50";
   }
 
-  return "border-rose-200 bg-rose-50 text-rose-950";
+  return "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-50";
 }
 
 function getConfidenceTone(level: string): string {
   if (level === "alta") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    return "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100";
   }
 
   if (level === "media") {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100";
   }
 
-  return "border-rose-200 bg-rose-50 text-rose-900";
+  return "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
 }
 
 function sortByImpact(a: RuleResult, b: RuleResult): number {
@@ -105,8 +105,8 @@ function FactorList({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+      <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
         {icon}
         {title}
       </div>
@@ -115,9 +115,11 @@ function FactorList({
           <Badge
             key={`${rule.factor}-${rule.score}`}
             variant="outline"
-            className="min-h-8 max-w-full justify-start gap-2 whitespace-normal border-slate-200 bg-white px-3 py-1 text-left text-slate-700"
+            className="min-h-8 max-w-full justify-start gap-2 whitespace-normal border-slate-200 bg-white px-3 py-1 text-left text-slate-700 dark:border-border dark:bg-muted/30 dark:text-slate-200"
           >
-            <span className="font-medium text-slate-950">{rule.label}</span>
+            <span className="font-medium text-slate-950 dark:text-slate-50">
+              {rule.label}
+            </span>
             <span>{rule.score}/100</span>
           </Badge>
         ))}
@@ -142,8 +144,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     (fallbackScore ? getPrimaryReason(fallbackScore) : null);
 
   return (
-    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
-      <CardHeader className="gap-3 border-b border-slate-100 bg-slate-50/70">
+    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+      <CardHeader className="gap-3 border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
         <div className="flex items-start justify-between gap-3">
           <div>
             <CardTitle>Recomendação</CardTitle>
@@ -157,8 +159,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             className={cn(
               "h-7 px-3",
               bestWindow
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                : "border-amber-200 bg-amber-50 text-amber-900",
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100"
+                : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100",
             )}
           >
             {bestWindow ? (
@@ -194,12 +196,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           </div>
 
           <div className="grid gap-3">
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
                 <Timer className="size-4 text-sky-700" />
                 Janela recomendada
               </div>
-              <p className="mt-2 text-2xl font-semibold text-slate-950">
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">
                 {timeLabel}
               </p>
               <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
@@ -215,8 +217,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
 
             {bestWindow ? (
-              <div className="rounded-lg border border-slate-200 bg-white p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
                   <ShieldCheck className="size-4 text-emerald-700" />
                   Confiança da previsão
                 </div>
@@ -238,7 +240,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 </div>
               </div>
             ) : (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100">
                 Nenhuma janela atingiu o mínimo de{" "}
                 {recommendation.activity.minRecommendedScore}/100. O melhor
                 horário isolado ainda aparece para comparação.
@@ -248,8 +250,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         </div>
 
         {primaryReason ? (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-border dark:bg-muted/30">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
               <Gauge className="size-4 text-emerald-700" />
               Motivo principal
             </div>
@@ -274,17 +276,17 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
 
         {alternatives.length > 0 ? (
           <div className="space-y-3">
-            <h3 className="text-sm font-medium text-slate-950">
+            <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
               Alternativas
             </h3>
             <div className="grid gap-2">
               {alternatives.map((window) => (
                 <div
                   key={`${window.startTime}-${window.endTime}`}
-                  className="grid gap-3 rounded-lg border border-border bg-white px-3 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="grid gap-3 rounded-lg border border-border bg-white px-3 py-3 text-sm dark:bg-muted/20 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <div className="min-w-0 space-y-1">
-                    <p className="font-medium text-slate-950">
+                    <p className="font-medium text-slate-950 dark:text-slate-50">
                       {window.startLabel} - {window.endLabel}
                     </p>
                     <p className="line-clamp-2 text-muted-foreground">

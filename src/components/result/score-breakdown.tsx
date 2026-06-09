@@ -30,7 +30,7 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
   const source = getBreakdownSource(recommendation);
 
   return (
-    <Card className="rounded-lg border-border/80 shadow-sm">
+    <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
       <CardHeader>
         <div className="flex items-start gap-2">
           <SlidersHorizontal className="mt-0.5 size-4 shrink-0 text-sky-700" />
@@ -50,7 +50,9 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-950">{rule.label}</p>
+                    <p className="font-medium text-slate-950 dark:text-slate-50">
+                      {rule.label}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       Peso {rule.weight}
                     </p>

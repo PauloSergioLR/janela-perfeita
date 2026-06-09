@@ -16,7 +16,7 @@ export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
           href="https://open-meteo.com/"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-sky-800 underline-offset-4 hover:underline"
+          className="inline-flex items-center gap-1 font-medium text-sky-800 underline-offset-4 hover:underline dark:text-sky-300"
         >
           Open-Meteo
           <ExternalLink className="size-3" />
