@@ -64,7 +64,9 @@ function TimelineTooltip({
   return (
     <div className="max-w-80 rounded-lg border border-border bg-background p-3 text-sm shadow-lg">
       <div className="flex items-center justify-between gap-4">
-        <p className="font-medium text-slate-950">{datum.hourLabel}</p>
+        <p className="font-medium text-slate-950 dark:text-slate-50">
+          {datum.hourLabel}
+        </p>
         <Badge
           variant="outline"
           className="h-6 border-slate-200 bg-slate-50 px-2 text-slate-900"
@@ -73,7 +75,7 @@ function TimelineTooltip({
         </Badge>
       </div>
       <p className="mt-2 leading-5 text-muted-foreground">{datum.reason}</p>
-      <div className="mt-3 grid gap-1 text-xs text-slate-600">
+      <div className="mt-3 grid gap-1 text-xs text-slate-600 dark:text-slate-300">
         {datum.rainRisk ? <p>{datum.rainRisk}</p> : null}
         {datum.confidenceLevel ? (
           <p>
@@ -100,7 +102,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
     : null;
 
   return (
-    <Card className="rounded-lg border-border/80 bg-white shadow-sm">
+    <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
       <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <CardTitle>Timeline de scores</CardTitle>
@@ -134,7 +136,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                 data={data}
                 margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
               >
-                <CartesianGrid stroke="#e5e7eb" vertical={false} />
+                <CartesianGrid stroke="var(--border)" vertical={false} />
                 <XAxis
                   dataKey="hourLabel"
                   fontSize={12}
@@ -142,6 +144,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                   minTickGap={8}
                   tickLine={false}
                   axisLine={false}
+                  tick={{ fill: "var(--muted-foreground)" }}
                 />
                 <YAxis
                   domain={[0, 100]}
@@ -150,6 +153,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                   tickLine={false}
                   axisLine={false}
                   width={36}
+                  tick={{ fill: "var(--muted-foreground)" }}
                 />
                 <Tooltip
                   content={(props) => <TimelineTooltip {...props} />}
@@ -157,7 +161,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                 />
                 <ReferenceLine
                   y={minRecommendedScore}
-                  stroke="#047857"
+                  stroke="var(--primary)"
                   strokeDasharray="4 4"
                   ifOverflow="extendDomain"
                 />

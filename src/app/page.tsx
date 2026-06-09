@@ -12,6 +12,7 @@ import {
   Loader2,
   MapPin,
   Moon,
+  RefreshCw,
   Route,
   Search,
 } from "lucide-react";
@@ -212,8 +213,20 @@ export default function Home() {
     });
   }
 
+  function handleRecommendationRetry() {
+    if (!canSearch || selectedCity === null || selectedActivityId === "") {
+      return;
+    }
+
+    recommendationMutation.mutate({
+      city: selectedCity,
+      activityId: selectedActivityId,
+      date: selectedDate,
+    });
+  }
+
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#eef6f5_100%)] px-4 py-5 text-foreground sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#eef6f5_100%)] px-4 py-5 text-foreground dark:bg-[linear-gradient(180deg,#101b2b_0%,#172339_52%,#102525_100%)] sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <header className="grid gap-4 border-b border-border pb-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="space-y-3">
@@ -232,35 +245,41 @@ export default function Home() {
               </Badge>
             </div>
             <div className="max-w-3xl space-y-2">
-              <h1 className="text-3xl font-semibold tracking-normal text-slate-950 sm:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-5xl">
                 Janela Perfeita
               </h1>
-              <p className="text-sm leading-6 text-slate-600 sm:text-base">
+              <p className="text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
                 Um painel de decisão para escolher quando correr, caminhar,
                 pedalar, fotografar o pôr do sol, observar estrelas ou lavar o
                 carro.
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-2 text-center shadow-sm">
-            <div className="rounded-md bg-slate-50 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950">6</p>
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-2 text-center shadow-sm dark:border-border dark:bg-card">
+            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+                6
+              </p>
               <p className="text-xs text-muted-foreground">atividades</p>
             </div>
-            <div className="rounded-md bg-slate-50 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950">7</p>
+            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+                7
+              </p>
               <p className="text-xs text-muted-foreground">dias</p>
             </div>
-            <div className="rounded-md bg-slate-50 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950">0-100</p>
+            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+                0-100
+              </p>
               <p className="text-xs text-muted-foreground">score</p>
             </div>
           </div>
         </header>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(390px,0.95fr)]">
-          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
-            <CardHeader className="border-b border-slate-100 bg-slate-50/70">
+          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
               <CardTitle>Planejar janela</CardTitle>
               <CardDescription>
                 Cidade, atividade e data definem a recomendação do dia.
@@ -283,31 +302,62 @@ export default function Home() {
                       placeholder="Ex.: Criciúma"
                       className="h-11 rounded-md pl-8"
                       autoComplete="off"
+                      role="combobox"
+                      aria-expanded={cityQueryEnabled}
+                      aria-controls="city-suggestions"
                     />
                     {cityQueryEnabled ? (
                       <div
+                        id="city-suggestions"
                         role="listbox"
                         className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
                       >
                         {cityQueryResult.isFetching ? (
-                          <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground">
+                          <div className="space-y-2 px-3 py-2 text-muted-foreground">
+                            <div className="flex items-center gap-2">
                             <Loader2 className="size-4 animate-spin" />
                             Buscando cidades...
+                            </div>
+                            <div className="grid gap-1">
+                              <span className="h-2 rounded-full bg-muted" />
+                              <span className="h-2 w-2/3 rounded-full bg-muted" />
+                            </div>
                           </div>
                         ) : null}
 
                         {cityQueryResult.isError ? (
-                          <div className="flex items-center gap-2 px-3 py-2 text-destructive">
-                            <AlertCircle className="size-4" />
-                            {(cityQueryResult.error as Error).message}
+                          <div className="space-y-2 px-3 py-2 text-destructive">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="size-4" />
+                              {(cityQueryResult.error as Error).message}
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-8"
+                              onClick={() => void cityQueryResult.refetch()}
+                            >
+                              <RefreshCw className="size-3" />
+                              Tentar novamente
+                            </Button>
                           </div>
                         ) : null}
 
                         {!cityQueryResult.isFetching &&
                         !cityQueryResult.isError &&
                         cityQueryResult.data?.length === 0 ? (
-                          <div className="px-3 py-2 text-muted-foreground">
-                            Nenhuma cidade encontrada. Tente ajustar o nome.
+                          <div className="space-y-2 px-3 py-2 text-muted-foreground">
+                            <p>Nenhuma cidade encontrada. Tente ajustar o nome.</p>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-8"
+                              onClick={() => handleCityQueryChange("")}
+                            >
+                              Limpar busca
+                            </Button>
                           </div>
                         ) : null}
 
@@ -317,7 +367,7 @@ export default function Home() {
                             type="button"
                             role="option"
                             aria-selected={false}
-                            className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-muted focus:bg-muted focus:outline-none"
+                            className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-muted focus:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             onClick={() => handleCitySelect(city)}
                           >
                             <MapPin className="mt-0.5 size-4 shrink-0 text-sky-700" />
@@ -340,7 +390,11 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <Label>Atividade</Label>
-                  <div className="grid gap-2 sm:grid-cols-2">
+                  <div
+                    className="grid gap-2 sm:grid-cols-2"
+                    role="radiogroup"
+                    aria-label="Atividade"
+                  >
                     {activities.map((activity) => {
                       const visual = ACTIVITY_VISUALS[activity.id];
                       const Icon = visual.icon;
@@ -353,10 +407,11 @@ export default function Home() {
                           className={cn(
                             "min-h-28 rounded-lg border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
                             selected
-                              ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm"
+                              ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-50"
                               : "border-border",
                           )}
-                          aria-pressed={selected}
+                          role="radio"
+                          aria-checked={selected}
                           onClick={() => {
                             setSelectedActivityId(activity.id);
                             resetRecommendationState();
@@ -366,7 +421,7 @@ export default function Home() {
                             <span
                               className={cn(
                                 "flex size-10 shrink-0 items-center justify-center rounded-md bg-muted",
-                                selected ? "bg-emerald-100" : "",
+                                selected ? "bg-emerald-100 dark:bg-emerald-900/50" : "",
                               )}
                             >
                               <Icon
@@ -420,6 +475,7 @@ export default function Home() {
                               ? "border-sky-600 bg-sky-50 text-sky-900"
                               : "border-border bg-background text-muted-foreground",
                           )}
+                          aria-pressed={selectedDate === option.value}
                           onClick={() => {
                             setSelectedDate(option.value);
                             resetRecommendationState();
@@ -455,8 +511,8 @@ export default function Home() {
             {recommendationMutation.isSuccess && recommendation ? (
               <RecommendationCard recommendation={recommendation} />
             ) : (
-              <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
-                <CardHeader className="border-b border-slate-100 bg-slate-50/70">
+              <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
                     {selectedActivity
@@ -464,30 +520,63 @@ export default function Home() {
                       : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-5">
+                <CardContent className="p-4 sm:p-5" aria-live="polite">
                   {recommendationMutation.isIdle ? (
-                    <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
-                      <Clock3 className="mt-0.5 size-4 shrink-0" />
-                      <span>
-                        Nenhuma busca executada. Preencha os campos para
-                        receber uma recomendação.
-                      </span>
+                    <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
+                      <div className="flex items-start gap-3">
+                        <Clock3 className="mt-0.5 size-4 shrink-0" />
+                        <span>
+                          Nenhuma busca executada. Preencha os campos para
+                          receber uma recomendação.
+                        </span>
+                      </div>
+                      <div className="grid gap-2 text-xs sm:grid-cols-3">
+                        <span className="rounded-md bg-background px-3 py-2">
+                          1. Cidade
+                        </span>
+                        <span className="rounded-md bg-background px-3 py-2">
+                          2. Atividade
+                        </span>
+                        <span className="rounded-md bg-background px-3 py-2">
+                          3. Data
+                        </span>
+                      </div>
                     </div>
                   ) : null}
 
                   {recommendationMutation.isPending ? (
-                    <div className="flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
-                      <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
-                      <span>Calculando notas e melhores janelas...</span>
+                    <div className="space-y-4 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100">
+                      <div className="flex items-start gap-3">
+                        <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
+                        <span>Calculando notas e melhores janelas...</span>
+                      </div>
+                      <div className="grid gap-2">
+                        <span className="h-3 rounded-full bg-sky-100 dark:bg-sky-900/70" />
+                        <span className="h-3 w-4/5 rounded-full bg-sky-100 dark:bg-sky-900/70" />
+                        <span className="h-3 w-3/5 rounded-full bg-sky-100 dark:bg-sky-900/70" />
+                      </div>
                     </div>
                   ) : null}
 
                   {recommendationMutation.isError ? (
-                    <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-                      <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                      <span>
-                        {(recommendationMutation.error as Error).message}
-                      </span>
+                    <div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                        <span>
+                          {(recommendationMutation.error as Error).message}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-9"
+                        disabled={!canSearch || recommendationMutation.isPending}
+                        onClick={handleRecommendationRetry}
+                      >
+                        <RefreshCw className="size-3" />
+                        Tentar novamente
+                      </Button>
                     </div>
                   ) : null}
                 </CardContent>

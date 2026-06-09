@@ -133,6 +133,18 @@ Interpretação:
 - Ícones precisam apoiar leitura, não substituir texto crítico.
 - Estados de foco devem continuar visíveis.
 
+## Tema Claro e Escuro
+
+- O tema claro deve sugerir manhã, céu limpo e decisão rápida.
+- O tema escuro deve sugerir noite, observação e leitura técnica.
+- A preferência do sistema pode definir o tema automaticamente.
+- Tokens de shadcn/ui continuam sendo a base de cor, borda, card, popover,
+  input, ring e estados.
+- Componentes principais devem evitar depender apenas de classes fixas como
+  `bg-white` ou `text-slate-950`; quando usadas, devem ter equivalente `dark:`.
+- O contraste de badges, botões, timeline, inputs e cards deve permanecer claro
+  nos dois temas.
+
 ## Restrições
 
 - Não quebrar shadcn/ui.
