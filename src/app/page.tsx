@@ -107,7 +107,7 @@ async function readApiResponse<T>(response: Response): Promise<T> {
       "message" in payload.error &&
       typeof payload.error.message === "string"
         ? payload.error.message
-        : "Nao foi possivel concluir a requisicao.";
+        : "Não foi possível concluir a requisição.";
 
     throw new Error(message);
   }
@@ -222,7 +222,7 @@ export default function Home() {
             </h1>
             <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
               Encontre a melhor janela do dia para atividades ao ar livre com
-              base na previsao horaria.
+              base na previsão horária.
             </p>
           </div>
           <Badge
@@ -238,7 +238,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Busca</CardTitle>
               <CardDescription>
-                Cidade, atividade e data para gerar a recomendacao.
+                Escolha cidade, atividade e data para gerar a recomendação.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -255,7 +255,7 @@ export default function Home() {
                       onChange={(event) =>
                         handleCityQueryChange(event.target.value)
                       }
-                      placeholder="Ex.: Criciuma"
+                      placeholder="Ex.: Criciúma"
                       className="h-10 pl-8"
                       autoComplete="off"
                     />
@@ -267,7 +267,7 @@ export default function Home() {
                         {cityQueryResult.isFetching ? (
                           <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground">
                             <Loader2 className="size-4 animate-spin" />
-                            Buscando cidades
+                            Buscando cidades...
                           </div>
                         ) : null}
 
@@ -282,7 +282,7 @@ export default function Home() {
                         !cityQueryResult.isError &&
                         cityQueryResult.data?.length === 0 ? (
                           <div className="px-3 py-2 text-muted-foreground">
-                            Nenhuma cidade encontrada.
+                            Nenhuma cidade encontrada. Tente ajustar o nome.
                           </div>
                         ) : null}
 
@@ -418,7 +418,7 @@ export default function Home() {
                       <Search className="size-4" />
                     )}
                     {recommendationMutation.isPending
-                      ? "Calculando"
+                      ? "Calculando..."
                       : "Encontrar janela"}
                   </Button>
                 </div>
@@ -436,21 +436,24 @@ export default function Home() {
                   <CardDescription>
                     {selectedActivity
                       ? `${selectedActivity.name} em ${selectedDate || "data"}`
-                      : "Aguardando selecao"}
+                      : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {recommendationMutation.isIdle ? (
                     <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                       <Clock3 className="mt-0.5 size-4 shrink-0" />
-                      <span>Nenhuma busca executada nesta sessao.</span>
+                      <span>
+                        Nenhuma busca executada nesta sessão. Preencha os campos
+                        para receber uma recomendação.
+                      </span>
                     </div>
                   ) : null}
 
                   {recommendationMutation.isPending ? (
                     <div className="flex items-start gap-3 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
                       <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
-                      <span>Calculando scores e melhores janelas.</span>
+                      <span>Calculando notas e melhores janelas...</span>
                     </div>
                   ) : null}
 

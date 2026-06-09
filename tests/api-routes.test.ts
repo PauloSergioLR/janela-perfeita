@@ -34,9 +34,20 @@ function makeWeather(time: string): HourlyWeather {
   return {
     time,
     temperature_2m: 19,
+    apparent_temperature: 19,
     precipitation: 0,
+    precipitation_probability: 0,
+    rain: 0,
+    showers: 0,
+    weather_code: 0,
     wind_speed_10m: 8,
+    wind_gusts_10m: 12,
     cloud_cover: 30,
+    cloud_cover_low: 10,
+    cloud_cover_mid: 35,
+    cloud_cover_high: 35,
+    visibility: 15000,
+    sunshine_duration: 2400,
     uv_index: 2,
     relative_humidity_2m: 60,
   };
@@ -62,7 +73,7 @@ describe("rotas internas da API", () => {
     });
   });
 
-  it("GET /api/geocoding valida query com minimo de 3 caracteres", async () => {
+  it("GET /api/geocoding valida query com mínimo de 3 caracteres", async () => {
     const { GET } = await import("@/app/api/geocoding/route");
     const response = await GET(new Request("http://localhost/api/geocoding?q=cr"));
     const payload = await response.json();
@@ -95,7 +106,7 @@ describe("rotas internas da API", () => {
 
     expect(response.status).toBe(502);
     expect(payload.error).toEqual({
-      message: "Nao foi possivel buscar cidades agora.",
+      message: "Não foi possível buscar cidades agora.",
     });
     expect(payload.stack).toBeUndefined();
   });
@@ -106,7 +117,7 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(400);
-    expect(payload.error.message).toBe("Dados invalidos para gerar recomendacao.");
+    expect(payload.error.message).toBe("Dados inválidos para gerar recomendação.");
     expect(payload.stack).toBeUndefined();
   });
 
@@ -122,10 +133,10 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(404);
-    expect(payload.error.message).toBe("Atividade nao encontrada.");
+    expect(payload.error.message).toBe("Atividade não encontrada.");
   });
 
-  it("POST /api/recommendation retorna 404 quando cidade nao existe", async () => {
+  it("POST /api/recommendation retorna 404 quando cidade não existe", async () => {
     getCitySuggestionsMock.mockResolvedValueOnce([]);
 
     const { POST } = await import("@/app/api/recommendation/route");
@@ -139,7 +150,7 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(404);
-    expect(payload.error.message).toBe("Cidade nao encontrada.");
+    expect(payload.error.message).toBe("Cidade não encontrada.");
   });
 
   it("POST /api/recommendation retorna 502 em falha de forecast", async () => {
@@ -156,7 +167,7 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(502);
-    expect(payload.error.message).toBe("Nao foi possivel buscar a previsao agora.");
+    expect(payload.error.message).toBe("Não foi possível buscar a previsão agora.");
   });
 
   it("POST /api/recommendation orquestra cidade, forecast, atividade, score e janelas", async () => {

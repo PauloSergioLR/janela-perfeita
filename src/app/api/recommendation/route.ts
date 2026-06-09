@@ -36,7 +36,7 @@ const recommendationRequestSchema = z
     cityQuery: z.string().trim().min(3).optional(),
   })
   .refine((data) => data.city !== undefined || data.cityQuery !== undefined, {
-    message: "Informe uma cidade para gerar a recomendacao.",
+    message: "Informe uma cidade para gerar a recomendação.",
     path: ["city"],
   });
 
@@ -79,7 +79,7 @@ async function readRequestBody(request: Request): Promise<unknown> {
   try {
     return await request.json();
   } catch {
-    throw new ApiRouteError(400, "JSON invalido no corpo da requisicao.");
+    throw new ApiRouteError(400, "JSON inválido no corpo da requisição.");
   }
 }
 
@@ -93,7 +93,7 @@ async function resolveCity(city: City | undefined, cityQuery: string | undefined
     const [firstCity] = cities;
 
     if (!firstCity) {
-      throw new ApiRouteError(404, "Cidade nao encontrada.");
+      throw new ApiRouteError(404, "Cidade não encontrada.");
     }
 
     return firstCity;
@@ -102,7 +102,7 @@ async function resolveCity(city: City | undefined, cityQuery: string | undefined
       throw error;
     }
 
-    throw new ApiRouteError(502, "Nao foi possivel buscar a cidade agora.");
+    throw new ApiRouteError(502, "Não foi possível buscar a cidade agora.");
   }
 }
 
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       : undefined;
 
     if (!activity) {
-      throw new ApiRouteError(404, "Atividade nao encontrada.");
+      throw new ApiRouteError(404, "Atividade não encontrada.");
     }
 
     const city = await resolveCity(body.city, body.cityQuery);
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       lon: city.coordinates.lon,
       date: body.date,
     }).catch(() => {
-      throw new ApiRouteError(502, "Nao foi possivel buscar a previsao agora.");
+      throw new ApiRouteError(502, "Não foi possível buscar a previsão agora.");
     });
     const generatedAtDate = new Date();
     const scores = calculateDayScores({
@@ -143,20 +143,20 @@ export async function POST(request: Request) {
       windows,
       bestWindow: windows[0] ?? null,
       disclaimer:
-        "Recomendacao estimada com base na previsao meteorologica da Open-Meteo; nao substitui avaliacao local das condicoes.",
+        "Recomendação estimada com base na previsão meteorológica da Open-Meteo; não substitui avaliação local das condições.",
     };
 
     return NextResponse.json({ recommendation });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return jsonError(400, "Dados invalidos para gerar recomendacao.");
+      return jsonError(400, "Dados inválidos para gerar recomendação.");
     }
 
     if (error instanceof ApiRouteError) {
       return jsonError(error.status, error.message);
     }
 
-    return jsonError(500, "Erro inesperado ao gerar recomendacao.");
+    return jsonError(500, "Erro inesperado ao gerar recomendação.");
   }
 }
 

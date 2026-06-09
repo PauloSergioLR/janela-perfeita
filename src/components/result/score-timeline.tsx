@@ -85,14 +85,14 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
         <div>
           <CardTitle>Timeline de scores</CardTitle>
           <CardDescription>
-            Avaliacao hora a hora para {recommendation.activity.name}.
+            Avaliação hora a hora para {recommendation.activity.name}.
           </CardDescription>
         </div>
         <Badge
           variant="outline"
           className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
         >
-          Minimo {minRecommendedScore}/100
+          Mínimo {minRecommendedScore}/100
         </Badge>
       </CardHeader>
       <CardContent>
@@ -140,7 +140,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-            Sem scores disponiveis para montar a timeline.
+            Sem dados disponíveis para montar a timeline.
           </div>
         )}
       </CardContent>

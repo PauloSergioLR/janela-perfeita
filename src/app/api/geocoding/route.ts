@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ cities });
   } catch {
-    return jsonError(502, "Nao foi possivel buscar cidades agora.");
+    return jsonError(502, "Não foi possível buscar cidades agora.");
   }
 }
 

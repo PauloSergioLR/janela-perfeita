@@ -7,9 +7,20 @@ export const openMeteoForecastFixture = {
   hourly: {
     time: forecastHours,
     temperature_2m: forecastHours.map(() => 20),
+    apparent_temperature: forecastHours.map(() => 20),
     precipitation: forecastHours.map(() => 0),
+    precipitation_probability: forecastHours.map(() => 0),
+    rain: forecastHours.map(() => 0),
+    showers: forecastHours.map(() => 0),
+    weather_code: forecastHours.map(() => 0),
     wind_speed_10m: forecastHours.map(() => 10),
+    wind_gusts_10m: forecastHours.map(() => 14),
     cloud_cover: forecastHours.map(() => 40),
+    cloud_cover_low: forecastHours.map(() => 15),
+    cloud_cover_mid: forecastHours.map(() => 45),
+    cloud_cover_high: forecastHours.map(() => 45),
+    visibility: forecastHours.map(() => 15000),
+    sunshine_duration: forecastHours.map(() => 2400),
     uv_index: forecastHours.map(() => 2),
     relative_humidity_2m: forecastHours.map(() => 60),
   },
@@ -56,5 +67,5 @@ export const invalidOpenMeteoGeocodingFixture = {
 
 export const openMeteoErrorFixture = {
   error: true,
-  reason: "Parametro invalido.",
+  reason: "Parâmetro inválido.",
 };

@@ -27,9 +27,20 @@ export interface City {
 export interface HourlyWeather {
   time: string;
   temperature_2m: number;
+  apparent_temperature: number;
   precipitation: number;
+  precipitation_probability: number;
+  rain: number;
+  showers: number;
+  weather_code: number;
   wind_speed_10m: number;
+  wind_gusts_10m: number;
   cloud_cover: number;
+  cloud_cover_low: number;
+  cloud_cover_mid: number;
+  cloud_cover_high: number;
+  visibility: number;
+  sunshine_duration: number;
   uv_index: number;
   relative_humidity_2m: number;
 }

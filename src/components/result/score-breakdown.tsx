@@ -76,7 +76,7 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
           </ul>
         ) : (
           <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-            Sem fatores disponiveis para esta busca.
+            Sem fatores disponíveis para esta busca.
           </div>
         )}
       </CardContent>

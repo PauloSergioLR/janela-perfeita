@@ -1,14 +1,16 @@
 import type { Activity, ActivityId } from "@/types";
 import {
-  createClearSkyRule,
-  createCloudCoverRangeRule,
   createGoldenHourRule,
   createHumidityRule,
-  createMinimumTemperatureRule,
   createNightRule,
   createPrecipitationRule,
+  createStargazingQualityRule,
+  createSunsetCloudRule,
+  createSunshineRule,
   createTemperatureRule,
   createUvRule,
+  createVisibilityRule,
+  createWindGustRule,
   createWindRule,
 } from "./activity-rules";
 
@@ -21,7 +23,7 @@ export const ACTIVITIES = [
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createTemperatureRule(40, 16, 22),
+      createTemperatureRule(40, 16, 22, { useApparentTemperature: true }),
       createPrecipitationRule(30),
       createWindRule(20, 15),
       createUvRule(10, 3),
@@ -35,7 +37,7 @@ export const ACTIVITIES = [
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createTemperatureRule(40, 15, 25),
+      createTemperatureRule(40, 15, 25, { useApparentTemperature: true }),
       createPrecipitationRule(35),
       createWindRule(25, 25),
     ],
@@ -49,8 +51,9 @@ export const ACTIVITIES = [
     minDurationHours: 1,
     rules: [
       createPrecipitationRule(35),
-      createTemperatureRule(30, 15, 25),
-      createWindRule(25, 20),
+      createTemperatureRule(25, 15, 25),
+      createWindRule(15, 20),
+      createWindGustRule(15, 30),
       createUvRule(10, 5),
     ],
   },
@@ -58,28 +61,28 @@ export const ACTIVITIES = [
     id: "fotografar_por_do_sol",
     name: "Fotografar pôr do sol",
     shortDescription:
-      "Valoriza golden hour, nuvens interessantes, pouca chuva e umidade menor.",
+      "Valoriza a hora dourada, nuvens interessantes, pouca chuva e boa visibilidade.",
     minRecommendedScore: 60,
     minDurationHours: 1,
     rules: [
-      createGoldenHourRule(40),
-      createCloudCoverRangeRule(30, 20, 60),
-      createPrecipitationRule(20),
-      createHumidityRule(10),
+      createGoldenHourRule(35),
+      createSunsetCloudRule(25),
+      createVisibilityRule(20),
+      createPrecipitationRule(15),
+      createSunshineRule(5),
     ],
   },
   {
     id: "observar_estrelas",
     name: "Observar estrelas",
     shortDescription:
-      "Procura noite, céu limpo, ausência de chuva e temperatura mínima confortável.",
+      "Procura noite, boa visibilidade, poucas nuvens baixas e baixa umidade.",
     minRecommendedScore: 70,
     minDurationHours: 2,
     rules: [
-      createClearSkyRule(50),
-      createNightRule(20),
-      createPrecipitationRule(20),
-      createMinimumTemperatureRule(10, 12),
+      createNightRule(45),
+      createStargazingQualityRule(45),
+      createPrecipitationRule(10),
     ],
   },
   {

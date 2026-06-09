@@ -60,6 +60,8 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
 - Usar commit Conventional Commit, por exemplo:
   `docs: atualiza contexto agents`.
 - Não misturar atualização de contexto com commits de feature, teste ou correção.
+- Qualquer regra nova dita pelo usuário durante a sessão deve ser registrada no
+  `AGENTS.md` para continuidade em sessões futuras.
 
 ## GitHub
 
@@ -82,6 +84,32 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
   - #8 Resultado visual e timeline - concluída.
   - #9 Testes e qualidade - concluída.
   - #10 PWA, README e deploy - concluída.
+  - #32 T11 - Polimento de textos em PT-BR - concluída.
+  - #33 T12 - Adicionar probabilidade de chuva e weather code - concluída.
+  - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - concluída.
+  - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
+  - #36 T15 - Melhorar score de fotografia de pôr do sol - aberta em `Todo`.
+  - #37 T16 - Melhorar score de observar estrelas - aberta em `Todo`.
+  - #38 T17 - Criar score de confiança da previsão - aberta em `Todo`.
+  - #39 T18 - Criar design direction com Taste Skill - aberta em `Todo`.
+  - #40 T19 - Redesign da home com Taste Skill - aberta em `Todo`.
+  - #41 T20 - Redesign do card de resultado - aberta em `Todo`.
+  - #42 T21 - Melhorar timeline de score - aberta em `Todo`.
+  - #43 T22 - Melhorar estados de loading, empty e error - aberta em `Todo`.
+  - #44 T23 - Polimento mobile e acessibilidade - aberta em `Todo`.
+  - #45 T24 - Tema visual claro/escuro - aberta em `Todo`.
+  - #46 T25 - Modo inverso: o que fazer hoje? - aberta em `Todo`.
+  - #47 T26 - Comparar melhores dias da semana - aberta em `Todo`.
+  - #48 T27 - Compartilhar resultado - aberta em `Todo`.
+  - #49 T28 - Histórico local de buscas - aberta em `Todo`.
+  - #50 T29 - Criar camada WeatherProvider - aberta em `Todo`.
+  - #51 T30 - Comparar modelos da Open-Meteo - aberta em `Todo`.
+  - #52 T31 - Adicionar segunda API meteorológica opcional - aberta em `Todo`.
+  - #53 T32 - Backtesting de acurácia - aberta em `Todo`.
+  - #54 T33 - Playwright para fluxo principal - aberta em `Todo`.
+  - #55 T34 - Modo demo com fixtures - aberta em `Todo`.
+  - #56 T35 - Página técnica explicando o score - aberta em `Todo`.
+  - #57 T36 - Atualizar README com evolução do projeto - aberta em `Todo`.
 
 ## Validação obrigatória
 
@@ -341,10 +369,69 @@ Concluído:
 - GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
   registrada nas PRs antes do merge ou antes de manter a PR aberta.
 - Vercel CLI usado via `C:\Program Files\Volta\npx.cmd --yes vercel@latest`.
+- Roteiro de continuação recebido em
+  `C:\Users\lll\Downloads\Janela_Perfeita_Roteiro_Continuacao_Melhorias.md`.
+- Issues pós-MVP #32 a #57 criadas a partir do roteiro e adicionadas ao Project
+  `Janela Perfeita` com status `Todo`.
+- Issue #32 concluída na branch `feature/10-copy-polish-ptbr`.
+- PR #59 (`feature/10-copy-polish-ptbr` -> `develop`) mergeada com CI verde.
+- Commit principal da T11:
+  - `5669143 fix: melhora textos e mensagens da interface`
+- Entrega da T11:
+  - acentuação e padronização de textos visíveis da UI;
+  - mensagens de erro, loading e empty states mais claras;
+  - metadata e disclaimers em PT-BR correto;
+  - rótulo visível `Golden hour` substituído por `Hora dourada`, preservando o
+    identificador técnico `golden_hour`;
+  - testes atualizados para as mensagens corrigidas.
+- Issue #32 fechada e card movido para `Done`.
+- Validações locais executadas na T11:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
+- Issue #33 concluída na branch `feature/11-precipitation-probability`.
+- PR #61 (`feature/11-precipitation-probability` -> `develop`) mergeada com CI
+  verde.
+- Commit principal da T12:
+  - `8fc84ad feat: considera probabilidade de chuva nas recomendações`
+- Entrega da T12:
+  - `HourlyWeather`, schemas e serviço Open-Meteo atualizados com
+    `precipitation_probability`, `rain`, `showers` e `weather_code`;
+  - regras de chuva passam a considerar acumulado, probabilidade, chuva,
+    pancadas e códigos meteorológicos;
+  - motivos em português cobrem risco moderado, pancadas, garoa, tempestade e
+    precipitação congelada;
+  - fixtures e testes atualizados; cobertura subiu para Statements 95.62%,
+    Branches 83.76%, Functions 93.4%, Lines 96.21%.
+- Issue #33 fechada e card movido para `Done`.
+- Validações locais executadas na T12:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
+- Issue #34 concluída na branch `feature/12-lavar-carro-janela-seca`.
+- PR #63 (`feature/12-lavar-carro-janela-seca` -> `develop`) mergeada com CI
+  verde.
+- Commit principal da T13:
+  - `835e591 feat: avalia chuva futura para lavar carro`
+- Entrega da T13:
+  - `calculateDayScores` aplica penalidade específica para `lavar_carro` quando
+    a regra de chuva detecta risco relevante nas próximas 3 horas;
+  - breakdown recebe fator `chuva_futura` com motivo em português;
+  - cenário 14h/15h seco e 16h chuva forte coberto por teste, sem recomendar
+    janela 14h-16h como ideal.
+- Issue #34 fechada e card movido para `Done`.
+- Validações locais executadas na T13:
+  - `npm run lint`
+  - `npm test`
+  - `npm run test:coverage`
+  - `npm run build`
 
 ## Próxima etapa recomendada
 
-MVP concluído.
+MVP concluído. Continuação pós-MVP em andamento com issues #35 a #57 abertas no
+Project.
 
 Branches principais:
 
@@ -359,10 +446,9 @@ Produção atual:
 https://janela-perfeita.vercel.app
 ```
 
-Próximos passos possíveis:
+Próximos passos recomendados:
 
-- Fazer revisão manual final no deploy público.
-- Criar novas issues apenas se surgirem ajustes pós-MVP.
+- Iniciar pela issue #35, T14 - Adicionar sensação térmica e rajadas de vento.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
