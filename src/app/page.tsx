@@ -213,36 +213,61 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_42%,#f8fafc_100%)] px-4 py-6 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-normal text-slate-950 sm:text-4xl">
-              Janela Perfeita
-            </h1>
-            <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
-              Encontre a melhor janela do dia para atividades ao ar livre com
-              base na previsão horária.
-            </p>
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#eef6f5_100%)] px-4 py-5 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <header className="grid gap-4 border-b border-border pb-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="outline"
+                className="h-7 border-sky-200 bg-sky-50 px-3 text-sky-900"
+              >
+                Dashboard meteorológico
+              </Badge>
+              <Badge
+                variant="outline"
+                className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
+              >
+                Open-Meteo
+              </Badge>
+            </div>
+            <div className="max-w-3xl space-y-2">
+              <h1 className="text-3xl font-semibold tracking-normal text-slate-950 sm:text-4xl lg:text-5xl">
+                Janela Perfeita
+              </h1>
+              <p className="text-sm leading-6 text-slate-600 sm:text-base">
+                Um painel de decisão para escolher quando correr, caminhar,
+                pedalar, fotografar o pôr do sol, observar estrelas ou lavar o
+                carro.
+              </p>
+            </div>
           </div>
-          <Badge
-            variant="outline"
-            className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
-          >
-            MVP
-          </Badge>
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-2 text-center shadow-sm">
+            <div className="rounded-md bg-slate-50 px-3 py-2">
+              <p className="text-lg font-semibold text-slate-950">6</p>
+              <p className="text-xs text-muted-foreground">atividades</p>
+            </div>
+            <div className="rounded-md bg-slate-50 px-3 py-2">
+              <p className="text-lg font-semibold text-slate-950">7</p>
+              <p className="text-xs text-muted-foreground">dias</p>
+            </div>
+            <div className="rounded-md bg-slate-50 px-3 py-2">
+              <p className="text-lg font-semibold text-slate-950">0-100</p>
+              <p className="text-xs text-muted-foreground">score</p>
+            </div>
+          </div>
         </header>
 
-        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
-          <Card className="rounded-lg border-border/80 shadow-sm">
-            <CardHeader>
-              <CardTitle>Busca</CardTitle>
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(390px,0.95fr)]">
+          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/70">
+              <CardTitle>Planejar janela</CardTitle>
               <CardDescription>
-                Escolha cidade, atividade e data para gerar a recomendação.
+                Cidade, atividade e data definem a recomendação do dia.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <CardContent className="p-4 sm:p-5">
+              <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
                   <div className="relative">
@@ -256,7 +281,7 @@ export default function Home() {
                         handleCityQueryChange(event.target.value)
                       }
                       placeholder="Ex.: Criciúma"
-                      className="h-10 pl-8"
+                      className="h-11 rounded-md pl-8"
                       autoComplete="off"
                     />
                     {cityQueryEnabled ? (
@@ -326,9 +351,9 @@ export default function Home() {
                           key={activity.id}
                           type="button"
                           className={cn(
-                            "min-h-24 rounded-lg border bg-background p-3 text-left transition hover:border-foreground/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                            "min-h-28 rounded-lg border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
                             selected
-                              ? "border-emerald-600 bg-emerald-50 text-emerald-950"
+                              ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm"
                               : "border-border",
                           )}
                           aria-pressed={selected}
@@ -340,7 +365,7 @@ export default function Home() {
                           <span className="flex items-start gap-3">
                             <span
                               className={cn(
-                                "flex size-9 shrink-0 items-center justify-center rounded-md bg-muted",
+                                "flex size-10 shrink-0 items-center justify-center rounded-md bg-muted",
                                 selected ? "bg-emerald-100" : "",
                               )}
                             >
@@ -381,7 +406,7 @@ export default function Home() {
                           setSelectedDate(event.target.value);
                           resetRecommendationState();
                         }}
-                        className="h-10 pl-8"
+                        className="h-11 rounded-md pl-8"
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -409,7 +434,7 @@ export default function Home() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="h-10 min-w-40"
+                    className="h-11 min-w-44 rounded-md"
                     disabled={!canSearch || recommendationMutation.isPending}
                   >
                     {recommendationMutation.isPending ? (
@@ -430,8 +455,8 @@ export default function Home() {
             {recommendationMutation.isSuccess && recommendation ? (
               <RecommendationCard recommendation={recommendation} />
             ) : (
-              <Card className="rounded-lg border-border/80 shadow-sm">
-                <CardHeader>
+              <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/70">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
                     {selectedActivity
@@ -439,13 +464,13 @@ export default function Home() {
                       : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-5">
                   {recommendationMutation.isIdle ? (
-                    <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
                       <Clock3 className="mt-0.5 size-4 shrink-0" />
                       <span>
-                        Nenhuma busca executada nesta sessão. Preencha os campos
-                        para receber uma recomendação.
+                        Nenhuma busca executada. Preencha os campos para
+                        receber uma recomendação.
                       </span>
                     </div>
                   ) : null}

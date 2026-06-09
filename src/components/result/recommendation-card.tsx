@@ -2,12 +2,14 @@ import {
   AlertTriangle,
   CalendarDays,
   CheckCircle2,
-  Clock3,
   Gauge,
   MapPin,
   ShieldCheck,
-  Sparkles,
+  Timer,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -25,35 +27,102 @@ import {
   getPeakHourScore,
   getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
-import type { Recommendation } from "@/types";
+import { cn } from "@/lib/utils";
+import type { Recommendation, RuleResult } from "@/types";
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
 }
 
-function RecommendationHighlights({
-  recommendation,
-}: RecommendationCardProps) {
-  const bestWindow = recommendation.bestWindow;
-  const fallbackScore = getPeakHourScore(recommendation.scores);
-  const highlights = bestWindow?.highlights.length
-    ? bestWindow.highlights
-    : fallbackScore
-      ? [
-          `Nenhuma janela atingiu o mínimo de ${recommendation.activity.minRecommendedScore}/100.`,
-          getPrimaryReason(fallbackScore),
-        ]
-      : ["Sem horários avaliados para esta data."];
+function getScoreTone(score: number): string {
+  if (score >= 75) {
+    return "border-emerald-200 bg-emerald-50 text-emerald-950";
+  }
+
+  if (score >= 55) {
+    return "border-amber-200 bg-amber-50 text-amber-950";
+  }
+
+  return "border-rose-200 bg-rose-50 text-rose-950";
+}
+
+function getConfidenceTone(level: string): string {
+  if (level === "alta") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  }
+
+  if (level === "media") {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+
+  return "border-rose-200 bg-rose-50 text-rose-900";
+}
+
+function sortByImpact(a: RuleResult, b: RuleResult): number {
+  return (
+    b.score - a.score || b.weight - a.weight || a.label.localeCompare(b.label)
+  );
+}
+
+function sortByPenalty(a: RuleResult, b: RuleResult): number {
+  return (
+    a.score - b.score || b.weight - a.weight || a.label.localeCompare(b.label)
+  );
+}
+
+function getFactorGroups(recommendation: Recommendation): {
+  positive: RuleResult[];
+  attention: RuleResult[];
+} {
+  const sourceScore = recommendation.bestWindow
+    ? getPeakHourScore(recommendation.bestWindow.scores)
+    : getPeakHourScore(recommendation.scores);
+  const rules = sourceScore?.breakdown ?? [];
+
+  return {
+    positive: rules
+      .filter((rule) => rule.score >= 70)
+      .sort(sortByImpact)
+      .slice(0, 3),
+    attention: rules
+      .filter((rule) => rule.score < 70)
+      .sort(sortByPenalty)
+      .slice(0, 3),
+  };
+}
+
+function FactorList({
+  title,
+  icon,
+  rules,
+}: {
+  title: string;
+  icon: ReactNode;
+  rules: RuleResult[];
+}) {
+  if (rules.length === 0) {
+    return null;
+  }
 
   return (
-    <ul className="space-y-2 text-sm text-muted-foreground">
-      {highlights.map((highlight) => (
-        <li key={highlight} className="flex gap-2">
-          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald-600" />
-          <span>{highlight}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+        {icon}
+        {title}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {rules.map((rule) => (
+          <Badge
+            key={`${rule.factor}-${rule.score}`}
+            variant="outline"
+            className="min-h-8 max-w-full justify-start gap-2 whitespace-normal border-slate-200 bg-white px-3 py-1 text-left text-slate-700"
+          >
+            <span className="font-medium text-slate-950">{rule.label}</span>
+            <span>{rule.score}/100</span>
+          </Badge>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -67,10 +136,14 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     : fallbackScore
       ? `${fallbackScore.hourLabel} foi o melhor horário isolado`
       : "Sem horário avaliado";
+  const factorGroups = getFactorGroups(recommendation);
+  const primaryReason =
+    bestWindow?.highlights[0] ??
+    (fallbackScore ? getPrimaryReason(fallbackScore) : null);
 
   return (
-    <Card className="rounded-lg border-border/80 shadow-sm">
-      <CardHeader className="gap-3">
+    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm">
+      <CardHeader className="gap-3 border-b border-slate-100 bg-slate-50/70">
         <div className="flex items-start justify-between gap-3">
           <div>
             <CardTitle>Recomendação</CardTitle>
@@ -81,11 +154,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           </div>
           <Badge
             variant="outline"
-            className={
+            className={cn(
+              "h-7 px-3",
               bestWindow
-                ? "h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
-                : "h-7 border-amber-200 bg-amber-50 px-3 text-amber-900"
-            }
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-amber-200 bg-amber-50 text-amber-900",
+            )}
           >
             {bestWindow ? (
               <CheckCircle2 className="size-3" />
@@ -97,75 +171,105 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5">
-        <div className="grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center">
-          <div className="flex min-h-28 min-w-28 flex-col items-center justify-center rounded-lg border border-slate-200 bg-slate-950 px-4 text-white">
-            <span className="text-xs font-medium text-slate-300">Score</span>
-            <span className="text-4xl leading-none font-semibold">
-              {displayScore}
+      <CardContent className="space-y-5 p-4 sm:p-5">
+        <div className="grid gap-4 lg:grid-cols-[minmax(130px,0.45fr)_minmax(0,1fr)]">
+          <div
+            className={cn(
+              "flex min-h-36 flex-col justify-between rounded-lg border p-4",
+              getScoreTone(displayScore),
+            )}
+          >
+            <span className="text-xs font-medium uppercase tracking-wider">
+              Score
             </span>
-            <span className="text-xs text-slate-300">/100</span>
+            <div>
+              <span className="text-5xl leading-none font-semibold">
+                {displayScore}
+              </span>
+              <span className="ml-1 text-sm font-medium">/100</span>
+            </div>
+            <span className="text-xs">
+              Mínimo {recommendation.activity.minRecommendedScore}/100
+            </span>
           </div>
 
-          <dl className="grid gap-3 text-sm">
-            <div className="flex items-start gap-2">
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-emerald-700" />
-              <div>
-                <dt className="font-medium text-slate-950">Atividade</dt>
-                <dd className="text-muted-foreground">
-                  {recommendation.activity.name}
-                </dd>
+          <div className="grid gap-3">
+            <div className="rounded-lg border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <Timer className="size-4 text-sky-700" />
+                Janela recomendada
               </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <MapPin className="mt-0.5 size-4 shrink-0 text-sky-700" />
-              <div>
-                <dt className="font-medium text-slate-950">Cidade</dt>
-                <dd className="text-muted-foreground">
+              <p className="mt-2 text-2xl font-semibold text-slate-950">
+                {timeLabel}
+              </p>
+              <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="size-4 text-cyan-700" />
+                  {formatRecommendationDate(recommendation.date)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="size-4 text-sky-700" />
                   {formatRecommendationLocation(recommendation)}
-                </dd>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex items-start gap-2">
-                <CalendarDays className="mt-0.5 size-4 shrink-0 text-cyan-700" />
-                <div>
-                  <dt className="font-medium text-slate-950">Data</dt>
-                  <dd className="text-muted-foreground">
-                    {formatRecommendationDate(recommendation.date)}
-                  </dd>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <Clock3 className="mt-0.5 size-4 shrink-0 text-violet-700" />
-                <div>
-                  <dt className="font-medium text-slate-950">Horário</dt>
-                  <dd className="text-muted-foreground">{timeLabel}</dd>
                 </div>
               </div>
             </div>
+
             {bestWindow ? (
-              <div className="flex items-start gap-2">
-                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-700" />
-                <div>
-                  <dt className="font-medium text-slate-950">Confiança</dt>
-                  <dd className="text-muted-foreground">
-                    {formatForecastConfidenceLevel(bestWindow.confidence.level)}
-                    {" - "}
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+                  <ShieldCheck className="size-4 text-emerald-700" />
+                  Confiança da previsão
+                </div>
+                <div className="mt-2 flex flex-wrap items-start gap-2">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "h-7 px-3",
+                      getConfidenceTone(bestWindow.confidence.level),
+                    )}
+                  >
+                    {formatForecastConfidenceLevel(
+                      bestWindow.confidence.level,
+                    )}
+                  </Badge>
+                  <p className="min-w-0 flex-1 text-sm leading-6 text-muted-foreground">
                     {bestWindow.confidence.reason}
-                  </dd>
+                  </p>
                 </div>
               </div>
-            ) : null}
-          </dl>
+            ) : (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                Nenhuma janela atingiu o mínimo de{" "}
+                {recommendation.activity.minRecommendedScore}/100. O melhor
+                horário isolado ainda aparece para comparação.
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
-            <Gauge className="size-4 text-emerald-700" />
-            Destaques
+        {primaryReason ? (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-950">
+              <Gauge className="size-4 text-emerald-700" />
+              Motivo principal
+            </div>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {primaryReason}
+            </p>
           </div>
-          <RecommendationHighlights recommendation={recommendation} />
+        ) : null}
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <FactorList
+            title="Fatores a favor"
+            icon={<TrendingUp className="size-4 text-emerald-700" />}
+            rules={factorGroups.positive}
+          />
+          <FactorList
+            title="Pontos de atenção"
+            icon={<TrendingDown className="size-4 text-amber-700" />}
+            rules={factorGroups.attention}
+          />
         </div>
 
         {alternatives.length > 0 ? (
@@ -177,13 +281,13 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               {alternatives.map((window) => (
                 <div
                   key={`${window.startTime}-${window.endTime}`}
-                  className="grid gap-2 rounded-lg border border-border px-3 py-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="grid gap-3 rounded-lg border border-border bg-white px-3 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 space-y-1">
                     <p className="font-medium text-slate-950">
                       {window.startLabel} - {window.endLabel}
                     </p>
-                    <p className="truncate text-muted-foreground">
+                    <p className="line-clamp-2 text-muted-foreground">
                       {formatDurationHours(window.durationHours)}
                       {window.highlights[0] ? ` - ${window.highlights[0]}` : ""}
                     </p>
@@ -196,7 +300,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                   </div>
                   <Badge
                     variant="outline"
-                    className="h-7 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
+                    className="h-8 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
                   >
                     {window.avgScore}/100
                   </Badge>

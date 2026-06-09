@@ -13,6 +13,9 @@ export interface TimelineDatum {
   score: number;
   reason: string;
   isRecommended: boolean;
+  isBestWindow: boolean;
+  rainRisk: string | null;
+  confidenceLevel: ForecastConfidenceLevel | null;
 }
 
 export interface BreakdownSource {
@@ -44,14 +47,43 @@ export function getPrimaryReason(score: HourScore): string {
 export function buildTimelineData(
   scores: HourScore[],
   minRecommendedScore: number,
+  bestWindow: WindowResult | null = null,
 ): TimelineDatum[] {
+  const bestWindowTimes = new Set(
+    bestWindow?.scores.map((score) => score.time) ?? [],
+  );
+
   return scores.map((score) => ({
     time: score.time,
     hourLabel: score.hourLabel,
     score: score.score,
     reason: getPrimaryReason(score),
     isRecommended: score.score >= minRecommendedScore,
+    isBestWindow: bestWindowTimes.has(score.time),
+    rainRisk: getRainRiskLabel(score),
+    confidenceLevel:
+      bestWindowTimes.has(score.time) && bestWindow
+        ? bestWindow.confidence.level
+        : null,
   }));
+}
+
+function getRainRiskLabel(score: HourScore): string | null {
+  const precipitation = Math.max(
+    score.weather.precipitation,
+    score.weather.rain,
+    score.weather.showers,
+  );
+
+  if (precipitation > 0) {
+    return `Chuva prevista: ${precipitation} mm`;
+  }
+
+  if (score.weather.precipitation_probability >= 20) {
+    return `Risco de chuva: ${score.weather.precipitation_probability}%`;
+  }
+
+  return null;
 }
 
 export function getAlternativeWindows(windows: WindowResult[]): WindowResult[] {
