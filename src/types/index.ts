@@ -134,3 +134,41 @@ export interface Recommendation {
   bestWindow: WindowResult | null;
   disclaimer: string;
 }
+
+/** Item ranqueado quando o app recomenda atividades para uma cidade e data. */
+export interface ActivityRankingItem {
+  position: number;
+  recommendation: Recommendation;
+  score: number;
+  isRecommended: boolean;
+}
+
+/** Ranking de atividades calculado para a mesma cidade e data. */
+export interface ActivityRanking {
+  city: City;
+  date: string;
+  generatedAt: string;
+  items: ActivityRankingItem[];
+  bestActivity: ActivityRankingItem | null;
+  disclaimer: string;
+}
+
+/** Item ranqueado quando o app compara dias para uma atividade. */
+export interface DayRankingItem {
+  position: number;
+  recommendation: Recommendation;
+  score: number;
+  isRecommended: boolean;
+}
+
+/** Comparação dos próximos dias para uma atividade. */
+export interface WeekComparison {
+  activity: Activity;
+  city: City;
+  startDate: string;
+  endDate: string;
+  generatedAt: string;
+  days: DayRankingItem[];
+  bestDay: DayRankingItem | null;
+  disclaimer: string;
+}

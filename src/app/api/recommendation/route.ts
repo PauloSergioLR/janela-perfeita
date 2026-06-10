@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getActivityById } from "@/lib/domain/activities";
-import { calculateDayScores } from "@/lib/engine/score-calculator";
-import { findBestWindows } from "@/lib/engine/window-finder";
+import { getActivityById, getAllActivities } from "@/lib/domain/activities";
+import {
+  buildActivityRanking,
+  buildRecommendation,
+  buildWeekComparison,
+} from "@/lib/engine/recommendation-exploration";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
 import { getWeatherForecast } from "@/lib/services/open-meteo-weather.service";
-import type { ActivityId, City, Recommendation } from "@/types";
+import type { Activity, ActivityId, City } from "@/types";
 
 const ACTIVITY_IDS = [
   "correr",
@@ -28,9 +31,14 @@ const citySchema = z.object({
   }),
 });
 
+const recommendationModeSchema = z.enum(["janela", "atividades", "semana"]);
+const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
+const WEEK_COMPARISON_DAYS = 7;
+
 const recommendationRequestSchema = z
   .object({
-    activityId: z.string().trim().min(1),
+    mode: recommendationModeSchema.default("janela"),
+    activityId: z.string().trim().min(1).optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     city: citySchema.optional(),
     cityQuery: z.string().trim().min(3).optional(),
@@ -38,6 +46,15 @@ const recommendationRequestSchema = z
   .refine((data) => data.city !== undefined || data.cityQuery !== undefined, {
     message: "Informe uma cidade para gerar a recomendação.",
     path: ["city"],
+  })
+  .superRefine((data, ctx) => {
+    if (MODES_WITH_ACTIVITY.has(data.mode) && !data.activityId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe uma atividade para gerar a recomendação.",
+        path: ["activityId"],
+      });
+    }
   });
 
 class ApiRouteError extends Error {
@@ -55,6 +72,14 @@ function jsonError(status: number, message: string) {
 
 function isActivityId(value: string): value is ActivityId {
   return (ACTIVITY_IDS as readonly string[]).includes(value);
+}
+
+function addDaysToDate(date: string, days: number): string {
+  const parsedDate = new Date(`${date}T00:00:00.000Z`);
+
+  parsedDate.setUTCDate(parsedDate.getUTCDate() + days);
+
+  return parsedDate.toISOString().slice(0, 10);
 }
 
 function getLocalDateTimeForZone(date: Date, timeZone?: string): string {
@@ -106,45 +131,73 @@ async function resolveCity(city: City | undefined, cityQuery: string | undefined
   }
 }
 
+function resolveActivity(activityId: string | undefined): Activity {
+  const activity =
+    activityId && isActivityId(activityId) ? getActivityById(activityId) : undefined;
+
+  if (!activity) {
+    throw new ApiRouteError(404, "Atividade não encontrada.");
+  }
+
+  return activity;
+}
+
 export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
     const body = recommendationRequestSchema.parse(payload);
-    const activity = isActivityId(body.activityId)
-      ? getActivityById(body.activityId)
-      : undefined;
-
-    if (!activity) {
-      throw new ApiRouteError(404, "Atividade não encontrada.");
-    }
-
     const city = await resolveCity(body.city, body.cityQuery);
+    const generatedAtDate = new Date();
+    const generatedAt = generatedAtDate.toISOString();
+    const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
     const forecast = await getWeatherForecast({
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: body.date,
+      endDate:
+        body.mode === "semana"
+          ? addDaysToDate(body.date, WEEK_COMPARISON_DAYS - 1)
+          : undefined,
     }).catch(() => {
       throw new ApiRouteError(502, "Não foi possível buscar a previsão agora.");
     });
-    const generatedAtDate = new Date();
-    const scores = calculateDayScores({
-      activity,
-      hourly: forecast.hourly,
-      astronomy: forecast.astronomy,
-      now: getLocalDateTimeForZone(generatedAtDate, city.timezone),
-    });
-    const windows = findBestWindows(scores, activity);
-    const recommendation: Recommendation = {
+
+    if (body.mode === "atividades") {
+      const activityRanking = buildActivityRanking({
+        activities: getAllActivities(),
+        city,
+        hourly: forecast.hourly,
+        astronomy: forecast.astronomy,
+        generatedAt,
+        now,
+      });
+
+      return NextResponse.json({ activityRanking });
+    }
+
+    const activity = resolveActivity(body.activityId);
+
+    if (body.mode === "semana") {
+      const weekComparison = buildWeekComparison({
+        activity,
+        city,
+        hourly: forecast.hourly,
+        dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
+        generatedAt,
+        now,
+      });
+
+      return NextResponse.json({ weekComparison });
+    }
+
+    const recommendation = buildRecommendation({
       activity,
       city,
-      date: forecast.astronomy.date,
-      generatedAt: generatedAtDate.toISOString(),
-      scores,
-      windows,
-      bestWindow: windows[0] ?? null,
-      disclaimer:
-        "Recomendação estimada com base na previsão meteorológica da Open-Meteo; não substitui avaliação local das condições.",
-    };
+      hourly: forecast.hourly,
+      astronomy: forecast.astronomy,
+      generatedAt,
+      now,
+    });
 
     return NextResponse.json({ recommendation });
   } catch (error) {

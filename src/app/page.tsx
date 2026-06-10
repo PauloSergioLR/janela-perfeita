@@ -5,10 +5,12 @@ import {
   AlertCircle,
   Bike,
   CalendarDays,
+  CalendarSearch,
   Camera,
   Car,
   Clock3,
   Footprints,
+  ListChecks,
   Loader2,
   MapPin,
   Moon,
@@ -17,10 +19,12 @@ import {
   Search,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
 import { RecommendationCard } from "@/components/result/recommendation-card";
 import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { ScoreTimeline } from "@/components/result/score-timeline";
+import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,19 +45,36 @@ import {
   type SearchDateOption,
 } from "@/lib/ui/search-page";
 import { cn } from "@/lib/utils";
-import type { ActivityId, City, Recommendation } from "@/types";
+import type {
+  ActivityId,
+  ActivityRanking,
+  City,
+  Recommendation,
+  WeekComparison,
+} from "@/types";
 
 type GeocodingResponse = {
   cities: City[];
 };
 
 type RecommendationResponse = {
-  recommendation: Recommendation;
+  recommendation?: Recommendation;
+  activityRanking?: ActivityRanking;
+  weekComparison?: WeekComparison;
 };
 
 type ActivityVisual = {
   icon: typeof Footprints;
   tone: string;
+};
+
+type SearchMode = "janela" | "atividades" | "semana";
+
+type SearchModeOption = {
+  id: SearchMode;
+  label: string;
+  description: string;
+  icon: typeof Search;
 };
 
 const ACTIVITY_VISUALS = {
@@ -82,6 +103,27 @@ const ACTIVITY_VISUALS = {
     tone: "text-rose-700",
   },
 } satisfies Record<ActivityId, ActivityVisual>;
+
+const SEARCH_MODE_OPTIONS = [
+  {
+    id: "janela",
+    label: "Janela",
+    description: "Atividade e data",
+    icon: Search,
+  },
+  {
+    id: "atividades",
+    label: "O que fazer",
+    description: "Ranking do dia",
+    icon: ListChecks,
+  },
+  {
+    id: "semana",
+    label: "Semana",
+    description: "Melhor dia",
+    icon: CalendarSearch,
+  },
+] satisfies SearchModeOption[];
 
 function useDebouncedValue(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -125,7 +167,8 @@ async function fetchCities(query: string): Promise<City[]> {
 
 async function requestRecommendation(input: {
   city: City;
-  activityId: ActivityId;
+  mode: SearchMode;
+  activityId?: ActivityId;
   date: string;
 }): Promise<RecommendationResponse> {
   const response = await fetch("/api/recommendation", {
@@ -148,15 +191,19 @@ export default function Home() {
     "",
   );
   const [selectedDate, setSelectedDate] = useState("");
+  const [searchMode, setSearchMode] = useState<SearchMode>("janela");
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
     SEARCH_DEBOUNCE_MS,
   );
-  const canSearch = canSubmitSearch({
-    city: selectedCity,
-    activityId: selectedActivityId,
-    date: selectedDate,
-  });
+  const canSearch =
+    searchMode === "atividades"
+      ? selectedCity !== null && selectedDate !== ""
+      : canSubmitSearch({
+          city: selectedCity,
+          activityId: selectedActivityId,
+          date: selectedDate,
+        });
   const minDate = dateOptions[0]?.value ?? "";
   const maxDate = dateOptions[dateOptions.length - 1]?.value ?? "";
   const cityQueryEnabled =
@@ -173,6 +220,12 @@ export default function Home() {
     (activity) => activity.id === selectedActivityId,
   );
   const recommendation = recommendationMutation.data?.recommendation;
+  const activityRanking = recommendationMutation.data?.activityRanking;
+  const weekComparison = recommendationMutation.data?.weekComparison;
+  const resultDisclaimer =
+    recommendation?.disclaimer ??
+    activityRanking?.disclaimer ??
+    weekComparison?.disclaimer;
 
   useEffect(() => {
     const options = buildSearchDateOptions();
@@ -199,30 +252,30 @@ export default function Home() {
     resetRecommendationState();
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function submitCurrentSearch() {
+    if (!canSearch || selectedCity === null) {
+      return;
+    }
 
-    if (!canSearch || selectedCity === null || selectedActivityId === "") {
+    if (searchMode !== "atividades" && selectedActivityId === "") {
       return;
     }
 
     recommendationMutation.mutate({
       city: selectedCity,
-      activityId: selectedActivityId,
+      mode: searchMode,
+      activityId: selectedActivityId || undefined,
       date: selectedDate,
     });
   }
 
-  function handleRecommendationRetry() {
-    if (!canSearch || selectedCity === null || selectedActivityId === "") {
-      return;
-    }
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submitCurrentSearch();
+  }
 
-    recommendationMutation.mutate({
-      city: selectedCity,
-      activityId: selectedActivityId,
-      date: selectedDate,
-    });
+  function handleRecommendationRetry() {
+    submitCurrentSearch();
   }
 
   return (
@@ -287,6 +340,53 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-5">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                <div className="space-y-3">
+                  <Label>Modo</Label>
+                  <div
+                    className="grid gap-2 sm:grid-cols-3"
+                    role="radiogroup"
+                    aria-label="Modo de recomendação"
+                  >
+                    {SEARCH_MODE_OPTIONS.map((mode) => {
+                      const Icon = mode.icon;
+                      const selected = searchMode === mode.id;
+
+                      return (
+                        <button
+                          key={mode.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          className={cn(
+                            "min-h-20 rounded-lg border bg-background p-3 text-left transition hover:border-foreground/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                            selected
+                              ? "border-sky-600 bg-sky-50 text-sky-950 shadow-sm dark:border-sky-800 dark:bg-sky-950/30 dark:text-sky-50"
+                              : "border-border",
+                          )}
+                          onClick={() => {
+                            setSearchMode(mode.id);
+                            resetRecommendationState();
+                          }}
+                        >
+                          <span className="flex items-start gap-3">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                              <Icon className="size-4 text-sky-700" />
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block font-medium">
+                                {mode.label}
+                              </span>
+                              <span className="block text-xs leading-5 text-muted-foreground">
+                                {mode.description}
+                              </span>
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
                   <div className="relative">
@@ -388,67 +488,73 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label>Atividade</Label>
-                  <div
-                    className="grid gap-2 sm:grid-cols-2"
-                    role="radiogroup"
-                    aria-label="Atividade"
-                  >
-                    {activities.map((activity) => {
-                      const visual = ACTIVITY_VISUALS[activity.id];
-                      const Icon = visual.icon;
-                      const selected = selectedActivityId === activity.id;
+                {searchMode !== "atividades" ? (
+                  <div className="space-y-3">
+                    <Label>Atividade</Label>
+                    <div
+                      className="grid gap-2 sm:grid-cols-2"
+                      role="radiogroup"
+                      aria-label="Atividade"
+                    >
+                      {activities.map((activity) => {
+                        const visual = ACTIVITY_VISUALS[activity.id];
+                        const Icon = visual.icon;
+                        const selected = selectedActivityId === activity.id;
 
-                      return (
-                        <button
-                          key={activity.id}
-                          type="button"
-                          className={cn(
-                            "min-h-28 rounded-lg border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
-                            selected
-                              ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-50"
-                              : "border-border",
-                          )}
-                          role="radio"
-                          aria-checked={selected}
-                          onClick={() => {
-                            setSelectedActivityId(activity.id);
-                            resetRecommendationState();
-                          }}
-                        >
-                          <span className="flex items-start gap-3">
-                            <span
-                              className={cn(
-                                "flex size-10 shrink-0 items-center justify-center rounded-md bg-muted",
-                                selected ? "bg-emerald-100 dark:bg-emerald-900/50" : "",
-                              )}
-                            >
-                              <Icon
+                        return (
+                          <button
+                            key={activity.id}
+                            type="button"
+                            className={cn(
+                              "min-h-28 rounded-lg border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                              selected
+                                ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-50"
+                                : "border-border",
+                            )}
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => {
+                              setSelectedActivityId(activity.id);
+                              resetRecommendationState();
+                            }}
+                          >
+                            <span className="flex items-start gap-3">
+                              <span
                                 className={cn(
-                                  "size-4",
-                                  selected ? "text-emerald-700" : visual.tone,
+                                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-muted",
+                                  selected
+                                    ? "bg-emerald-100 dark:bg-emerald-900/50"
+                                    : "",
                                 )}
-                              />
-                            </span>
-                            <span className="min-w-0 space-y-1">
-                              <span className="block font-medium">
-                                {activity.name}
+                              >
+                                <Icon
+                                  className={cn(
+                                    "size-4",
+                                    selected ? "text-emerald-700" : visual.tone,
+                                  )}
+                                />
                               </span>
-                              <span className="line-clamp-2 text-xs leading-5 text-muted-foreground">
-                                {activity.shortDescription}
+                              <span className="min-w-0 space-y-1">
+                                <span className="block font-medium">
+                                  {activity.name}
+                                </span>
+                                <span className="line-clamp-2 text-xs leading-5 text-muted-foreground">
+                                  {activity.shortDescription}
+                                </span>
                               </span>
                             </span>
-                          </span>
-                        </button>
-                      );
-                    })}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
                 <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                   <div className="space-y-2">
-                    <Label htmlFor="date">Data</Label>
+                    <Label htmlFor="date">
+                      {searchMode === "semana" ? "A partir de" : "Data"}
+                    </Label>
                     <div className="relative">
                       <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" />
                       <Input
@@ -500,7 +606,11 @@ export default function Home() {
                     )}
                     {recommendationMutation.isPending
                       ? "Calculando..."
-                      : "Encontrar janela"}
+                      : searchMode === "atividades"
+                        ? "Ver ranking"
+                        : searchMode === "semana"
+                          ? "Comparar semana"
+                          : "Encontrar janela"}
                   </Button>
                 </div>
               </form>
@@ -510,12 +620,20 @@ export default function Home() {
           <aside className="flex flex-col gap-4">
             {recommendationMutation.isSuccess && recommendation ? (
               <RecommendationCard recommendation={recommendation} />
+            ) : recommendationMutation.isSuccess && activityRanking ? (
+              <ActivityRankingCard ranking={activityRanking} />
+            ) : recommendationMutation.isSuccess && weekComparison ? (
+              <WeekComparisonCard comparison={weekComparison} />
             ) : (
               <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
                 <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
-                    {selectedActivity
+                    {searchMode === "atividades"
+                      ? selectedDate
+                        ? `Ranking em ${selectedDate}`
+                        : "Ranking de atividades"
+                      : selectedActivity
                       ? `${selectedActivity.name} em ${selectedDate || "data"}`
                       : "Aguardando seleção"}
                   </CardDescription>
@@ -534,11 +652,13 @@ export default function Home() {
                         <span className="rounded-md bg-background px-3 py-2">
                           1. Cidade
                         </span>
+                        {searchMode !== "atividades" ? (
+                          <span className="rounded-md bg-background px-3 py-2">
+                            2. Atividade
+                          </span>
+                        ) : null}
                         <span className="rounded-md bg-background px-3 py-2">
-                          2. Atividade
-                        </span>
-                        <span className="rounded-md bg-background px-3 py-2">
-                          3. Data
+                          {searchMode === "atividades" ? "2. Data" : "3. Data"}
                         </span>
                       </div>
                     </div>
@@ -592,7 +712,7 @@ export default function Home() {
           </section>
         ) : null}
 
-        <AttributionFooter disclaimer={recommendation?.disclaimer} />
+        <AttributionFooter disclaimer={resultDisclaimer} />
       </div>
     </main>
   );

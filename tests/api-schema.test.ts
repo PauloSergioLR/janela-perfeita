@@ -48,6 +48,13 @@ describe("schemas da API Open-Meteo", () => {
       sunrise: "2026-06-05T06:30",
       sunset: "2026-06-05T17:58",
     });
+    expect(forecast.dailyAstronomy).toEqual([
+      {
+        date: "2026-06-05",
+        sunrise: "2026-06-05T06:30",
+        sunset: "2026-06-05T17:58",
+      },
+    ]);
   });
 
   it("rejeita fixture invalida de forecast", () => {
