@@ -16,10 +16,11 @@ export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
           href="https://open-meteo.com/"
           target="_blank"
           rel="noreferrer"
+          aria-label="Open-Meteo (abre em nova aba)"
           className="inline-flex items-center gap-1 font-medium text-sky-800 underline-offset-4 hover:underline dark:text-sky-300"
         >
           Open-Meteo
-          <ExternalLink className="size-3" />
+          <ExternalLink className="size-3" aria-hidden="true" />
         </a>
         .
       </p>

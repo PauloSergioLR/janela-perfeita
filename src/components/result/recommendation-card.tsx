@@ -157,16 +157,16 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           <Badge
             variant="outline"
             className={cn(
-              "h-7 px-3",
+              "h-7 shrink-0 px-3",
               bestWindow
                 ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100"
                 : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100",
             )}
           >
             {bestWindow ? (
-              <CheckCircle2 className="size-3" />
+              <CheckCircle2 className="size-3" aria-hidden="true" />
             ) : (
-              <AlertTriangle className="size-3" />
+              <AlertTriangle className="size-3" aria-hidden="true" />
             )}
             {bestWindow ? "Janela ideal" : "Sem janela ideal"}
           </Badge>
@@ -198,7 +198,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           <div className="grid gap-3">
             <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
-                <Timer className="size-4 text-sky-700" />
+                <Timer className="size-4 text-sky-700" aria-hidden="true" />
                 Janela recomendada
               </div>
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">
@@ -206,11 +206,11 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               </p>
               <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
                 <div className="flex items-center gap-2">
-                  <CalendarDays className="size-4 text-cyan-700" />
+                  <CalendarDays className="size-4 text-cyan-700" aria-hidden="true" />
                   {formatRecommendationDate(recommendation.date)}
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="size-4 text-sky-700" />
+                  <MapPin className="size-4 text-sky-700" aria-hidden="true" />
                   {formatRecommendationLocation(recommendation)}
                 </div>
               </div>
@@ -219,7 +219,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             {bestWindow ? (
               <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-                  <ShieldCheck className="size-4 text-emerald-700" />
+                  <ShieldCheck className="size-4 text-emerald-700" aria-hidden="true" />
                   Confiança da previsão
                 </div>
                 <div className="mt-2 flex flex-wrap items-start gap-2">
@@ -252,7 +252,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         {primaryReason ? (
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-border dark:bg-muted/30">
             <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-              <Gauge className="size-4 text-emerald-700" />
+              <Gauge className="size-4 text-emerald-700" aria-hidden="true" />
               Motivo principal
             </div>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -264,12 +264,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         <div className="grid gap-4 md:grid-cols-2">
           <FactorList
             title="Fatores a favor"
-            icon={<TrendingUp className="size-4 text-emerald-700" />}
+            icon={<TrendingUp className="size-4 text-emerald-700" aria-hidden="true" />}
             rules={factorGroups.positive}
           />
           <FactorList
             title="Pontos de atenção"
-            icon={<TrendingDown className="size-4 text-amber-700" />}
+            icon={<TrendingDown className="size-4 text-amber-700" aria-hidden="true" />}
             rules={factorGroups.attention}
           />
         </div>
@@ -302,7 +302,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                   </div>
                   <Badge
                     variant="outline"
-                    className="h-8 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
+                    className="h-8 shrink-0 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
                   >
                     {window.avgScore}/100
                   </Badge>

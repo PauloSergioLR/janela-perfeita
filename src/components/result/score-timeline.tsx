@@ -115,6 +115,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
           <Badge
             variant="outline"
             className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
+            aria-label={`Score mínimo recomendado: ${minRecommendedScore}/100`}
           >
             Mínimo {minRecommendedScore}/100
           </Badge>
@@ -122,6 +123,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
             <Badge
               variant="outline"
               className="h-7 border-sky-200 bg-sky-50 px-3 text-sky-900"
+              aria-label={`Melhor janela: ${bestWindowLabel}`}
             >
               Melhor {bestWindowLabel}
             </Badge>
@@ -130,7 +132,11 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
       </CardHeader>
       <CardContent>
         {data.length > 0 ? (
-          <div className="h-80 w-full min-w-0 sm:h-72">
+          <div
+            className="h-80 w-full min-w-0 sm:h-72"
+            role="img"
+            aria-label={`Timeline de scores por hora para ${recommendation.activity.name}. Melhor janela: ${bestWindowLabel ?? "não identificada"}. Score mínimo recomendado: ${minRecommendedScore}/100.`}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
@@ -140,8 +146,8 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
                 <XAxis
                   dataKey="hourLabel"
                   fontSize={12}
-                  interval={2}
-                  minTickGap={8}
+                  interval="preserveStartEnd"
+                  minTickGap={16}
                   tickLine={false}
                   axisLine={false}
                   tick={{ fill: "var(--muted-foreground)" }}

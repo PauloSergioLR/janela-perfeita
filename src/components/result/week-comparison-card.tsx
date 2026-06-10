@@ -25,13 +25,13 @@ interface WeekComparisonCardProps {
 
 function DayBadge({ item }: { item: DayRankingItem }) {
   return item.isRecommended ? (
-    <Badge className="h-7 bg-sky-700 text-white hover:bg-sky-700">
+    <Badge className="h-7 shrink-0 bg-sky-700 text-white hover:bg-sky-700">
       {item.score}/100
     </Badge>
   ) : (
     <Badge
       variant="outline"
-      className="h-7 border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100"
+      className="h-7 shrink-0 border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100"
     >
       Não recomendado
     </Badge>
@@ -53,7 +53,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
         {bestRecommendation ? (
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sky-950 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-50">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal">
-              <Trophy className="size-4" />
+              <Trophy className="size-4" aria-hidden="true" />
               Melhor opção
             </div>
             <p className="mt-2 text-2xl font-semibold tracking-normal">
@@ -66,7 +66,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
           </div>
         ) : null}
 
-        <ol className="space-y-3">
+        <ol className="space-y-3" aria-label="Comparação de dias da semana">
           {comparison.days.map((item) => {
             const recommendation = item.recommendation;
             const confidence = recommendation.bestWindow?.confidence.level;
@@ -93,22 +93,22 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
-                        <Clock3 className="size-3" />
+                        <Clock3 className="size-3" aria-hidden="true" />
                         {formatWindowSummary(recommendation.bestWindow)}
                       </span>
                       {confidence ? (
                         <span className="inline-flex items-center gap-1">
-                          <CheckCircle2 className="size-3" />
+                          <CheckCircle2 className="size-3" aria-hidden="true" />
                           Confiança {formatForecastConfidenceLevel(confidence)}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1">
-                          <AlertCircle className="size-3" />
+                          <AlertCircle className="size-3" aria-hidden="true" />
                           Sem janela boa
                         </span>
                       )}
                       <span className="inline-flex items-center gap-1">
-                        <CalendarDays className="size-3" />
+                        <CalendarDays className="size-3" aria-hidden="true" />
                         {recommendation.date}
                       </span>
                     </div>

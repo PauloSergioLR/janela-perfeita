@@ -22,7 +22,7 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
 - Features saem de `develop` e voltam por PR para `develop`.
 - No fim do MVP, abrir PR de `develop` para `main`.
 - Não usar `master`.
-- Nomes de branches devem ser curtos, sem numeração:
+- Nomes de branches devem ser curtos, sem numeração de qualquer tipo:
   - `feature/tipos-dominio`
   - `feature/regras-atividades`
   - `feature/servicos-open-meteo`

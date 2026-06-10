@@ -341,11 +341,11 @@ export default function Home() {
             <CardContent className="p-4 sm:p-5">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 <div className="space-y-3">
-                  <Label>Modo</Label>
+                  <Label id="modo-label">Modo</Label>
                   <div
                     className="grid gap-2 sm:grid-cols-3"
                     role="radiogroup"
-                    aria-label="Modo de recomendação"
+                    aria-labelledby="modo-label"
                   >
                     {SEARCH_MODE_OPTIONS.map((mode) => {
                       const Icon = mode.icon;
@@ -370,7 +370,7 @@ export default function Home() {
                         >
                           <span className="flex items-start gap-3">
                             <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                              <Icon className="size-4 text-sky-700" />
+                              <Icon className="size-4 text-sky-700" aria-hidden="true" />
                             </span>
                             <span className="min-w-0">
                               <span className="block font-medium">
@@ -391,7 +391,7 @@ export default function Home() {
                   <Label htmlFor="city">Cidade</Label>
                   <div className="relative">
                     <div className="pointer-events-none absolute top-2 left-2.5 text-muted-foreground">
-                      <MapPin className="size-4" />
+                      <MapPin className="size-4" aria-hidden="true" />
                     </div>
                     <Input
                       id="city"
@@ -415,7 +415,7 @@ export default function Home() {
                         {cityQueryResult.isFetching ? (
                           <div className="space-y-2 px-3 py-2 text-muted-foreground">
                             <div className="flex items-center gap-2">
-                            <Loader2 className="size-4 animate-spin" />
+                            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                             Buscando cidades...
                             </div>
                             <div className="grid gap-1">
@@ -428,7 +428,7 @@ export default function Home() {
                         {cityQueryResult.isError ? (
                           <div className="space-y-2 px-3 py-2 text-destructive">
                             <div className="flex items-center gap-2">
-                              <AlertCircle className="size-4" />
+                              <AlertCircle className="size-4" aria-hidden="true" />
                               {(cityQueryResult.error as Error).message}
                             </div>
                             <Button
@@ -438,7 +438,7 @@ export default function Home() {
                               className="h-8"
                               onClick={() => void cityQueryResult.refetch()}
                             >
-                              <RefreshCw className="size-3" />
+                              <RefreshCw className="size-3" aria-hidden="true" />
                               Tentar novamente
                             </Button>
                           </div>
@@ -470,7 +470,7 @@ export default function Home() {
                             className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-muted focus:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             onClick={() => handleCitySelect(city)}
                           >
-                            <MapPin className="mt-0.5 size-4 shrink-0 text-sky-700" />
+                            <MapPin className="mt-0.5 size-4 shrink-0 text-sky-700" aria-hidden="true" />
                             <span className="flex min-w-0 flex-col">
                               <span className="truncate font-medium">
                                 {city.name}
@@ -490,11 +490,11 @@ export default function Home() {
 
                 {searchMode !== "atividades" ? (
                   <div className="space-y-3">
-                    <Label>Atividade</Label>
+                    <Label id="atividade-label">Atividade</Label>
                     <div
                       className="grid gap-2 sm:grid-cols-2"
                       role="radiogroup"
-                      aria-label="Atividade"
+                      aria-labelledby="atividade-label"
                     >
                       {activities.map((activity) => {
                         const visual = ACTIVITY_VISUALS[activity.id];
@@ -532,6 +532,7 @@ export default function Home() {
                                     "size-4",
                                     selected ? "text-emerald-700" : visual.tone,
                                   )}
+                                  aria-hidden="true"
                                 />
                               </span>
                               <span className="min-w-0 space-y-1">
@@ -556,7 +557,7 @@ export default function Home() {
                       {searchMode === "semana" ? "A partir de" : "Data"}
                     </Label>
                     <div className="relative">
-                      <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" />
+                      <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
                       <Input
                         id="date"
                         type="date"
@@ -600,9 +601,9 @@ export default function Home() {
                     disabled={!canSearch || recommendationMutation.isPending}
                   >
                     {recommendationMutation.isPending ? (
-                      <Loader2 className="size-4 animate-spin" />
+                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                     ) : (
-                      <Search className="size-4" />
+                      <Search className="size-4" aria-hidden="true" />
                     )}
                     {recommendationMutation.isPending
                       ? "Calculando..."
@@ -642,7 +643,7 @@ export default function Home() {
                   {recommendationMutation.isIdle ? (
                     <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
                       <div className="flex items-start gap-3">
-                        <Clock3 className="mt-0.5 size-4 shrink-0" />
+                        <Clock3 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                         <span>
                           Nenhuma busca executada. Preencha os campos para
                           receber uma recomendação.
@@ -667,7 +668,7 @@ export default function Home() {
                   {recommendationMutation.isPending ? (
                     <div className="space-y-4 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100">
                       <div className="flex items-start gap-3">
-                        <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" />
+                        <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" aria-hidden="true" />
                         <span>Calculando notas e melhores janelas...</span>
                       </div>
                       <div className="grid gap-2">
@@ -681,7 +682,7 @@ export default function Home() {
                   {recommendationMutation.isError ? (
                     <div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
                       <div className="flex items-start gap-3">
-                        <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                        <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                         <span>
                           {(recommendationMutation.error as Error).message}
                         </span>
@@ -694,7 +695,7 @@ export default function Home() {
                         disabled={!canSearch || recommendationMutation.isPending}
                         onClick={handleRecommendationRetry}
                       >
-                        <RefreshCw className="size-3" />
+                        <RefreshCw className="size-3" aria-hidden="true" />
                         Tentar novamente
                       </Button>
                     </div>

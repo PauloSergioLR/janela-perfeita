@@ -33,7 +33,7 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
     <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
       <CardHeader>
         <div className="flex items-start gap-2">
-          <SlidersHorizontal className="mt-0.5 size-4 shrink-0 text-sky-700" />
+          <SlidersHorizontal className="mt-0.5 size-4 shrink-0 text-sky-700" aria-hidden="true" />
           <div>
             <CardTitle>{source.title}</CardTitle>
             <CardDescription>{source.subtitle}</CardDescription>
@@ -66,11 +66,16 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
                   <div
+                    role="progressbar"
+                    aria-valuenow={rule.score}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${rule.label}: ${rule.score}/100`}
                     className={getScoreBarClass(rule)}
                     style={{ width: `${rule.score}%`, height: "100%" }}
                   />
                 </div>
-                <p className="mt-3 text-sm leading-5 text-muted-foreground">
+                <p className="mt-3 text-sm leading-5 text-muted-foreground break-words">
                   {rule.reason}
                 </p>
               </li>
