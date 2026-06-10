@@ -30,7 +30,10 @@ const astronomy: DailyAstronomy = {
   sunset: "2030-06-05T18:00",
 };
 
-function makeWeather(time: string): HourlyWeather {
+function makeWeather(
+  time: string,
+  overrides: Partial<HourlyWeather> = {},
+): HourlyWeather {
   return {
     time,
     temperature_2m: 19,
@@ -50,6 +53,7 @@ function makeWeather(time: string): HourlyWeather {
     sunshine_duration: 2400,
     uv_index: 2,
     relative_humidity_2m: 60,
+    ...overrides,
   };
 }
 
@@ -70,6 +74,7 @@ describe("rotas internas da API", () => {
         makeWeather("2030-06-05T08:00"),
       ],
       astronomy,
+      dailyAstronomy: [astronomy],
     });
   });
 
@@ -187,6 +192,7 @@ describe("rotas internas da API", () => {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: astronomy.date,
+      endDate: undefined,
     });
     expect(payload.recommendation.activity.id).toBe("correr");
     expect(payload.recommendation.city).toEqual(city);
@@ -203,6 +209,70 @@ describe("rotas internas da API", () => {
     );
     expect(payload.recommendation.disclaimer).toContain("Open-Meteo");
     expect(payload.stack).toBeUndefined();
+  });
+
+  it("POST /api/recommendation retorna ranking de atividades no modo inverso", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        mode: "atividades",
+        date: astronomy.date,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getWeatherForecastMock).toHaveBeenCalledTimes(1);
+    expect(payload.activityRanking.items).toHaveLength(6);
+    expect(payload.activityRanking.bestActivity).toEqual(
+      expect.objectContaining({
+        position: 1,
+        recommendation: expect.objectContaining({
+          activity: expect.objectContaining({
+            id: expect.any(String),
+          }),
+        }),
+      }),
+    );
+  });
+
+  it("POST /api/recommendation compara dias usando uma chamada de forecast", async () => {
+    const secondAstronomy: DailyAstronomy = {
+      date: "2030-06-06",
+      sunrise: "2030-06-06T06:30",
+      sunset: "2030-06-06T18:00",
+    };
+    getWeatherForecastMock.mockResolvedValueOnce({
+      hourly: [
+        makeWeather("2030-06-05T07:00", { precipitation: 1 }),
+        makeWeather("2030-06-06T07:00"),
+      ],
+      astronomy,
+      dailyAstronomy: [astronomy, secondAstronomy],
+    });
+
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        mode: "semana",
+        activityId: "correr",
+        date: astronomy.date,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getWeatherForecastMock).toHaveBeenCalledWith({
+      lat: city.coordinates.lat,
+      lon: city.coordinates.lon,
+      date: astronomy.date,
+      endDate: "2030-06-11",
+    });
+    expect(payload.weekComparison.activity.id).toBe("correr");
+    expect(payload.weekComparison.days).toHaveLength(2);
+    expect(payload.weekComparison.bestDay.position).toBe(1);
   });
 });
 

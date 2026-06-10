@@ -94,6 +94,18 @@ describe("serviço de previsão Open-Meteo", () => {
     expect(url.searchParams.get("hourly")).toContain("relative_humidity_2m");
   });
 
+  it("monta a URL de forecast com intervalo quando endDate é informado", () => {
+    const url = buildForecastUrl({
+      lat: -28.6775,
+      lon: -49.3697,
+      date: "2026-06-05",
+      endDate: "2026-06-11",
+    });
+
+    expect(url.searchParams.get("start_date")).toBe("2026-06-05");
+    expect(url.searchParams.get("end_date")).toBe("2026-06-11");
+  });
+
   it("mapeia resposta válida para clima horário e astronomia diária", () => {
     const forecast = parseForecastResponse(createForecastFixture());
 
@@ -123,6 +135,13 @@ describe("serviço de previsão Open-Meteo", () => {
       sunrise: "2026-06-05T06:30",
       sunset: "2026-06-05T17:58",
     });
+    expect(forecast.dailyAstronomy).toEqual([
+      {
+        date: "2026-06-05",
+        sunrise: "2026-06-05T06:30",
+        sunset: "2026-06-05T17:58",
+      },
+    ]);
   });
 
   it("rejeita resposta de forecast em formato inválido", () => {

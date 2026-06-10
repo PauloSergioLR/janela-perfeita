@@ -7,6 +7,7 @@ const forecastParamsSchema = z.object({
   lat: z.number().min(-90).max(90),
   lon: z.number().min(-180).max(180),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });
 
 export type WeatherForecastParams = z.infer<typeof forecastParamsSchema>;
@@ -42,7 +43,7 @@ export function buildForecastUrl(params: WeatherForecastParams): URL {
   url.searchParams.set("daily", "sunrise,sunset");
   url.searchParams.set("timezone", "auto");
   url.searchParams.set("start_date", parsedParams.date);
-  url.searchParams.set("end_date", parsedParams.date);
+  url.searchParams.set("end_date", parsedParams.endDate ?? parsedParams.date);
 
   return url;
 }
