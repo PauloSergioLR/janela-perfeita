@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Providers } from "./providers";
 
 const themeScript = `
 (() => {
   try {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.classList.toggle("dark", prefersDark);
+    const stored = localStorage.getItem("theme");
+    const isDark = stored ? stored === "dark" : true;
+    document.documentElement.classList.toggle("dark", isDark);
   } catch {}
 })();
 `;
@@ -77,7 +79,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <Providers>{children}</Providers>
+        <Providers>
+          <ThemeToggle />
+          {children}
+        </Providers>
       </body>
     </html>
   );
