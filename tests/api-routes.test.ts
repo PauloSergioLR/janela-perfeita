@@ -2,14 +2,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { City, DailyAstronomy, HourlyWeather } from "@/types";
 
 const getCitySuggestionsMock = vi.fn();
-const getWeatherForecastMock = vi.fn();
+const getForecastMock = vi.fn();
 
 vi.mock("@/lib/services/open-meteo-geocoding.service", () => ({
   getCitySuggestions: getCitySuggestionsMock,
 }));
 
-vi.mock("@/lib/services/open-meteo-weather.service", () => ({
-  getWeatherForecast: getWeatherForecastMock,
+vi.mock("@/lib/weather/open-meteo-weather-provider", () => ({
+  openMeteoWeatherProvider: {
+    name: "Open-Meteo",
+    getForecast: getForecastMock,
+  },
 }));
 
 const city: City = {
@@ -68,7 +71,7 @@ describe("rotas internas da API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getCitySuggestionsMock.mockResolvedValue([city]);
-    getWeatherForecastMock.mockResolvedValue({
+    getForecastMock.mockResolvedValue({
       hourly: [
         makeWeather("2030-06-05T07:00"),
         makeWeather("2030-06-05T08:00"),
@@ -159,7 +162,7 @@ describe("rotas internas da API", () => {
   });
 
   it("POST /api/recommendation retorna 502 em falha de forecast", async () => {
-    getWeatherForecastMock.mockRejectedValueOnce(new Error("falha externa"));
+    getForecastMock.mockRejectedValueOnce(new Error("falha externa"));
 
     const { POST } = await import("@/app/api/recommendation/route");
     const response = await POST(
@@ -188,7 +191,7 @@ describe("rotas internas da API", () => {
 
     expect(response.status).toBe(200);
     expect(getCitySuggestionsMock).toHaveBeenCalledWith("Criciuma");
-    expect(getWeatherForecastMock).toHaveBeenCalledWith({
+    expect(getForecastMock).toHaveBeenCalledWith({
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: astronomy.date,
@@ -223,7 +226,7 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(getWeatherForecastMock).toHaveBeenCalledTimes(1);
+    expect(getForecastMock).toHaveBeenCalledTimes(1);
     expect(payload.activityRanking.items).toHaveLength(6);
     expect(payload.activityRanking.bestActivity).toEqual(
       expect.objectContaining({
@@ -243,7 +246,7 @@ describe("rotas internas da API", () => {
       sunrise: "2030-06-06T06:30",
       sunset: "2030-06-06T18:00",
     };
-    getWeatherForecastMock.mockResolvedValueOnce({
+    getForecastMock.mockResolvedValueOnce({
       hourly: [
         makeWeather("2030-06-05T07:00", { precipitation: 1 }),
         makeWeather("2030-06-06T07:00"),
@@ -264,7 +267,7 @@ describe("rotas internas da API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(getWeatherForecastMock).toHaveBeenCalledWith({
+    expect(getForecastMock).toHaveBeenCalledWith({
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: astronomy.date,
