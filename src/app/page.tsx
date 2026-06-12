@@ -51,8 +51,11 @@ import {
   buildSearchHistoryEntry,
   clearSearchHistory,
   getSearchHistoryLabel,
+  modeUsesActivity,
+  normalizeSearchHistoryDraft,
   readSearchHistory,
   saveSearchHistoryEntry,
+  type SearchHistoryDraft,
 } from "@/lib/ui/search-history";
 import { cn } from "@/lib/utils";
 import type {
@@ -274,27 +277,24 @@ export default function Home() {
     activityName?: string;
     date: string;
   }) {
+    const normalizedInput = normalizeSearchHistoryDraft(input);
     const entry = buildSearchHistoryEntry({
-      ...input,
+      ...normalizedInput,
       createdAt: new Date().toISOString(),
     });
 
     setSearchHistory(saveSearchHistoryEntry(window.localStorage, entry));
   }
 
-  function runSearch(input: {
-    city: City;
-    mode: SearchMode;
-    activityId?: ActivityId;
-    activityName?: string;
-    date: string;
-  }) {
-    saveSearch(input);
+  function runSearch(input: SearchHistoryDraft) {
+    const normalizedInput = normalizeSearchHistoryDraft(input);
+
+    saveSearch(normalizedInput);
     recommendationMutation.mutate({
-      city: input.city,
-      mode: input.mode,
-      activityId: input.activityId,
-      date: input.date,
+      city: normalizedInput.city,
+      mode: normalizedInput.mode,
+      activityId: normalizedInput.activityId,
+      date: normalizedInput.date,
     });
   }
 
@@ -303,15 +303,19 @@ export default function Home() {
       return;
     }
 
-    if (searchMode !== "atividades" && selectedActivityId === "") {
+    if (modeUsesActivity(searchMode) && selectedActivityId === "") {
       return;
     }
 
     runSearch({
       city: selectedCity,
       mode: searchMode,
-      activityId: selectedActivityId || undefined,
-      activityName: selectedActivity?.name,
+      activityId: modeUsesActivity(searchMode)
+        ? selectedActivityId || undefined
+        : undefined,
+      activityName: modeUsesActivity(searchMode)
+        ? selectedActivity?.name
+        : undefined,
       date: selectedDate,
     });
   }
@@ -333,24 +337,26 @@ export default function Home() {
       ? entry.date
       : dateOptions[0]?.value ?? entry.date;
 
-    setSearchMode(entry.mode);
-    setSelectedCity(entry.city);
-    setCityQuery(formatCityLabel(entry.city));
-    setSelectedDate(date);
-    setSelectedActivityId(entry.activityId ?? "");
-    resetRecommendationState();
-
-    if (entry.mode !== "atividades" && !entry.activityId) {
-      return;
-    }
-
-    runSearch({
+    const searchInput = normalizeSearchHistoryDraft({
       city: entry.city,
       mode: entry.mode,
       activityId: entry.activityId,
       activityName: entry.activityName,
       date,
     });
+
+    setSearchMode(searchInput.mode);
+    setSelectedCity(searchInput.city);
+    setCityQuery(formatCityLabel(searchInput.city));
+    setSelectedDate(searchInput.date);
+    setSelectedActivityId(searchInput.activityId ?? "");
+    resetRecommendationState();
+
+    if (modeUsesActivity(searchInput.mode) && !searchInput.activityId) {
+      return;
+    }
+
+    runSearch(searchInput);
   }
 
   function handleClearHistory() {

@@ -51,6 +51,32 @@ interface BuildSearchHistoryEntryInput {
   createdAt: string;
 }
 
+export interface SearchHistoryDraft {
+  mode: SearchMode;
+  city: City;
+  activityId?: ActivityId;
+  activityName?: string;
+  date: string;
+}
+
+export function modeUsesActivity(mode: SearchMode): boolean {
+  return mode !== "atividades";
+}
+
+export function normalizeSearchHistoryDraft(
+  input: SearchHistoryDraft,
+): SearchHistoryDraft {
+  if (modeUsesActivity(input.mode)) {
+    return input;
+  }
+
+  return {
+    mode: input.mode,
+    city: input.city,
+    date: input.date,
+  };
+}
+
 function buildSearchId(input: Omit<BuildSearchHistoryEntryInput, "createdAt">) {
   return [
     input.mode,
@@ -64,13 +90,15 @@ function buildSearchId(input: Omit<BuildSearchHistoryEntryInput, "createdAt">) {
 export function buildSearchHistoryEntry(
   input: BuildSearchHistoryEntryInput,
 ): SearchHistoryEntry {
+  const normalizedInput = normalizeSearchHistoryDraft(input);
+
   return {
-    id: buildSearchId(input),
-    mode: input.mode,
-    city: input.city,
-    activityId: input.activityId,
-    activityName: input.activityName,
-    date: input.date,
+    id: buildSearchId(normalizedInput),
+    mode: normalizedInput.mode,
+    city: normalizedInput.city,
+    activityId: normalizedInput.activityId,
+    activityName: normalizedInput.activityName,
+    date: normalizedInput.date,
     createdAt: input.createdAt,
   };
 }

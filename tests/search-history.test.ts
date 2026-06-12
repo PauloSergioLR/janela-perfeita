@@ -3,6 +3,8 @@ import {
   buildSearchHistoryEntry,
   clearSearchHistory,
   getSearchHistoryLabel,
+  modeUsesActivity,
+  normalizeSearchHistoryDraft,
   readSearchHistory,
   saveSearchHistoryEntry,
   SEARCH_HISTORY_LIMIT,
@@ -108,5 +110,20 @@ describe("historico local de buscas", () => {
     });
 
     expect(getSearchHistoryLabel(entry)).toContain("Ranking de atividades");
+  });
+
+  it("remove atividade escondida do modo o que fazer", () => {
+    const draft = normalizeSearchHistoryDraft({
+      mode: "atividades",
+      city: criciumaCity,
+      activityId: "observar_estrelas",
+      activityName: "Observar estrelas",
+      date: "2030-06-05",
+    });
+
+    expect(draft.activityId).toBeUndefined();
+    expect(draft.activityName).toBeUndefined();
+    expect(modeUsesActivity("semana")).toBe(true);
+    expect(modeUsesActivity("atividades")).toBe(false);
   });
 });
