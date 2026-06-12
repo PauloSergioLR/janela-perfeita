@@ -7,7 +7,7 @@ import {
   buildWeekComparison,
 } from "@/lib/engine/recommendation-exploration";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
-import { getWeatherForecast } from "@/lib/services/open-meteo-weather.service";
+import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
 import type { Activity, ActivityId, City } from "@/types";
 
 const ACTIVITY_IDS = [
@@ -34,6 +34,7 @@ const citySchema = z.object({
 const recommendationModeSchema = z.enum(["janela", "atividades", "semana"]);
 const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
 const WEEK_COMPARISON_DAYS = 7;
+const weatherProvider = openMeteoWeatherProvider;
 
 const recommendationRequestSchema = z
   .object({
@@ -150,7 +151,7 @@ export async function POST(request: Request) {
     const generatedAtDate = new Date();
     const generatedAt = generatedAtDate.toISOString();
     const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
-    const forecast = await getWeatherForecast({
+    const forecast = await weatherProvider.getForecast({
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: body.date,

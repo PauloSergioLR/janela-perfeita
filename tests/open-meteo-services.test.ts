@@ -11,6 +11,7 @@ import {
   parseForecastResponse,
   parseGeocodingResponse,
 } from "@/lib/services/open-meteo.schemas";
+import { OpenMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
 
 function createForecastFixture() {
   const hours = Array.from(
@@ -196,6 +197,24 @@ describe("serviço de previsão Open-Meteo", () => {
     expect(fetchMock).toHaveBeenCalledWith(expect.any(URL));
     expect(forecast.hourly).toHaveLength(24);
     expect(forecast.astronomy.sunset).toBe("2026-06-05T17:58");
+  });
+
+  it("expoe provider Open-Meteo com forecast normalizado", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(createJsonResponse(createForecastFixture()));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const provider = new OpenMeteoWeatherProvider();
+    const forecast = await provider.getForecast({
+      lat: -28.6775,
+      lon: -49.3697,
+      date: "2026-06-05",
+    });
+
+    expect(provider.name).toBe("Open-Meteo");
+    expect(forecast.hourly).toHaveLength(24);
+    expect(forecast.dailyAstronomy[0]?.date).toBe("2026-06-05");
   });
 
   it("retorna erro amigável quando o forecast vem em formato inválido", async () => {
