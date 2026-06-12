@@ -30,8 +30,9 @@ vale a pena fazer esta atividade hoje?".
 - Mostra melhor janela do dia, alternativas e timeline.
 - Explica os principais motivos da recomendacao.
 - Informa quando nao ha janela boa.
+- Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Usa Open-Meteo com atribuicao e disclaimer.
-- Nao armazena localizacao, IP, historico ou dados pessoais.
+- Nao armazena localizacao, IP, historico ou dados pessoais em servidor.
 
 ## Arquitetura
 
@@ -223,8 +224,10 @@ No MVP, Janela Perfeita:
 
 - nao exige login
 - nao usa banco de dados
-- nao persiste historico
-- nao armazena localizacao
+- salva apenas as ultimas 5 buscas no `localStorage` do proprio navegador
+- permite limpar esse historico local pela interface
+- nao envia historico local para servidor
+- nao armazena localizacao em servidor
 - nao armazena IP ou dados pessoais
 
 ## Fluxo de desenvolvimento
