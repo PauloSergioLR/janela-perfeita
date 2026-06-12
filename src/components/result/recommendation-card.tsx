@@ -10,6 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { ShareResultButton } from "@/components/result/share-result-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -27,6 +28,7 @@ import {
   getPeakHourScore,
   getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
+import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
 import type { Recommendation, RuleResult } from "@/types";
 
@@ -142,6 +144,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const primaryReason =
     bestWindow?.highlights[0] ??
     (fallbackScore ? getPrimaryReason(fallbackScore) : null);
+  const shareText = buildRecommendationShareText(recommendation);
 
   return (
     <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
@@ -154,22 +157,28 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               {formatRecommendationLocation(recommendation)}
             </CardDescription>
           </div>
-          <Badge
-            variant="outline"
-            className={cn(
-              "h-7 shrink-0 px-3",
-              bestWindow
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100"
-                : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100",
-            )}
-          >
-            {bestWindow ? (
-              <CheckCircle2 className="size-3" aria-hidden="true" />
-            ) : (
-              <AlertTriangle className="size-3" aria-hidden="true" />
-            )}
-            {bestWindow ? "Janela ideal" : "Sem janela ideal"}
-          </Badge>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <Badge
+              variant="outline"
+              className={cn(
+                "h-7 px-3",
+                bestWindow
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100"
+                  : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100",
+              )}
+            >
+              {bestWindow ? (
+                <CheckCircle2 className="size-3" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="size-3" aria-hidden="true" />
+              )}
+              {bestWindow ? "Janela ideal" : "Sem janela ideal"}
+            </Badge>
+            <ShareResultButton
+              title="Janela Perfeita"
+              text={shareText}
+            />
+          </div>
         </div>
       </CardHeader>
 

@@ -1,5 +1,6 @@
 import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Trophy } from "lucide-react";
 import type { DayRankingItem, WeekComparison } from "@/types";
+import { ShareResultButton } from "@/components/result/share-result-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -16,6 +17,7 @@ import {
   formatWindowSummary,
   getRecommendationRankingReason,
 } from "@/lib/ui/exploration-result";
+import { buildWeekComparisonShareText } from "@/lib/ui/share-result";
 import { formatCityLabel } from "@/lib/ui/search-page";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +42,7 @@ function DayBadge({ item }: { item: DayRankingItem }) {
 
 export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
   const bestRecommendation = comparison.bestDay?.recommendation;
+  const shareText = buildWeekComparisonShareText(comparison);
 
   return (
     <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
@@ -48,6 +51,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
         <CardDescription>
           {comparison.activity.name} em {formatCityLabel(comparison.city)}
         </CardDescription>
+        <ShareResultButton title="Janela Perfeita" text={shareText} />
       </CardHeader>
       <CardContent className="space-y-4 p-4 sm:p-5">
         {bestRecommendation ? (

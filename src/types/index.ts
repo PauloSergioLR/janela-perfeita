@@ -7,6 +7,8 @@ export type ActivityId =
   | "observar_estrelas"
   | "lavar_carro";
 
+export type SearchMode = "janela" | "atividades" | "semana";
+
 /** Coordenadas geográficas usadas para consultar previsão meteorológica. */
 export interface Coordinates {
   lat: number;
@@ -171,4 +173,15 @@ export interface WeekComparison {
   days: DayRankingItem[];
   bestDay: DayRankingItem | null;
   disclaimer: string;
+}
+
+/** Busca salva localmente no navegador para repetição rápida. */
+export interface SearchHistoryEntry {
+  id: string;
+  mode: SearchMode;
+  city: City;
+  activityId?: ActivityId;
+  activityName?: string;
+  date: string;
+  createdAt: string;
 }

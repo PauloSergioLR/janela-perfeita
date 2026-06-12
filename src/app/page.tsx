@@ -10,13 +10,16 @@ import {
   Car,
   Clock3,
   Footprints,
+  History,
   ListChecks,
   Loader2,
   MapPin,
   Moon,
   RefreshCw,
+  RotateCcw,
   Route,
   Search,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
@@ -44,12 +47,21 @@ import {
   SEARCH_DEBOUNCE_MS,
   type SearchDateOption,
 } from "@/lib/ui/search-page";
+import {
+  buildSearchHistoryEntry,
+  clearSearchHistory,
+  getSearchHistoryLabel,
+  readSearchHistory,
+  saveSearchHistoryEntry,
+} from "@/lib/ui/search-history";
 import { cn } from "@/lib/utils";
 import type {
   ActivityId,
   ActivityRanking,
   City,
   Recommendation,
+  SearchHistoryEntry,
+  SearchMode,
   WeekComparison,
 } from "@/types";
 
@@ -67,8 +79,6 @@ type ActivityVisual = {
   icon: typeof Footprints;
   tone: string;
 };
-
-type SearchMode = "janela" | "atividades" | "semana";
 
 type SearchModeOption = {
   id: SearchMode;
@@ -192,6 +202,7 @@ export default function Home() {
   );
   const [selectedDate, setSelectedDate] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("janela");
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
     SEARCH_DEBOUNCE_MS,
@@ -234,6 +245,10 @@ export default function Home() {
     setSelectedDate(options[0]?.value ?? "");
   }, []);
 
+  useEffect(() => {
+    setSearchHistory(readSearchHistory(window.localStorage));
+  }, []);
+
   function resetRecommendationState() {
     if (!recommendationMutation.isIdle) {
       recommendationMutation.reset();
@@ -252,6 +267,37 @@ export default function Home() {
     resetRecommendationState();
   }
 
+  function saveSearch(input: {
+    city: City;
+    mode: SearchMode;
+    activityId?: ActivityId;
+    activityName?: string;
+    date: string;
+  }) {
+    const entry = buildSearchHistoryEntry({
+      ...input,
+      createdAt: new Date().toISOString(),
+    });
+
+    setSearchHistory(saveSearchHistoryEntry(window.localStorage, entry));
+  }
+
+  function runSearch(input: {
+    city: City;
+    mode: SearchMode;
+    activityId?: ActivityId;
+    activityName?: string;
+    date: string;
+  }) {
+    saveSearch(input);
+    recommendationMutation.mutate({
+      city: input.city,
+      mode: input.mode,
+      activityId: input.activityId,
+      date: input.date,
+    });
+  }
+
   function submitCurrentSearch() {
     if (!canSearch || selectedCity === null) {
       return;
@@ -261,10 +307,11 @@ export default function Home() {
       return;
     }
 
-    recommendationMutation.mutate({
+    runSearch({
       city: selectedCity,
       mode: searchMode,
       activityId: selectedActivityId || undefined,
+      activityName: selectedActivity?.name,
       date: selectedDate,
     });
   }
@@ -276,6 +323,39 @@ export default function Home() {
 
   function handleRecommendationRetry() {
     submitCurrentSearch();
+  }
+
+  function handleHistorySelect(entry: SearchHistoryEntry) {
+    const historyDateIsAvailable = dateOptions.some(
+      (option) => option.value === entry.date,
+    );
+    const date = historyDateIsAvailable
+      ? entry.date
+      : dateOptions[0]?.value ?? entry.date;
+
+    setSearchMode(entry.mode);
+    setSelectedCity(entry.city);
+    setCityQuery(formatCityLabel(entry.city));
+    setSelectedDate(date);
+    setSelectedActivityId(entry.activityId ?? "");
+    resetRecommendationState();
+
+    if (entry.mode !== "atividades" && !entry.activityId) {
+      return;
+    }
+
+    runSearch({
+      city: entry.city,
+      mode: entry.mode,
+      activityId: entry.activityId,
+      activityName: entry.activityName,
+      date,
+    });
+  }
+
+  function handleClearHistory() {
+    clearSearchHistory(window.localStorage);
+    setSearchHistory([]);
   }
 
   return (
@@ -331,6 +411,7 @@ export default function Home() {
         </header>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(390px,0.95fr)]">
+          <div className="flex flex-col gap-4">
           <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
             <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
               <CardTitle>Planejar janela</CardTitle>
@@ -617,6 +698,68 @@ export default function Home() {
               </form>
             </CardContent>
           </Card>
+
+          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Buscas recentes</CardTitle>
+                  <CardDescription>Apenas neste navegador</CardDescription>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 rounded-md"
+                  disabled={searchHistory.length === 0}
+                  onClick={handleClearHistory}
+                >
+                  <Trash2 className="size-3.5" aria-hidden="true" />
+                  Limpar
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-5">
+              {searchHistory.length > 0 ? (
+                <div className="grid gap-2">
+                  {searchHistory.map((entry) => {
+                    const mode = SEARCH_MODE_OPTIONS.find(
+                      (option) => option.id === entry.mode,
+                    );
+
+                    return (
+                      <button
+                        key={`${entry.id}-${entry.createdAt}`}
+                        type="button"
+                        className="grid gap-2 rounded-lg border border-border bg-background p-3 text-left transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                        onClick={() => handleHistorySelect(entry)}
+                      >
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-2 font-medium text-slate-950 dark:text-slate-50">
+                            <History className="size-4 text-sky-700" aria-hidden="true" />
+                            {getSearchHistoryLabel(entry)}
+                          </span>
+                          <span className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            <span>{mode?.label ?? "Busca"}</span>
+                            <span>{entry.date}</span>
+                          </span>
+                        </span>
+                        <span className="inline-flex h-8 items-center gap-1 rounded-md border border-border px-2 text-xs text-muted-foreground">
+                          <RotateCcw className="size-3" aria-hidden="true" />
+                          Repetir
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                  Nenhuma busca recente.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          </div>
 
           <aside className="flex flex-col gap-4">
             {recommendationMutation.isSuccess && recommendation ? (
