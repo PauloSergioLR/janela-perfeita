@@ -1,12 +1,13 @@
 # Janela Perfeita
 
 Janela Perfeita e um web app que transforma previsao meteorologica horaria em
-recomendacoes praticas de melhores horarios para atividades ao ar livre.
+recomendacoes praticas de melhores janelas para atividades ao ar livre.
 
-O produto nao tenta ser mais um app de clima. A previsao e apenas a entrada: a
-aplicacao combina regras de dominio, pesos por atividade, contexto solar e
-agrupamento de horas consecutivas para responder uma pergunta mais util: "quando
-vale a pena fazer esta atividade hoje?".
+O produto nao tenta ser apenas mais um app de clima. A previsao e a entrada; a
+entrega e uma decisao: a aplicacao combina regras de dominio, pesos por
+atividade, contexto solar, confianca da previsao e agrupamento de horas
+consecutivas para responder uma pergunta mais util: "quando vale a pena fazer
+esta atividade?".
 
 ## Demo
 
@@ -15,7 +16,7 @@ vale a pena fazer esta atividade hoje?".
 
 ![Tela inicial do Janela Perfeita](docs/screenshot-home.png)
 
-## O que o MVP faz
+## O que o app faz hoje
 
 - Busca cidade por nome, sem exigir GPS.
 - Recomenda datas de hoje ate hoje+6.
@@ -30,6 +31,13 @@ vale a pena fazer esta atividade hoje?".
 - Mostra melhor janela do dia, alternativas e timeline.
 - Explica os principais motivos da recomendacao.
 - Informa quando nao ha janela boa.
+- Calcula confianca da previsao dentro da janela recomendada.
+- Considera probabilidade de chuva, chuva, pancadas, weather code, sensacao
+  termica, rajadas, visibilidade, duracao de sol e camadas de nuvens.
+- Oferece modo inverso para responder "o que fazer hoje?".
+- Compara melhores dias da semana para uma atividade.
+- Compara modelos da Open-Meteo quando solicitado.
+- Pode comparar Open-Meteo com WeatherAPI.com quando `WEATHERAPI_KEY` existe.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Inclui uma pagina tecnica de backtesting com fixture historica local.
 - Inclui `/como-funciona` para explicar score, pesos, janelas e limitações.
@@ -44,24 +52,31 @@ flowchart LR
   U[Usuario] --> UI[Next.js App Router]
   UI --> GEO[/GET /api/geocoding/]
   UI --> REC[/POST /api/recommendation/]
+  UI --> DEMO[?demo=true]
+  UI --> TECH[/como-funciona e /tecnico/backtesting/]
 
   GEO --> GS[Open-Meteo Geocoding Service]
   GS --> OMGeo[(Open-Meteo Geocoding API)]
 
-  REC --> WS[Open-Meteo Forecast Service]
+  REC --> WP[WeatherProvider]
   REC --> ACT[Atividades e regras ponderadas]
   REC --> ENG[Engine de score e janelas]
+  REC --> CMP[Comparacao de modelos/providers]
+  DEMO --> FIX[Fixtures locais]
 
-  WS --> OMForecast[(Open-Meteo Forecast API)]
+  WP --> OMForecast[(Open-Meteo Forecast API)]
+  WP -. opcional .-> WAPI[(WeatherAPI.com)]
   ACT --> ENG
-  ENG --> OUT[Recommendation]
+  ENG --> OUT[Recommendation / Ranking / Semana]
+  CMP --> OUT
+  FIX --> ENG
   OUT --> UI
 ```
 
 ## Como a recomendacao funciona
 
-1. A UI envia cidade, atividade e data para a API interna.
-2. A API consulta forecast e astronomia diaria na Open-Meteo.
+1. A UI envia cidade, modo, atividade e data para a API interna.
+2. A API consulta forecast e astronomia diaria via `WeatherProvider`.
 3. A engine monta contexto por hora:
    - hora local
    - se a data e hoje
@@ -72,6 +87,23 @@ flowchart LR
 4. Cada atividade avalia fatores com pesos proprios.
 5. A engine calcula scores horarios e agrupa horas consecutivas acima do minimo.
 6. As janelas sao ordenadas por media, pico, duracao e horario inicial.
+7. A melhor janela recebe confianca baseada na estabilidade dos fatores.
+8. Em modos extras, a mesma engine gera ranking de atividades ou comparacao da
+   semana.
+
+## Dados meteorologicos usados
+
+O score usa dados horarios normalizados:
+
+- temperatura e sensacao termica;
+- precipitacao, chuva, pancadas, probabilidade de chuva e weather code;
+- vento medio e rajadas;
+- cobertura de nuvens total, baixa, media e alta;
+- visibilidade;
+- duracao de sol;
+- indice UV;
+- umidade relativa;
+- nascer e por do sol diarios.
 
 ## Regras das atividades
 
@@ -79,13 +111,29 @@ flowchart LR
 | --- | --- | ---: | ---: |
 | Correr | temperatura 40, chuva 30, vento 20, UV 10 | 60 | 1h |
 | Caminhar | temperatura 40, chuva 35, vento 25 | 60 | 1h |
-| Pedalar | chuva 35, temperatura 30, vento 25, UV 10 | 65 | 1h |
-| Fotografar por do sol | golden hour 40, nuvens 30, chuva 20, umidade 10 | 60 | 1h |
-| Observar estrelas | ceu limpo 50, noite 20, chuva 20, temperatura minima 10 | 70 | 2h |
+| Pedalar | chuva 35, temperatura 25, vento 15, rajadas 15, UV 10 | 65 | 1h |
+| Fotografar por do sol | hora dourada 35, nuvens 25, visibilidade 20, chuva 15, sol 5 | 60 | 1h |
+| Observar estrelas | noite 45, qualidade do ceu 45, chuva 10 | 70 | 2h |
 | Lavar carro | chuva 50, umidade 20, temperatura 20, vento 10 | 65 | 2h |
 
 Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 0 a 100.
+
+## Funcionalidades tecnicas
+
+- **Confianca da previsao:** mostra se a janela e estavel ou se ha variacao
+  relevante de chuva, vento, temperatura e nuvens.
+- **Modo inverso:** ranqueia as seis atividades para a mesma cidade e data.
+- **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
+  de uma atividade.
+- **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
+  mostra divergencia, sem fazer media cega.
+- **Provider opcional:** WeatherAPI.com pode entrar como segunda fonte apenas
+  para comparacao, quando `WEATHERAPI_KEY` esta configurada.
+- **Historico local:** salva somente as ultimas buscas no `localStorage`.
+- **Compartilhamento:** gera texto compartilhavel do resultado.
+- **Modo demo:** usa fixture local apenas com `?demo=true`.
+- **Backtesting:** pagina tecnica valida a metodologia com amostra local.
 
 ## Stack
 
@@ -113,6 +161,7 @@ src/lib/engine/weather-context.ts       # contexto solar e horario
 src/lib/engine/score-calculator.ts      # score por hora
 src/lib/engine/window-finder.ts         # melhores janelas
 src/lib/backtesting/*                   # backtesting tecnico isolado
+src/lib/ui/score-explainer.ts           # dados da pagina como funciona
 src/lib/services/open-meteo.*           # servicos e schemas externos
 src/lib/services/weatherapi-weather.*   # segunda fonte meteorologica opcional
 src/lib/weather/*                       # providers e comparacoes de previsao
@@ -157,14 +206,14 @@ npm run build
 npm run test:e2e
 ```
 
-Cobertura registrada apos a issue #9:
+Cobertura local atual:
 
 | Metrica | Cobertura |
 | --- | ---: |
-| Statements | 93.13% |
-| Branches | 78.91% |
-| Functions | 93.25% |
-| Lines | 93.72% |
+| Statements | 94.94% |
+| Branches | 80.80% |
+| Functions | 96.33% |
+| Lines | 95.14% |
 
 O relatorio HTML local fica em `coverage/index.html`.
 
@@ -239,6 +288,7 @@ Etapas:
 
 ```text
 npm ci
+npx playwright install --with-deps chromium
 npm run lint
 npm test
 npm run test:coverage
@@ -266,6 +316,15 @@ https://janela-perfeita.vercel.app
 O MVP nao precisa de banco, backend externo separado, login, autenticacao,
 pagamento, anuncios ou marketplace.
 
+## Paginas tecnicas
+
+- `/como-funciona`: explica score, pesos, janelas, confianca e limitacoes.
+- `/tecnico/backtesting`: mostra um relatorio tecnico com fixture historica
+  local.
+
+Essas paginas ajudam a defender o projeto em entrevista, GitHub e portfolio sem
+misturar texto longo na experiencia principal.
+
 ## Open-Meteo
 
 Este projeto usa dados da Open-Meteo:
@@ -278,6 +337,8 @@ Este projeto usa dados da Open-Meteo:
 Uso tratado como nao comercial e de portfolio. As recomendacoes sao estimativas
 baseadas em previsao meteorologica e nao substituem avaliacao local das
 condicoes.
+
+O projeto usa atribuicao visivel para Open-Meteo na interface e no README.
 
 ## Segunda fonte meteorologica opcional
 
@@ -299,7 +360,7 @@ Referencia oficial: https://www.weatherapi.com/docs/
 
 ## Privacidade
 
-No MVP, Janela Perfeita:
+Janela Perfeita:
 
 - nao exige login
 - nao usa banco de dados
@@ -308,6 +369,25 @@ No MVP, Janela Perfeita:
 - nao envia historico local para servidor
 - nao armazena localizacao em servidor
 - nao armazena IP ou dados pessoais
+
+## Limitacoes
+
+- Previsao meteorologica pode mudar; o app nao promete precisao absoluta.
+- O score e uma estimativa baseada nas regras atuais, nao uma garantia de
+  seguranca ou conforto.
+- WeatherAPI.com e opcional e nao substitui automaticamente a Open-Meteo.
+- Comparacoes entre modelos e providers mostram divergencia; nao fazem media
+  automatica entre fontes.
+- O backtesting atual usa amostra local preparada, nao auditoria meteorologica
+  oficial.
+- O modo demo existe apenas para apresentacao controlada.
+
+## Roadmap
+
+- Melhorar a amostra do backtesting com dados historicos reais e reprodutiveis.
+- Criar mais cenarios E2E para modos semana, inverso, demo e compartilhamento.
+- Evoluir acessibilidade e tema visual sem mudar a regra de negocio.
+- Adicionar novas fontes meteorologicas somente como comparacao explicita.
 
 ## Fluxo de desenvolvimento
 
