@@ -171,8 +171,16 @@ async function readApiResponse<T>(response: Response): Promise<T> {
   return payload as T;
 }
 
-async function fetchCities(query: string): Promise<City[]> {
-  const response = await fetch(`/api/geocoding?q=${encodeURIComponent(query)}`);
+async function fetchCities(query: string, demoMode: boolean): Promise<City[]> {
+  const params = new URLSearchParams({
+    q: query,
+  });
+
+  if (demoMode) {
+    params.set("demo", "true");
+  }
+
+  const response = await fetch(`/api/geocoding?${params.toString()}`);
   const payload = await readApiResponse<GeocodingResponse>(response);
 
   return payload.cities;
@@ -184,6 +192,7 @@ async function requestRecommendation(input: {
   activityId?: ActivityId;
   date: string;
   compareModels?: boolean;
+  demo?: boolean;
 }): Promise<RecommendationResponse> {
   const response = await fetch("/api/recommendation", {
     method: "POST",
@@ -207,6 +216,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("janela");
   const [compareModels, setCompareModels] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
@@ -225,8 +235,8 @@ export default function Home() {
   const cityQueryEnabled =
     debouncedCityQuery.length >= 3 && selectedCity === null;
   const cityQueryResult = useQuery({
-    queryKey: ["geocoding", debouncedCityQuery],
-    queryFn: () => fetchCities(debouncedCityQuery),
+    queryKey: ["geocoding", debouncedCityQuery, demoMode],
+    queryFn: () => fetchCities(debouncedCityQuery, demoMode),
     enabled: cityQueryEnabled,
   });
   const recommendationMutation = useMutation({
@@ -248,6 +258,12 @@ export default function Home() {
 
     setDateOptions(options);
     setSelectedDate(options[0]?.value ?? "");
+  }, []);
+
+  useEffect(() => {
+    setDemoMode(
+      new URLSearchParams(window.location.search).get("demo") === "true",
+    );
   }, []);
 
   useEffect(() => {
@@ -288,16 +304,22 @@ export default function Home() {
     setSearchHistory(saveSearchHistoryEntry(window.localStorage, entry));
   }
 
-  function runSearch(input: SearchHistoryDraft & { compareModels?: boolean }) {
+  function runSearch(
+    input: SearchHistoryDraft & { compareModels?: boolean; demo?: boolean },
+  ) {
     const normalizedInput = normalizeSearchHistoryDraft(input);
 
-    saveSearch(normalizedInput);
+    if (!input.demo) {
+      saveSearch(normalizedInput);
+    }
+
     recommendationMutation.mutate({
       city: normalizedInput.city,
       mode: normalizedInput.mode,
       activityId: normalizedInput.activityId,
       date: normalizedInput.date,
       compareModels: input.compareModels,
+      demo: input.demo,
     });
   }
 
@@ -321,6 +343,7 @@ export default function Home() {
         : undefined,
       date: selectedDate,
       compareModels: searchMode === "janela" ? compareModels : false,
+      demo: demoMode,
     });
   }
 
@@ -363,6 +386,7 @@ export default function Home() {
     runSearch({
       ...searchInput,
       compareModels: searchInput.mode === "janela" ? compareModels : false,
+      demo: demoMode,
     });
   }
 
@@ -389,6 +413,14 @@ export default function Home() {
               >
                 Open-Meteo
               </Badge>
+              {demoMode ? (
+                <Badge
+                  variant="outline"
+                  className="h-7 border-amber-200 bg-amber-50 px-3 text-amber-900"
+                >
+                  Modo demo
+                </Badge>
+              ) : null}
             </div>
             <div className="max-w-3xl space-y-2">
               <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-5xl">
@@ -709,7 +741,7 @@ export default function Home() {
                   </Button>
                 </div>
 
-                {searchMode === "janela" ? (
+                {searchMode === "janela" && !demoMode ? (
                   <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 text-sm">
                     <input
                       type="checkbox"

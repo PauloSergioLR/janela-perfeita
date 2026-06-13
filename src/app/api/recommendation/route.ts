@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  DEMO_DISCLAIMER,
+  getDemoCitySuggestions,
+  getDemoForecast,
+} from "@/lib/demo/demo-weather";
 import { getActivityById, getAllActivities } from "@/lib/domain/activities";
 import {
   buildActivityRanking,
@@ -61,6 +66,7 @@ const recommendationRequestSchema = z
     activityId: z.string().trim().min(1).optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     compareModels: z.boolean().optional().default(false),
+    demo: z.boolean().optional().default(false),
     city: citySchema.optional(),
     cityQuery: z.string().trim().min(3).optional(),
   })
@@ -129,9 +135,25 @@ async function readRequestBody(request: Request): Promise<unknown> {
   }
 }
 
-async function resolveCity(city: City | undefined, cityQuery: string | undefined) {
+async function resolveCity(input: {
+  city: City | undefined;
+  cityQuery: string | undefined;
+  demoMode: boolean;
+}) {
+  const { city, cityQuery, demoMode } = input;
+
   if (city) {
     return city;
+  }
+
+  if (demoMode) {
+    const [demoCity] = getDemoCitySuggestions(cityQuery ?? "");
+
+    if (!demoCity) {
+      throw new ApiRouteError(404, "Cidade não encontrada.");
+    }
+
+    return demoCity;
   }
 
   try {
@@ -161,6 +183,12 @@ function resolveActivity(activityId: string | undefined): Activity {
   }
 
   return activity;
+}
+
+function applyDemoDisclaimer<T extends { disclaimer: string }>(value: T): T {
+  value.disclaimer = DEMO_DISCLAIMER;
+
+  return value;
 }
 
 async function getOptionalModelAgreement(input: {
@@ -228,7 +256,11 @@ export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
     const body = recommendationRequestSchema.parse(payload);
-    const city = await resolveCity(body.city, body.cityQuery);
+    const city = await resolveCity({
+      city: body.city,
+      cityQuery: body.cityQuery,
+      demoMode: body.demo,
+    });
     const generatedAtDate = new Date();
     const generatedAt = generatedAtDate.toISOString();
     const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
@@ -241,16 +273,21 @@ export async function POST(request: Request) {
           ? addDaysToDate(body.date, WEEK_COMPARISON_DAYS - 1)
           : undefined,
     };
-    const forecast = await weatherProvider.getForecast(forecastParams).catch(() => {
-      throw new ApiRouteError(502, "Não foi possível buscar a previsão agora.");
-    });
+    const forecast = body.demo
+      ? getDemoForecast(forecastParams)
+      : await weatherProvider.getForecast(forecastParams).catch(() => {
+          throw new ApiRouteError(
+            502,
+            "Não foi possível buscar a previsão agora.",
+          );
+        });
     const modelAgreement = await getOptionalModelAgreement({
-      enabled: body.compareModels && body.mode === "janela",
+      enabled: body.compareModels && body.mode === "janela" && !body.demo,
       forecastParams,
       primaryForecast: forecast,
     });
     const providerComparison = await getOptionalProviderComparison({
-      enabled: body.mode === "janela",
+      enabled: body.mode === "janela" && !body.demo,
       forecastParams,
       primaryForecast: forecast,
     });
@@ -264,6 +301,13 @@ export async function POST(request: Request) {
         generatedAt,
         now,
       });
+
+      if (body.demo) {
+        activityRanking.disclaimer = DEMO_DISCLAIMER;
+        activityRanking.items.forEach((item) =>
+          applyDemoDisclaimer(item.recommendation),
+        );
+      }
 
       return NextResponse.json({ activityRanking });
     }
@@ -279,6 +323,13 @@ export async function POST(request: Request) {
         generatedAt,
         now,
       });
+
+      if (body.demo) {
+        weekComparison.disclaimer = DEMO_DISCLAIMER;
+        weekComparison.days.forEach((day) =>
+          applyDemoDisclaimer(day.recommendation),
+        );
+      }
 
       return NextResponse.json({ weekComparison });
     }
@@ -298,6 +349,10 @@ export async function POST(request: Request) {
 
     if (providerComparison) {
       recommendation.providerComparison = providerComparison;
+    }
+
+    if (body.demo) {
+      applyDemoDisclaimer(recommendation);
     }
 
     return NextResponse.json({ recommendation });

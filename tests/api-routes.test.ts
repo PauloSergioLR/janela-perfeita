@@ -132,6 +132,23 @@ describe("rotas internas da API", () => {
     expect(getCitySuggestionsMock).toHaveBeenCalledWith("Criciuma");
   });
 
+  it("GET /api/geocoding usa cidades locais no modo demo", async () => {
+    const { GET } = await import("@/app/api/geocoding/route");
+    const response = await GET(
+      new Request("http://localhost/api/geocoding?q=demo&demo=true"),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.cities[0]).toEqual(
+      expect.objectContaining({
+        name: "Criciúma",
+        country: "Brasil",
+      }),
+    );
+    expect(getCitySuggestionsMock).not.toHaveBeenCalled();
+  });
+
   it("GET /api/geocoding retorna 502 em erro externo", async () => {
     getCitySuggestionsMock.mockRejectedValueOnce(new Error("falha externa"));
 
@@ -244,6 +261,26 @@ describe("rotas internas da API", () => {
     expect(payload.recommendation.providerComparison).toBeUndefined();
     expect(getSecondaryForecastMock).not.toHaveBeenCalled();
     expect(payload.stack).toBeUndefined();
+  });
+
+  it("POST /api/recommendation usa forecast local no modo demo", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        cityQuery: "demo",
+        activityId: "correr",
+        date: astronomy.date,
+        demo: true,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getCitySuggestionsMock).not.toHaveBeenCalled();
+    expect(getForecastMock).not.toHaveBeenCalled();
+    expect(payload.recommendation.city.name).toBe("Criciúma");
+    expect(payload.recommendation.disclaimer).toContain("Modo demo");
+    expect(payload.recommendation.scores).toHaveLength(24);
   });
 
   it("POST /api/recommendation compara modelos quando flag opcional esta ativa", async () => {
