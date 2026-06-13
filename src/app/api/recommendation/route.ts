@@ -9,12 +9,20 @@ import {
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
 import { calculateModelAgreement } from "@/lib/weather/model-agreement";
 import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
+import { calculateProviderComparison } from "@/lib/weather/provider-comparison";
+import { weatherApiWeatherProvider } from "@/lib/weather/weatherapi-weather-provider";
 import type {
   ForecastParams,
   NormalizedForecast,
   WeatherModelId,
 } from "@/lib/weather/weather-provider";
-import type { Activity, ActivityId, City, ModelAgreement } from "@/types";
+import type {
+  Activity,
+  ActivityId,
+  City,
+  ModelAgreement,
+  WeatherProviderComparison,
+} from "@/types";
 
 const ACTIVITY_IDS = [
   "correr",
@@ -45,6 +53,7 @@ const MODEL_COMPARISON_MODELS = [
   "ecmwf_ifs025",
 ] as const satisfies readonly WeatherModelId[];
 const weatherProvider = openMeteoWeatherProvider;
+const secondaryWeatherProvider = weatherApiWeatherProvider;
 
 const recommendationRequestSchema = z
   .object({
@@ -186,6 +195,35 @@ async function getOptionalModelAgreement(input: {
   }
 }
 
+async function getOptionalProviderComparison(input: {
+  enabled: boolean;
+  forecastParams: ForecastParams;
+  primaryForecast: NormalizedForecast;
+}): Promise<WeatherProviderComparison | null> {
+  if (!input.enabled || !secondaryWeatherProvider.isConfigured) {
+    return null;
+  }
+
+  try {
+    const secondaryForecast = await secondaryWeatherProvider.getForecast(
+      input.forecastParams,
+    );
+
+    return calculateProviderComparison([
+      {
+        provider: weatherProvider.name,
+        forecast: input.primaryForecast,
+      },
+      {
+        provider: secondaryWeatherProvider.name,
+        forecast: secondaryForecast,
+      },
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
@@ -208,6 +246,11 @@ export async function POST(request: Request) {
     });
     const modelAgreement = await getOptionalModelAgreement({
       enabled: body.compareModels && body.mode === "janela",
+      forecastParams,
+      primaryForecast: forecast,
+    });
+    const providerComparison = await getOptionalProviderComparison({
+      enabled: body.mode === "janela",
       forecastParams,
       primaryForecast: forecast,
     });
@@ -251,6 +294,10 @@ export async function POST(request: Request) {
 
     if (modelAgreement) {
       recommendation.modelAgreement = modelAgreement;
+    }
+
+    if (providerComparison) {
+      recommendation.providerComparison = providerComparison;
     }
 
     return NextResponse.json({ recommendation });

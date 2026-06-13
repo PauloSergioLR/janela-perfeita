@@ -108,6 +108,8 @@ src/lib/engine/weather-context.ts       # contexto solar e horario
 src/lib/engine/score-calculator.ts      # score por hora
 src/lib/engine/window-finder.ts         # melhores janelas
 src/lib/services/open-meteo.*           # servicos e schemas externos
+src/lib/services/weatherapi-weather.*   # segunda fonte meteorologica opcional
+src/lib/weather/*                       # providers e comparacoes de previsao
 src/components/result/*                 # resultado, timeline e breakdown
 tests/                                  # cobertura de dominio, engine, API e UI
 ```
@@ -194,7 +196,8 @@ Configuracao recomendada na Vercel:
 - Install command: `npm ci`
 - Build command: `npm run build`
 - Output: padrao do Next.js
-- Variaveis de ambiente: nenhuma obrigatoria no MVP
+- Variaveis de ambiente obrigatorias: nenhuma
+- Variaveis opcionais: `WEATHERAPI_KEY`
 
 Deploy atual:
 
@@ -217,6 +220,24 @@ Este projeto usa dados da Open-Meteo:
 Uso tratado como nao comercial e de portfolio. As recomendacoes sao estimativas
 baseadas em previsao meteorologica e nao substituem avaliacao local das
 condicoes.
+
+## Segunda fonte meteorologica opcional
+
+O app pode comparar a Open-Meteo com a WeatherAPI.com quando houver chave local:
+
+```bash
+WEATHERAPI_KEY=sua_chave
+```
+
+Use essa variavel em `.env.local` no desenvolvimento ou nas variaveis da Vercel.
+Nao ha chave commitada no repositorio, e `.env.local` nao deve entrar em commit.
+
+Sem `WEATHERAPI_KEY`, o app continua funcionando normalmente apenas com
+Open-Meteo. Com a chave configurada, a WeatherAPI.com entra somente como fonte
+de comparacao e alerta de divergencia. O app nao substitui automaticamente a
+Open-Meteo e nao faz media cega entre APIs.
+
+Referencia oficial: https://www.weatherapi.com/docs/
 
 ## Privacidade
 
