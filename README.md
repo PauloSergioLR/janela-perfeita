@@ -32,6 +32,7 @@ vale a pena fazer esta atividade hoje?".
 - Informa quando nao ha janela boa.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Inclui uma pagina tecnica de backtesting com fixture historica local.
+- Inclui `/como-funciona` para explicar score, pesos, janelas e limitações.
 - Permite modo demo isolado via `?demo=true`.
 - Usa Open-Meteo com atribuicao e disclaimer.
 - Nao armazena localizacao, IP, historico ou dados pessoais em servidor.

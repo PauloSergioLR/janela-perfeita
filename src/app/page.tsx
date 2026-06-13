@@ -21,6 +21,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
@@ -421,6 +422,12 @@ export default function Home() {
                   Modo demo
                 </Badge>
               ) : null}
+              <Link
+                href="/como-funciona"
+                className="inline-flex h-7 items-center rounded-md border border-border bg-white px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground dark:bg-card"
+              >
+                Como funciona
+              </Link>
             </div>
             <div className="max-w-3xl space-y-2">
               <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-5xl">
