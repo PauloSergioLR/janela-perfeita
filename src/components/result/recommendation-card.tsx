@@ -72,7 +72,7 @@ function formatModelAgreementLevel(level: ModelAgreement["level"]): string {
   return "Baixa";
 }
 
-function getModelAgreementTone(level: ModelAgreement["level"]): string {
+function getAgreementTone(level: ModelAgreement["level"]): string {
   if (level === "alta") {
     return "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100";
   }
@@ -170,6 +170,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     (fallbackScore ? getPrimaryReason(fallbackScore) : null);
   const modelAgreement = recommendation.modelAgreement;
   const worstDivergence = modelAgreement?.divergences[0];
+  const providerComparison = recommendation.providerComparison;
+  const worstProviderDivergence = providerComparison?.divergences[0];
   const shareText = buildRecommendationShareText(recommendation);
 
   return (
@@ -300,7 +302,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           <div
             className={cn(
               "rounded-lg border p-4 text-sm leading-6",
-              getModelAgreementTone(modelAgreement.level),
+              getAgreementTone(modelAgreement.level),
             )}
           >
             <div className="flex items-center gap-2 font-medium">
@@ -317,6 +319,32 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             {worstDivergence ? (
               <p className="mt-1">
                 Maior divergência: {worstDivergence.reason}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        {providerComparison ? (
+          <div
+            className={cn(
+              "rounded-lg border p-4 text-sm leading-6",
+              getAgreementTone(providerComparison.level),
+            )}
+          >
+            <div className="flex items-center gap-2 font-medium">
+              {providerComparison.level === "alta" ? (
+                <ShieldCheck className="size-4" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="size-4" aria-hidden="true" />
+              )}
+              Concordância entre fontes:{" "}
+              {formatModelAgreementLevel(providerComparison.level)} (
+              {providerComparison.score}/100)
+            </div>
+            <p className="mt-2">{providerComparison.reason}</p>
+            {worstProviderDivergence ? (
+              <p className="mt-1">
+                Maior divergência: {worstProviderDivergence.reason}
               </p>
             ) : null}
           </div>

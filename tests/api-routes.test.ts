@@ -3,6 +3,8 @@ import type { City, DailyAstronomy, HourlyWeather } from "@/types";
 
 const getCitySuggestionsMock = vi.fn();
 const getForecastMock = vi.fn();
+const getSecondaryForecastMock = vi.fn();
+let secondaryWeatherProviderConfigured = false;
 
 vi.mock("@/lib/services/open-meteo-geocoding.service", () => ({
   getCitySuggestions: getCitySuggestionsMock,
@@ -12,6 +14,16 @@ vi.mock("@/lib/weather/open-meteo-weather-provider", () => ({
   openMeteoWeatherProvider: {
     name: "Open-Meteo",
     getForecast: getForecastMock,
+  },
+}));
+
+vi.mock("@/lib/weather/weatherapi-weather-provider", () => ({
+  weatherApiWeatherProvider: {
+    name: "WeatherAPI.com",
+    get isConfigured() {
+      return secondaryWeatherProviderConfigured;
+    },
+    getForecast: getSecondaryForecastMock,
   },
 }));
 
@@ -70,11 +82,28 @@ function makePostRequest(body: unknown) {
 describe("rotas internas da API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    secondaryWeatherProviderConfigured = false;
     getCitySuggestionsMock.mockResolvedValue([city]);
     getForecastMock.mockResolvedValue({
       hourly: [
         makeWeather("2030-06-05T07:00"),
         makeWeather("2030-06-05T08:00"),
+      ],
+      astronomy,
+      dailyAstronomy: [astronomy],
+    });
+    getSecondaryForecastMock.mockResolvedValue({
+      hourly: [
+        makeWeather("2030-06-05T07:00", {
+          precipitation_probability: 70,
+          precipitation: 4,
+          cloud_cover: 90,
+        }),
+        makeWeather("2030-06-05T08:00", {
+          precipitation_probability: 70,
+          precipitation: 4,
+          cloud_cover: 90,
+        }),
       ],
       astronomy,
       dailyAstronomy: [astronomy],
@@ -212,6 +241,8 @@ describe("rotas internas da API", () => {
       }),
     );
     expect(payload.recommendation.disclaimer).toContain("Open-Meteo");
+    expect(payload.recommendation.providerComparison).toBeUndefined();
+    expect(getSecondaryForecastMock).not.toHaveBeenCalled();
     expect(payload.stack).toBeUndefined();
   });
 
@@ -274,6 +305,34 @@ describe("rotas internas da API", () => {
     expect(payload.recommendation.modelAgreement).toEqual(
       expect.objectContaining({
         comparedModels: ["best_match", "gfs_global", "ecmwf_ifs025"],
+        score: expect.any(Number),
+      }),
+    );
+  });
+
+  it("POST /api/recommendation compara provider secundario quando chave existe", async () => {
+    secondaryWeatherProviderConfigured = true;
+
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getSecondaryForecastMock).toHaveBeenCalledWith({
+      lat: city.coordinates.lat,
+      lon: city.coordinates.lon,
+      date: astronomy.date,
+      endDate: undefined,
+    });
+    expect(payload.recommendation.providerComparison).toEqual(
+      expect.objectContaining({
+        comparedProviders: ["Open-Meteo", "WeatherAPI.com"],
         score: expect.any(Number),
       }),
     );

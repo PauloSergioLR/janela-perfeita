@@ -111,6 +111,14 @@ export interface ModelAgreement {
   reason: string;
 }
 
+export interface WeatherProviderComparison {
+  level: ModelAgreementLevel;
+  score: number;
+  comparedProviders: string[];
+  divergences: ModelDivergence[];
+  reason: string;
+}
+
 /** Atividade disponível para recomendação. */
 export interface Activity {
   id: ActivityId;
@@ -154,6 +162,7 @@ export interface Recommendation {
   windows: WindowResult[];
   bestWindow: WindowResult | null;
   modelAgreement?: ModelAgreement;
+  providerComparison?: WeatherProviderComparison;
   disclaimer: string;
 }
 
