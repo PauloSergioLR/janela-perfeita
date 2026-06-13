@@ -9,6 +9,7 @@ const forecastParamsSchema = z.object({
   lon: z.number().min(-180).max(180),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  model: z.enum(["best_match", "gfs_global", "ecmwf_ifs025"]).optional(),
 });
 
 export type WeatherForecastParams = ForecastParams;
@@ -45,6 +46,10 @@ export function buildForecastUrl(params: ForecastParams): URL {
   url.searchParams.set("timezone", "auto");
   url.searchParams.set("start_date", parsedParams.date);
   url.searchParams.set("end_date", parsedParams.endDate ?? parsedParams.date);
+
+  if (parsedParams.model) {
+    url.searchParams.set("models", parsedParams.model);
+  }
 
   return url;
 }

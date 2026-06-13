@@ -92,6 +92,25 @@ export interface ForecastConfidence {
   reason: string;
 }
 
+export type ModelAgreementLevel = "alta" | "media" | "baixa";
+
+export interface ModelDivergence {
+  factor: string;
+  label: string;
+  score: number;
+  maxDifference: number;
+  threshold: number;
+  reason: string;
+}
+
+export interface ModelAgreement {
+  level: ModelAgreementLevel;
+  score: number;
+  comparedModels: string[];
+  divergences: ModelDivergence[];
+  reason: string;
+}
+
 /** Atividade disponível para recomendação. */
 export interface Activity {
   id: ActivityId;
@@ -134,6 +153,7 @@ export interface Recommendation {
   scores: HourScore[];
   windows: WindowResult[];
   bestWindow: WindowResult | null;
+  modelAgreement?: ModelAgreement;
   disclaimer: string;
 }
 
