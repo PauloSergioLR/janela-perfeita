@@ -33,6 +33,9 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Instalar navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
       - name: Rodar lint
         run: npm run lint
 
@@ -44,3 +47,6 @@ jobs:
 
       - name: Gerar build
         run: npm run build
+
+      - name: Rodar testes E2E
+        run: npm run test:e2e
