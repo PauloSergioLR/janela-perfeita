@@ -30,7 +30,7 @@ import {
 } from "@/lib/ui/recommendation-result";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
-import type { Recommendation, RuleResult } from "@/types";
+import type { ModelAgreement, Recommendation, RuleResult } from "@/types";
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -58,6 +58,30 @@ function getConfidenceTone(level: string): string {
   }
 
   return "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
+}
+
+function formatModelAgreementLevel(level: ModelAgreement["level"]): string {
+  if (level === "alta") {
+    return "Alta";
+  }
+
+  if (level === "media") {
+    return "Média";
+  }
+
+  return "Baixa";
+}
+
+function getModelAgreementTone(level: ModelAgreement["level"]): string {
+  if (level === "alta") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100";
+  }
+
+  if (level === "media") {
+    return "border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100";
+  }
+
+  return "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
 }
 
 function sortByImpact(a: RuleResult, b: RuleResult): number {
@@ -144,6 +168,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const primaryReason =
     bestWindow?.highlights[0] ??
     (fallbackScore ? getPrimaryReason(fallbackScore) : null);
+  const modelAgreement = recommendation.modelAgreement;
+  const worstDivergence = modelAgreement?.divergences[0];
   const shareText = buildRecommendationShareText(recommendation);
 
   return (
@@ -267,6 +293,32 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {primaryReason}
             </p>
+          </div>
+        ) : null}
+
+        {modelAgreement ? (
+          <div
+            className={cn(
+              "rounded-lg border p-4 text-sm leading-6",
+              getModelAgreementTone(modelAgreement.level),
+            )}
+          >
+            <div className="flex items-center gap-2 font-medium">
+              {modelAgreement.level === "alta" ? (
+                <ShieldCheck className="size-4" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="size-4" aria-hidden="true" />
+              )}
+              Concordância entre modelos:{" "}
+              {formatModelAgreementLevel(modelAgreement.level)} (
+              {modelAgreement.score}/100)
+            </div>
+            <p className="mt-2">{modelAgreement.reason}</p>
+            {worstDivergence ? (
+              <p className="mt-1">
+                Maior divergência: {worstDivergence.reason}
+              </p>
+            ) : null}
           </div>
         ) : null}
 

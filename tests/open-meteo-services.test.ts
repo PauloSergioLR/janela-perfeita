@@ -107,6 +107,17 @@ describe("serviço de previsão Open-Meteo", () => {
     expect(url.searchParams.get("end_date")).toBe("2026-06-11");
   });
 
+  it("monta a URL de forecast com modelo opcional", () => {
+    const url = buildForecastUrl({
+      lat: -28.6775,
+      lon: -49.3697,
+      date: "2026-06-05",
+      model: "gfs_global",
+    });
+
+    expect(url.searchParams.get("models")).toBe("gfs_global");
+  });
+
   it("mapeia resposta válida para clima horário e astronomia diária", () => {
     const forecast = parseForecastResponse(createForecastFixture());
 

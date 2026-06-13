@@ -7,8 +7,14 @@ import {
   buildWeekComparison,
 } from "@/lib/engine/recommendation-exploration";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
+import { calculateModelAgreement } from "@/lib/weather/model-agreement";
 import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
-import type { Activity, ActivityId, City } from "@/types";
+import type {
+  ForecastParams,
+  NormalizedForecast,
+  WeatherModelId,
+} from "@/lib/weather/weather-provider";
+import type { Activity, ActivityId, City, ModelAgreement } from "@/types";
 
 const ACTIVITY_IDS = [
   "correr",
@@ -34,6 +40,10 @@ const citySchema = z.object({
 const recommendationModeSchema = z.enum(["janela", "atividades", "semana"]);
 const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
 const WEEK_COMPARISON_DAYS = 7;
+const MODEL_COMPARISON_MODELS = [
+  "gfs_global",
+  "ecmwf_ifs025",
+] as const satisfies readonly WeatherModelId[];
 const weatherProvider = openMeteoWeatherProvider;
 
 const recommendationRequestSchema = z
@@ -41,6 +51,7 @@ const recommendationRequestSchema = z
     mode: recommendationModeSchema.default("janela"),
     activityId: z.string().trim().min(1).optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    compareModels: z.boolean().optional().default(false),
     city: citySchema.optional(),
     cityQuery: z.string().trim().min(3).optional(),
   })
@@ -143,6 +154,38 @@ function resolveActivity(activityId: string | undefined): Activity {
   return activity;
 }
 
+async function getOptionalModelAgreement(input: {
+  enabled: boolean;
+  forecastParams: ForecastParams;
+  primaryForecast: NormalizedForecast;
+}): Promise<ModelAgreement | null> {
+  if (!input.enabled) {
+    return null;
+  }
+
+  try {
+    const comparedForecasts = await Promise.all(
+      MODEL_COMPARISON_MODELS.map(async (model) => ({
+        model,
+        forecast: await weatherProvider.getForecast({
+          ...input.forecastParams,
+          model,
+        }),
+      })),
+    );
+
+    return calculateModelAgreement([
+      {
+        model: "best_match",
+        forecast: input.primaryForecast,
+      },
+      ...comparedForecasts,
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
@@ -151,7 +194,7 @@ export async function POST(request: Request) {
     const generatedAtDate = new Date();
     const generatedAt = generatedAtDate.toISOString();
     const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
-    const forecast = await weatherProvider.getForecast({
+    const forecastParams: ForecastParams = {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: body.date,
@@ -159,8 +202,14 @@ export async function POST(request: Request) {
         body.mode === "semana"
           ? addDaysToDate(body.date, WEEK_COMPARISON_DAYS - 1)
           : undefined,
-    }).catch(() => {
+    };
+    const forecast = await weatherProvider.getForecast(forecastParams).catch(() => {
       throw new ApiRouteError(502, "Não foi possível buscar a previsão agora.");
+    });
+    const modelAgreement = await getOptionalModelAgreement({
+      enabled: body.compareModels && body.mode === "janela",
+      forecastParams,
+      primaryForecast: forecast,
     });
 
     if (body.mode === "atividades") {
@@ -199,6 +248,10 @@ export async function POST(request: Request) {
       generatedAt,
       now,
     });
+
+    if (modelAgreement) {
+      recommendation.modelAgreement = modelAgreement;
+    }
 
     return NextResponse.json({ recommendation });
   } catch (error) {

@@ -183,6 +183,7 @@ async function requestRecommendation(input: {
   mode: SearchMode;
   activityId?: ActivityId;
   date: string;
+  compareModels?: boolean;
 }): Promise<RecommendationResponse> {
   const response = await fetch("/api/recommendation", {
     method: "POST",
@@ -205,6 +206,7 @@ export default function Home() {
   );
   const [selectedDate, setSelectedDate] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("janela");
+  const [compareModels, setCompareModels] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
@@ -286,7 +288,7 @@ export default function Home() {
     setSearchHistory(saveSearchHistoryEntry(window.localStorage, entry));
   }
 
-  function runSearch(input: SearchHistoryDraft) {
+  function runSearch(input: SearchHistoryDraft & { compareModels?: boolean }) {
     const normalizedInput = normalizeSearchHistoryDraft(input);
 
     saveSearch(normalizedInput);
@@ -295,6 +297,7 @@ export default function Home() {
       mode: normalizedInput.mode,
       activityId: normalizedInput.activityId,
       date: normalizedInput.date,
+      compareModels: input.compareModels,
     });
   }
 
@@ -317,6 +320,7 @@ export default function Home() {
         ? selectedActivity?.name
         : undefined,
       date: selectedDate,
+      compareModels: searchMode === "janela" ? compareModels : false,
     });
   }
 
@@ -356,7 +360,10 @@ export default function Home() {
       return;
     }
 
-    runSearch(searchInput);
+    runSearch({
+      ...searchInput,
+      compareModels: searchInput.mode === "janela" ? compareModels : false,
+    });
   }
 
   function handleClearHistory() {
@@ -701,6 +708,28 @@ export default function Home() {
                           : "Encontrar janela"}
                   </Button>
                 </div>
+
+                {searchMode === "janela" ? (
+                  <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={compareModels}
+                      onChange={(event) => {
+                        setCompareModels(event.target.checked);
+                        resetRecommendationState();
+                      }}
+                      className="mt-1 size-4"
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-medium">
+                        Comparar modelos Open-Meteo
+                      </span>
+                      <span className="block text-xs leading-5 text-muted-foreground">
+                        Mostra concordância quando a recomendação for calculada.
+                      </span>
+                    </span>
+                  </label>
+                ) : null}
               </form>
             </CardContent>
           </Card>

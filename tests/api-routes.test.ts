@@ -197,6 +197,7 @@ describe("rotas internas da API", () => {
       date: astronomy.date,
       endDate: undefined,
     });
+    expect(getForecastMock).toHaveBeenCalledTimes(1);
     expect(payload.recommendation.activity.id).toBe("correr");
     expect(payload.recommendation.city).toEqual(city);
     expect(payload.recommendation.date).toBe(astronomy.date);
@@ -212,6 +213,70 @@ describe("rotas internas da API", () => {
     );
     expect(payload.recommendation.disclaimer).toContain("Open-Meteo");
     expect(payload.stack).toBeUndefined();
+  });
+
+  it("POST /api/recommendation compara modelos quando flag opcional esta ativa", async () => {
+    getForecastMock
+      .mockResolvedValueOnce({
+        hourly: [
+          makeWeather("2030-06-05T07:00"),
+          makeWeather("2030-06-05T08:00"),
+        ],
+        astronomy,
+        dailyAstronomy: [astronomy],
+      })
+      .mockResolvedValueOnce({
+        hourly: [
+          makeWeather("2030-06-05T07:00", { precipitation_probability: 5 }),
+          makeWeather("2030-06-05T08:00", { precipitation_probability: 5 }),
+        ],
+        astronomy,
+        dailyAstronomy: [astronomy],
+      })
+      .mockResolvedValueOnce({
+        hourly: [
+          makeWeather("2030-06-05T07:00", {
+            precipitation_probability: 70,
+            precipitation: 4,
+            cloud_cover: 90,
+          }),
+          makeWeather("2030-06-05T08:00", {
+            precipitation_probability: 70,
+            precipitation: 4,
+            cloud_cover: 90,
+          }),
+        ],
+        astronomy,
+        dailyAstronomy: [astronomy],
+      });
+
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+        compareModels: true,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getForecastMock).toHaveBeenCalledTimes(3);
+    expect(getForecastMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ model: "gfs_global" }),
+    );
+    expect(getForecastMock).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ model: "ecmwf_ifs025" }),
+    );
+    expect(payload.recommendation.modelAgreement).toEqual(
+      expect.objectContaining({
+        comparedModels: ["best_match", "gfs_global", "ecmwf_ifs025"],
+        score: expect.any(Number),
+      }),
+    );
   });
 
   it("POST /api/recommendation retorna ranking de atividades no modo inverso", async () => {
