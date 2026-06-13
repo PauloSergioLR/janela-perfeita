@@ -97,6 +97,7 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 - date-fns
 - Recharts
 - Vitest
+- Playwright
 
 ## Estrutura principal
 
@@ -114,6 +115,7 @@ src/lib/services/weatherapi-weather.*   # segunda fonte meteorologica opcional
 src/lib/weather/*                       # providers e comparacoes de previsao
 src/components/result/*                 # resultado, timeline e breakdown
 tests/                                  # cobertura de dominio, engine, API e UI
+e2e/                                    # testes E2E com Playwright
 ```
 
 ## Como rodar
@@ -149,6 +151,7 @@ npm run lint
 npm test
 npm run test:coverage
 npm run build
+npm run test:e2e
 ```
 
 Cobertura registrada apos a issue #9:
@@ -161,6 +164,20 @@ Cobertura registrada apos a issue #9:
 | Lines | 93.72% |
 
 O relatorio HTML local fica em `coverage/index.html`.
+
+Os testes E2E usam Playwright e exercitam o fluxo real da aplicacao, incluindo
+as rotas internas de geocoding e recomendacao. Na primeira execucao local,
+instale o navegador:
+
+```bash
+npx playwright install chromium
+```
+
+Depois rode:
+
+```bash
+npm run test:e2e
+```
 
 ## Backtesting tecnico
 
@@ -211,6 +228,7 @@ npm run lint
 npm test
 npm run test:coverage
 npm run build
+npm run test:e2e
 ```
 
 ## Deploy
