@@ -165,8 +165,9 @@ Cobertura registrada apos a issue #9:
 
 O relatorio HTML local fica em `coverage/index.html`.
 
-Os testes E2E usam Playwright e mockam as rotas internas para evitar chamadas
-meteorologicas reais. Na primeira execucao local, instale o navegador:
+Os testes E2E usam Playwright e exercitam o fluxo real da aplicacao, incluindo
+as rotas internas de geocoding e recomendacao. Na primeira execucao local,
+instale o navegador:
 
 ```bash
 npx playwright install chromium
