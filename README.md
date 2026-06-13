@@ -32,6 +32,7 @@ vale a pena fazer esta atividade hoje?".
 - Informa quando nao ha janela boa.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Inclui uma pagina tecnica de backtesting com fixture historica local.
+- Permite modo demo isolado via `?demo=true`.
 - Usa Open-Meteo com atribuicao e disclaimer.
 - Nao armazena localizacao, IP, historico ou dados pessoais em servidor.
 
@@ -104,6 +105,7 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 ```text
 src/app/api/geocoding/route.ts          # autocomplete de cidades
 src/app/api/recommendation/route.ts     # orquestracao da recomendacao
+src/lib/demo/*                          # fixtures isoladas do modo demo
 src/lib/domain/activities.ts            # catalogo das atividades
 src/lib/domain/activity-rules.ts        # regras ponderadas
 src/lib/engine/weather-context.ts       # contexto solar e horario
@@ -178,6 +180,18 @@ Depois rode:
 ```bash
 npm run test:e2e
 ```
+
+## Modo demo
+
+Para apresentar o projeto sem depender de API externa, abra:
+
+```text
+http://localhost:3000?demo=true
+```
+
+Nesse modo, cidade e previsao usam dados locais representativos. O fluxo normal
+sem `demo=true` continua usando as APIs reais. Buscas feitas em modo demo nao
+sao salvas no historico local para evitar mistura com uso normal.
 
 ## Backtesting tecnico
 
