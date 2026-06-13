@@ -31,6 +31,7 @@ vale a pena fazer esta atividade hoje?".
 - Explica os principais motivos da recomendacao.
 - Informa quando nao ha janela boa.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
+- Inclui uma pagina tecnica de backtesting com fixture historica local.
 - Usa Open-Meteo com atribuicao e disclaimer.
 - Nao armazena localizacao, IP, historico ou dados pessoais em servidor.
 
@@ -107,6 +108,7 @@ src/lib/domain/activity-rules.ts        # regras ponderadas
 src/lib/engine/weather-context.ts       # contexto solar e horario
 src/lib/engine/score-calculator.ts      # score por hora
 src/lib/engine/window-finder.ts         # melhores janelas
+src/lib/backtesting/*                   # backtesting tecnico isolado
 src/lib/services/open-meteo.*           # servicos e schemas externos
 src/lib/services/weatherapi-weather.*   # segunda fonte meteorologica opcional
 src/lib/weather/*                       # providers e comparacoes de previsao
@@ -159,6 +161,29 @@ Cobertura registrada apos a issue #9:
 | Lines | 93.72% |
 
 O relatorio HTML local fica em `coverage/index.html`.
+
+## Backtesting tecnico
+
+A pagina interna `/tecnico/backtesting` gera um relatorio local de backtesting
+para uma amostra preparada de Criciuma. Ela reaproveita a engine atual para
+responder, de forma inicial:
+
+```text
+Se o app tivesse recomendado essa janela, ela teria sido boa de verdade?
+```
+
+Metricas exibidas:
+
+- janelas recomendadas;
+- porcentagem de janelas que permaneceram secas;
+- score medio previsto e observado;
+- erro medio de temperatura;
+- principais fatores de divergencia;
+- taxa estimada de acerto.
+
+Limites importantes: a amostra atual e uma fixture local, nao uma auditoria
+meteorologica oficial. O objetivo e validar a metodologia sem afetar o fluxo
+principal, sem banco de dados e sem chamadas externas adicionais.
 
 ## PWA
 
