@@ -35,8 +35,10 @@ export interface HourlyWeather {
   rain: number;
   showers: number;
   weather_code: number;
+  weather_symbol?: string;
   wind_speed_10m: number;
   wind_gusts_10m: number;
+  wind_direction_10m?: number;
   cloud_cover: number;
   cloud_cover_low: number;
   cloud_cover_mid: number;

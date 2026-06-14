@@ -37,7 +37,8 @@ esta atividade?".
 - Oferece modo inverso para responder "o que fazer hoje?".
 - Compara melhores dias da semana para uma atividade.
 - Compara modelos da Open-Meteo quando solicitado.
-- Documenta MET Norway como segunda fonte gratuita preferencial para a v1.1.
+- Pode consultar MET Norway como segunda fonte gratuita quando
+  `MET_NORWAY_USER_AGENT` existe.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Inclui uma pagina tecnica de backtesting com fixture historica local.
 - Inclui `/como-funciona` para explicar score, pesos, janelas e limitações.
@@ -129,8 +130,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
   de uma atividade.
 - **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
   mostra divergencia, sem fazer media cega.
-- **Estrategia de segunda fonte:** MET Norway Locationforecast sera a fonte
-  gratuita preferencial da v1.1 para comparacao e alerta de divergencia.
+- **Provider MET Norway:** segunda fonte gratuita opcional da v1.1 para
+  comparacao e alerta de divergencia quando `MET_NORWAY_USER_AGENT` existe.
   WeatherAPI.com fica apenas como alternativa opcional futura.
 - **Historico local:** salva somente as ultimas buscas no `localStorage`.
 - **Compartilhamento:** gera texto compartilhavel do resultado.
@@ -165,6 +166,7 @@ src/lib/engine/window-finder.ts         # melhores janelas
 src/lib/backtesting/*                   # backtesting tecnico isolado
 src/lib/ui/score-explainer.ts           # dados da pagina como funciona
 src/lib/services/open-meteo.*           # servicos e schemas externos
+src/lib/services/met-norway-weather.*   # segunda fonte gratuita opcional
 src/lib/services/weatherapi-weather.*   # fonte opcional existente, sem chave obrigatoria
 src/lib/weather/*                       # providers e comparacoes de previsao
 src/components/result/*                 # resultado, timeline e breakdown
@@ -307,7 +309,7 @@ Configuracao recomendada na Vercel:
 - Build command: `npm run build`
 - Output: padrao do Next.js
 - Variaveis de ambiente obrigatorias: nenhuma
-- Variaveis opcionais planejadas para a v1.1: `MET_NORWAY_USER_AGENT`
+- Variaveis opcionais: `MET_NORWAY_USER_AGENT`
 
 Deploy atual:
 
@@ -346,17 +348,17 @@ O projeto usa atribuicao visivel para Open-Meteo na interface e no README.
 
 Open-Meteo segue como provider principal da aplicacao.
 
-Para a versao 1.1, a segunda fonte preferencial passa a ser a MET Norway
-Locationforecast API, porque e gratuita, tem cobertura global, nao exige API key
-e exige apenas um `User-Agent` identificando a aplicacao.
+Para a versao 1.1, a segunda fonte preferencial e a MET Norway Locationforecast
+API, porque e gratuita, tem cobertura global, nao exige API key e exige apenas
+um `User-Agent` identificando a aplicacao.
 
 ```bash
 MET_NORWAY_USER_AGENT="JanelaPerfeita/1.1 contato@example.com"
 ```
 
 Use essa variavel em `.env.local` no desenvolvimento ou nas variaveis da Vercel.
-Nao usar User-Agent generico. A integracao com MET Norway sera feita em tarefa
-propria; esta etapa apenas corrige e documenta a estrategia.
+Nao usar User-Agent generico. Sem essa variavel, o app continua funcionando
+normalmente apenas com Open-Meteo.
 
 A segunda fonte nao deve substituir automaticamente a Open-Meteo e nao deve
 fazer media cega entre APIs. Ela serve para:
@@ -369,6 +371,11 @@ fazer media cega entre APIs. Ela serve para:
 WeatherAPI.com fica apenas como alternativa opcional futura. Ela nao e provider
 padrao da v1.1, nao deve ser obrigatoria e nao pode tornar o funcionamento do
 app dependente de API paga ou chave obrigatoria.
+
+Observacao tecnica: a MET Norway Locationforecast nao entrega todos os mesmos
+campos da Open-Meteo, como astronomia, visibilidade, UV observado e duracao de
+sol. Por isso, o provider MET Norway e usado como fonte secundaria de
+comparacao; a recomendacao principal continua baseada na Open-Meteo.
 
 Referencias oficiais:
 
@@ -393,7 +400,7 @@ Janela Perfeita:
 - Previsao meteorologica pode mudar; o app nao promete precisao absoluta.
 - O score e uma estimativa baseada nas regras atuais, nao uma garantia de
   seguranca ou conforto.
-- MET Norway sera a segunda fonte gratuita preferencial quando integrada.
+- MET Norway e a segunda fonte gratuita opcional da v1.1.
 - WeatherAPI.com fica apenas como alternativa opcional futura.
 - Comparacoes entre modelos e providers mostram divergencia; nao fazem media
   automatica entre fontes.
@@ -406,7 +413,7 @@ Janela Perfeita:
 - Melhorar a amostra do backtesting com dados historicos reais e reprodutiveis.
 - Criar mais cenarios E2E para modos semana, inverso, demo e compartilhamento.
 - Evoluir acessibilidade e tema visual sem mudar a regra de negocio.
-- Integrar MET Norway como provider secundario gratuito e opcional.
+- Comparar Open-Meteo e MET Norway com avisos mais detalhados de divergencia.
 - Manter novas fontes meteorologicas somente como comparacao explicita.
 
 ## Fluxo de desenvolvimento

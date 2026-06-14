@@ -8,6 +8,8 @@ export interface ForecastParams {
   date: string;
   endDate?: string;
   model?: WeatherModelId;
+  timezone?: string;
+  referenceAstronomy?: DailyAstronomy[];
 }
 
 export interface NormalizedForecast {

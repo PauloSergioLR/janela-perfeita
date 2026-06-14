@@ -17,9 +17,9 @@ vi.mock("@/lib/weather/open-meteo-weather-provider", () => ({
   },
 }));
 
-vi.mock("@/lib/weather/weatherapi-weather-provider", () => ({
-  weatherApiWeatherProvider: {
-    name: "WeatherAPI.com",
+vi.mock("@/lib/weather/met-norway-weather-provider", () => ({
+  metNorwayWeatherProvider: {
+    name: "MET Norway",
     get isConfigured() {
       return secondaryWeatherProviderConfigured;
     },
@@ -347,7 +347,7 @@ describe("rotas internas da API", () => {
     );
   });
 
-  it("POST /api/recommendation compara provider secundario quando chave existe", async () => {
+  it("POST /api/recommendation compara provider secundario quando User-Agent existe", async () => {
     secondaryWeatherProviderConfigured = true;
 
     const { POST } = await import("@/app/api/recommendation/route");
@@ -366,10 +366,12 @@ describe("rotas internas da API", () => {
       lon: city.coordinates.lon,
       date: astronomy.date,
       endDate: undefined,
+      timezone: city.timezone,
+      referenceAstronomy: [astronomy],
     });
     expect(payload.recommendation.providerComparison).toEqual(
       expect.objectContaining({
-        comparedProviders: ["Open-Meteo", "WeatherAPI.com"],
+        comparedProviders: ["Open-Meteo", "MET Norway"],
         score: expect.any(Number),
       }),
     );
