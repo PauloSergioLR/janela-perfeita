@@ -13,9 +13,9 @@ import {
 } from "@/lib/engine/recommendation-exploration";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
 import { calculateModelAgreement } from "@/lib/weather/model-agreement";
+import { metNorwayWeatherProvider } from "@/lib/weather/met-norway-weather-provider";
 import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
 import { calculateProviderComparison } from "@/lib/weather/provider-comparison";
-import { weatherApiWeatherProvider } from "@/lib/weather/weatherapi-weather-provider";
 import type {
   ForecastParams,
   NormalizedForecast,
@@ -58,7 +58,7 @@ const MODEL_COMPARISON_MODELS = [
   "ecmwf_ifs025",
 ] as const satisfies readonly WeatherModelId[];
 const weatherProvider = openMeteoWeatherProvider;
-const secondaryWeatherProvider = weatherApiWeatherProvider;
+const secondaryWeatherProvider = metNorwayWeatherProvider;
 
 const recommendationRequestSchema = z
   .object({
@@ -227,15 +227,18 @@ async function getOptionalProviderComparison(input: {
   enabled: boolean;
   forecastParams: ForecastParams;
   primaryForecast: NormalizedForecast;
+  timezone?: string;
 }): Promise<WeatherProviderComparison | null> {
   if (!input.enabled || !secondaryWeatherProvider.isConfigured) {
     return null;
   }
 
   try {
-    const secondaryForecast = await secondaryWeatherProvider.getForecast(
-      input.forecastParams,
-    );
+    const secondaryForecast = await secondaryWeatherProvider.getForecast({
+      ...input.forecastParams,
+      timezone: input.timezone,
+      referenceAstronomy: input.primaryForecast.dailyAstronomy,
+    });
 
     return calculateProviderComparison([
       {
@@ -290,6 +293,7 @@ export async function POST(request: Request) {
       enabled: body.mode === "janela" && !body.demo,
       forecastParams,
       primaryForecast: forecast,
+      timezone: city.timezone,
     });
 
     if (body.mode === "atividades") {
