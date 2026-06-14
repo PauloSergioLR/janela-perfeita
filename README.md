@@ -37,7 +37,7 @@ esta atividade?".
 - Oferece modo inverso para responder "o que fazer hoje?".
 - Compara melhores dias da semana para uma atividade.
 - Compara modelos da Open-Meteo quando solicitado.
-- Pode comparar Open-Meteo com WeatherAPI.com quando `WEATHERAPI_KEY` existe.
+- Documenta MET Norway como segunda fonte gratuita preferencial para a v1.1.
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
 - Inclui uma pagina tecnica de backtesting com fixture historica local.
 - Inclui `/como-funciona` para explicar score, pesos, janelas e limitações.
@@ -65,7 +65,8 @@ flowchart LR
   DEMO --> FIX[Fixtures locais]
 
   WP --> OMForecast[(Open-Meteo Forecast API)]
-  WP -. opcional .-> WAPI[(WeatherAPI.com)]
+  WP -. estrategia v1.1 .-> MET[(MET Norway Locationforecast)]
+  WP -. alternativa futura .-> WAPI[(WeatherAPI.com)]
   ACT --> ENG
   ENG --> OUT[Recommendation / Ranking / Semana]
   CMP --> OUT
@@ -128,8 +129,9 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
   de uma atividade.
 - **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
   mostra divergencia, sem fazer media cega.
-- **Provider opcional:** WeatherAPI.com pode entrar como segunda fonte apenas
-  para comparacao, quando `WEATHERAPI_KEY` esta configurada.
+- **Estrategia de segunda fonte:** MET Norway Locationforecast sera a fonte
+  gratuita preferencial da v1.1 para comparacao e alerta de divergencia.
+  WeatherAPI.com fica apenas como alternativa opcional futura.
 - **Historico local:** salva somente as ultimas buscas no `localStorage`.
 - **Compartilhamento:** gera texto compartilhavel do resultado.
 - **Modo demo:** usa fixture local apenas com `?demo=true`.
@@ -163,7 +165,7 @@ src/lib/engine/window-finder.ts         # melhores janelas
 src/lib/backtesting/*                   # backtesting tecnico isolado
 src/lib/ui/score-explainer.ts           # dados da pagina como funciona
 src/lib/services/open-meteo.*           # servicos e schemas externos
-src/lib/services/weatherapi-weather.*   # segunda fonte meteorologica opcional
+src/lib/services/weatherapi-weather.*   # fonte opcional existente, sem chave obrigatoria
 src/lib/weather/*                       # providers e comparacoes de previsao
 src/components/result/*                 # resultado, timeline e breakdown
 tests/                                  # cobertura de dominio, engine, API e UI
@@ -305,7 +307,7 @@ Configuracao recomendada na Vercel:
 - Build command: `npm run build`
 - Output: padrao do Next.js
 - Variaveis de ambiente obrigatorias: nenhuma
-- Variaveis opcionais: `WEATHERAPI_KEY`
+- Variaveis opcionais planejadas para a v1.1: `MET_NORWAY_USER_AGENT`
 
 Deploy atual:
 
@@ -340,23 +342,39 @@ condicoes.
 
 O projeto usa atribuicao visivel para Open-Meteo na interface e no README.
 
-## Segunda fonte meteorologica opcional
+## Estrategia de segunda fonte meteorologica
 
-O app pode comparar a Open-Meteo com a WeatherAPI.com quando houver chave local:
+Open-Meteo segue como provider principal da aplicacao.
+
+Para a versao 1.1, a segunda fonte preferencial passa a ser a MET Norway
+Locationforecast API, porque e gratuita, tem cobertura global, nao exige API key
+e exige apenas um `User-Agent` identificando a aplicacao.
 
 ```bash
-WEATHERAPI_KEY=sua_chave
+MET_NORWAY_USER_AGENT="JanelaPerfeita/1.1 contato@example.com"
 ```
 
 Use essa variavel em `.env.local` no desenvolvimento ou nas variaveis da Vercel.
-Nao ha chave commitada no repositorio, e `.env.local` nao deve entrar em commit.
+Nao usar User-Agent generico. A integracao com MET Norway sera feita em tarefa
+propria; esta etapa apenas corrige e documenta a estrategia.
 
-Sem `WEATHERAPI_KEY`, o app continua funcionando normalmente apenas com
-Open-Meteo. Com a chave configurada, a WeatherAPI.com entra somente como fonte
-de comparacao e alerta de divergencia. O app nao substitui automaticamente a
-Open-Meteo e nao faz media cega entre APIs.
+A segunda fonte nao deve substituir automaticamente a Open-Meteo e nao deve
+fazer media cega entre APIs. Ela serve para:
 
-Referencia oficial: https://www.weatherapi.com/docs/
+- comparar previsoes;
+- medir divergencia entre fontes;
+- reduzir falsa confianca;
+- exibir aviso quando as fontes discordarem.
+
+WeatherAPI.com fica apenas como alternativa opcional futura. Ela nao e provider
+padrao da v1.1, nao deve ser obrigatoria e nao pode tornar o funcionamento do
+app dependente de API paga ou chave obrigatoria.
+
+Referencias oficiais:
+
+- MET Norway: https://api.met.no/weatherapi/locationforecast/2.0/documentation
+- Getting Started MET Norway: https://api.met.no/doc/GettingStarted
+- WeatherAPI.com: https://www.weatherapi.com/docs/
 
 ## Privacidade
 
@@ -375,7 +393,8 @@ Janela Perfeita:
 - Previsao meteorologica pode mudar; o app nao promete precisao absoluta.
 - O score e uma estimativa baseada nas regras atuais, nao uma garantia de
   seguranca ou conforto.
-- WeatherAPI.com e opcional e nao substitui automaticamente a Open-Meteo.
+- MET Norway sera a segunda fonte gratuita preferencial quando integrada.
+- WeatherAPI.com fica apenas como alternativa opcional futura.
 - Comparacoes entre modelos e providers mostram divergencia; nao fazem media
   automatica entre fontes.
 - O backtesting atual usa amostra local preparada, nao auditoria meteorologica
@@ -387,7 +406,8 @@ Janela Perfeita:
 - Melhorar a amostra do backtesting com dados historicos reais e reprodutiveis.
 - Criar mais cenarios E2E para modos semana, inverso, demo e compartilhamento.
 - Evoluir acessibilidade e tema visual sem mudar a regra de negocio.
-- Adicionar novas fontes meteorologicas somente como comparacao explicita.
+- Integrar MET Norway como provider secundario gratuito e opcional.
+- Manter novas fontes meteorologicas somente como comparacao explicita.
 
 ## Fluxo de desenvolvimento
 
