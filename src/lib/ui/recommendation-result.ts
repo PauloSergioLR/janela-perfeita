@@ -3,6 +3,7 @@ import type {
   HourScore,
   Recommendation,
   RuleResult,
+  UserAvailability,
   WindowResult,
 } from "@/types";
 import { formatCityLabel } from "./search-page";
@@ -23,6 +24,13 @@ export interface BreakdownSource {
   subtitle: string;
   score: HourScore | null;
 }
+
+const WHOLE_DAY_MIN_DURATION_HOURS = 22;
+
+type WindowDisplayInput = Pick<
+  WindowResult,
+  "startLabel" | "endLabel" | "durationHours"
+>;
 
 function compareRulesByPositiveImpact(a: RuleResult, b: RuleResult): number {
   return b.score - a.score || b.weight - a.weight || a.label.localeCompare(b.label);
@@ -90,6 +98,36 @@ export function getAlternativeWindows(windows: WindowResult[]): WindowResult[] {
   return windows.slice(1);
 }
 
+export function formatTimeRange(start: string, end: string): string {
+  if (start === end) {
+    return "Dia inteiro";
+  }
+
+  return `Das ${start} às ${end}`;
+}
+
+export function isWholeDayWindow(window: WindowDisplayInput): boolean {
+  return (
+    window.durationHours >= WHOLE_DAY_MIN_DURATION_HOURS ||
+    window.startLabel === window.endLabel
+  );
+}
+
+export function formatWindowTimeRange(window: WindowDisplayInput): string {
+  return isWholeDayWindow(window)
+    ? "Dia inteiro"
+    : formatTimeRange(window.startLabel, window.endLabel);
+}
+
+export function formatAvailabilityNotice(
+  availability: UserAvailability,
+): string {
+  return `Dentro da sua disponibilidade: ${formatTimeRange(
+    availability.availableFrom,
+    availability.availableTo,
+  )}.`;
+}
+
 export function formatForecastConfidenceLevel(
   level: ForecastConfidenceLevel,
 ): string {
@@ -127,6 +165,10 @@ export function getBreakdownSource(
 }
 
 export function formatDurationHours(durationHours: number): string {
+  if (durationHours >= WHOLE_DAY_MIN_DURATION_HOURS) {
+    return "dia inteiro";
+  }
+
   return durationHours === 1 ? "1 hora" : `${durationHours} horas`;
 }
 

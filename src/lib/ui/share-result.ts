@@ -2,6 +2,7 @@ import type { ActivityRanking, Recommendation, WeekComparison } from "@/types";
 import {
   formatRecommendationDate,
   formatRecommendationLocation,
+  formatWindowTimeRange,
   getPeakHourScore,
   getPrimaryReason,
 } from "./recommendation-result";
@@ -34,8 +35,8 @@ export function buildRecommendationShareText(
   recommendation: Recommendation,
 ): string {
   const windowSummary = recommendation.bestWindow
-    ? `${recommendation.bestWindow.startLabel} às ${recommendation.bestWindow.endLabel}`
-    : "sem janela ideal";
+    ? formatWindowTimeRange(recommendation.bestWindow)
+    : "Nenhuma janela ideal encontrada";
 
   return [
     `Janela Perfeita para ${recommendation.activity.name.toLowerCase()} em ${formatRecommendationLocation(recommendation)}:`,

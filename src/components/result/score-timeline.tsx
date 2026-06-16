@@ -23,6 +23,7 @@ import {
 import {
   buildTimelineData,
   formatForecastConfidenceLevel,
+  formatWindowTimeRange,
   type TimelineDatum,
 } from "@/lib/ui/recommendation-result";
 import type { Recommendation } from "@/types";
@@ -98,7 +99,7 @@ export function ScoreTimeline({ recommendation }: ScoreTimelineProps) {
     recommendation.bestWindow,
   );
   const bestWindowLabel = recommendation.bestWindow
-    ? `${recommendation.bestWindow.startLabel} - ${recommendation.bestWindow.endLabel}`
+    ? formatWindowTimeRange(recommendation.bestWindow)
     : null;
 
   return (

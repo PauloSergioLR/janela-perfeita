@@ -79,7 +79,7 @@ describe("texto de compartilhamento", () => {
     const text = buildRecommendationShareText(recommendation);
 
     expect(text).toContain("Janela Perfeita para correr");
-    expect(text).toContain("07:00 às 09:00");
+    expect(text).toContain("Das 07:00 às 09:00");
     expect(text).toContain("Score: 86/100");
     expect(text).toContain("Temperatura agradável");
   });
@@ -87,7 +87,7 @@ describe("texto de compartilhamento", () => {
   it("gera resumo quando nao existe janela ideal", () => {
     const text = buildRecommendationShareText(makeRecommendation(null));
 
-    expect(text).toContain("sem janela ideal");
+    expect(text).toContain("Nenhuma janela ideal encontrada");
     expect(text).toContain("Score: 90/100");
   });
 

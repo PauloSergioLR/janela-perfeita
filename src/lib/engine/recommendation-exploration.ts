@@ -52,7 +52,10 @@ interface BuildWeekComparisonInput {
 }
 
 function buildAvailabilityNotice(availability: UserAvailability): string {
-  return `Resultado filtrado pela disponibilidade informada: ${availability.availableFrom} ate ${availability.availableTo}.`;
+  return `Dentro da sua disponibilidade: ${formatActivityTimeWindow({
+    start: availability.availableFrom,
+    end: availability.availableTo,
+  })}.`;
 }
 
 function formatActivityTimeWindow(window: ActivityTimeWindow): string {
@@ -60,7 +63,7 @@ function formatActivityTimeWindow(window: ActivityTimeWindow): string {
     return "Dia inteiro";
   }
 
-  return `${window.start} ate ${window.end}`;
+  return `Das ${window.start} às ${window.end}`;
 }
 
 function buildGoldenHourTimeWindow(astronomy: DailyAstronomy): ActivityTimeWindow {
@@ -99,11 +102,7 @@ function buildDefaultTimeWindowNotice(
     return undefined;
   }
 
-  if (activity.defaultTimeWindowStrategy === "golden_hour") {
-    return `Resultado limitado a hora dourada do por do sol local: ${windows.map(formatActivityTimeWindow).join(", ")}.`;
-  }
-
-  return `Resultado limitado aos horarios padrao de ${activity.name}: ${windows.map(formatActivityTimeWindow).join(", ")}.`;
+  return `Dentro do horário recomendado para esta atividade: ${windows.map(formatActivityTimeWindow).join(" ou ")}.`;
 }
 
 function getPeakScore(recommendation: Recommendation): number {

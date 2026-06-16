@@ -84,7 +84,7 @@ describe("calculadora de score", () => {
     expect(scores[0].breakdown.at(-1)).toEqual(
       expect.objectContaining({
         factor: "disponibilidade",
-        reason: "Fora da disponibilidade informada (08:00 ate 10:00).",
+        reason: "Fora da disponibilidade informada (Das 08:00 às 10:00).",
       }),
     );
     expect(scores[1].score).toBeGreaterThanOrEqual(activity.minRecommendedScore);
@@ -170,7 +170,7 @@ describe("calculadora de score", () => {
     expect(scores[0].breakdown.at(-1)).toEqual(
       expect.objectContaining({
         factor: "horario_padrao",
-        reason: "Fora do horario padrao da atividade (17:00 ate 18:15).",
+        reason: "Fora do horario padrao da atividade (Das 17:00 às 18:15).",
       }),
     );
     expect(scores[1].score).toBeGreaterThan(0);
