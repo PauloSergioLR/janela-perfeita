@@ -148,6 +148,24 @@ describe("historico local de buscas", () => {
     expect(modeUsesActivity("dia")).toBe(false);
   });
 
+  it("formata consulta da semana sem atividade e disponibilidade", () => {
+    const entry = buildSearchHistoryEntry({
+      mode: "clima_semana",
+      city: criciumaCity,
+      activityId: "correr",
+      activityName: "Correr",
+      date: "2030-06-05",
+      availableFrom: "08:00",
+      availableTo: "10:00",
+      createdAt: "2030-06-01T10:00:00.000Z",
+    });
+
+    expect(entry.activityId).toBeUndefined();
+    expect(entry.availableFrom).toBeUndefined();
+    expect(getSearchHistoryLabel(entry)).toContain("Clima da semana");
+    expect(modeUsesActivity("clima_semana")).toBe(false);
+  });
+
   it("remove atividade escondida do modo o que fazer", () => {
     const draft = normalizeSearchHistoryDraft({
       mode: "atividades",

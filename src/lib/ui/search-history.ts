@@ -20,6 +20,7 @@ const SEARCH_MODES = [
   "atividades",
   "semana",
   "dia",
+  "clima_semana",
 ] as const satisfies readonly SearchMode[];
 
 const citySchema = z.object({
@@ -82,7 +83,7 @@ export function normalizeSearchHistoryDraft(
     return input;
   }
 
-  if (input.mode === "dia") {
+  if (input.mode === "dia" || input.mode === "clima_semana") {
     return {
       mode: input.mode,
       city: input.city,
@@ -199,6 +200,10 @@ export function getSearchHistoryLabel(entry: SearchHistoryEntry): string {
 
   if (entry.mode === "dia") {
     return `Clima do dia em ${formatCityLabel(entry.city)}${availability}`;
+  }
+
+  if (entry.mode === "clima_semana") {
+    return `Clima da semana em ${formatCityLabel(entry.city)}${availability}`;
   }
 
   return `${entry.activityName ?? "Atividade"} em ${formatCityLabel(entry.city)}${availability}`;

@@ -21,6 +21,7 @@ esta atividade?".
 - Busca cidade por nome, sem exigir GPS.
 - Recomenda datas de hoje ate hoje+6.
 - Permite consultar o clima completo de um dia sem escolher atividade.
+- Permite consultar um resumo visual dos proximos 7 dias sem escolher atividade.
 - Suporta sete atividades:
   - correr
   - caminhar
@@ -92,9 +93,9 @@ flowchart LR
 5. A engine calcula scores horarios e agrupa horas consecutivas acima do minimo.
 6. As janelas sao ordenadas por media, pico, duracao e horario inicial.
 7. A melhor janela recebe confianca baseada na estabilidade dos fatores.
-8. Em modos extras, a mesma engine gera ranking de atividades ou comparacao da
-   semana; o modo "Consulta do dia" consolida os dados horarios em um overview
-   diario sem depender de atividade.
+8. Em modos extras, a mesma engine gera ranking de atividades, comparacao da
+   semana por atividade, consulta do dia ou consulta visual dos proximos 7 dias
+   sem depender de atividade.
 
 ## Dados meteorologicos usados
 
@@ -131,6 +132,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
   relevante de chuva, vento, temperatura e nuvens.
 - **Consulta do dia:** mostra resumo diario com temperatura, sensacao termica,
   chuva, vento, rajadas, UV, nascer/por do sol, weather code e timeline horaria.
+- **Consulta da semana:** mostra cards diarios com icone do clima, minima,
+  maxima, chuva, vento, UV, resumo curto e destaques da semana.
 - **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
 - **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
   de uma atividade.
