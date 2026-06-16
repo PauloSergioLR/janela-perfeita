@@ -9,6 +9,7 @@ import {
   Camera,
   Car,
   Clock3,
+  CloudSun,
   Footprints,
   History,
   ListChecks,
@@ -26,6 +27,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
+import { DailyOverviewCard } from "@/components/result/daily-overview-card";
 import { RecommendationCard } from "@/components/result/recommendation-card";
 import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { ScoreTimeline } from "@/components/result/score-timeline";
@@ -64,6 +66,7 @@ import type {
   ActivityId,
   ActivityRanking,
   City,
+  DailyWeatherOverview,
   Recommendation,
   SearchHistoryEntry,
   SearchMode,
@@ -78,6 +81,7 @@ type RecommendationResponse = {
   recommendation?: Recommendation;
   activityRanking?: ActivityRanking;
   weekComparison?: WeekComparison;
+  dailyOverview?: DailyWeatherOverview;
 };
 
 type ActivityVisual = {
@@ -124,6 +128,12 @@ const ACTIVITY_VISUALS = {
 } satisfies Record<ActivityId, ActivityVisual>;
 
 const SEARCH_MODE_OPTIONS = [
+  {
+    id: "dia",
+    label: "Dia",
+    description: "Clima completo",
+    icon: CloudSun,
+  },
   {
     id: "janela",
     label: "Janela",
@@ -233,7 +243,7 @@ export default function Home() {
     SEARCH_DEBOUNCE_MS,
   );
   const canSearch =
-    searchMode === "atividades"
+    !modeUsesActivity(searchMode)
       ? selectedCity !== null && selectedDate !== ""
       : canSubmitSearch({
           city: selectedCity,
@@ -255,14 +265,16 @@ export default function Home() {
   const selectedActivity = activities.find(
     (activity) => activity.id === selectedActivityId,
   );
-  const usesAvailability = searchMode !== "semana";
+  const usesAvailability = searchMode === "janela" || searchMode === "atividades";
   const recommendation = recommendationMutation.data?.recommendation;
   const activityRanking = recommendationMutation.data?.activityRanking;
   const weekComparison = recommendationMutation.data?.weekComparison;
+  const dailyOverview = recommendationMutation.data?.dailyOverview;
   const resultDisclaimer =
     recommendation?.disclaimer ??
     activityRanking?.disclaimer ??
-    weekComparison?.disclaimer;
+    weekComparison?.disclaimer ??
+    dailyOverview?.disclaimer;
 
   useEffect(() => {
     const options = buildSearchDateOptions();
@@ -496,7 +508,7 @@ export default function Home() {
                 <div className="space-y-3">
                   <Label id="modo-label">Modo</Label>
                   <div
-                    className="grid gap-2 sm:grid-cols-3"
+                    className="grid gap-2 sm:grid-cols-4"
                     role="radiogroup"
                     aria-labelledby="modo-label"
                   >
@@ -641,7 +653,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {searchMode !== "atividades" ? (
+                {modeUsesActivity(searchMode) ? (
                   <div className="space-y-3">
                     <Label id="atividade-label">Atividade</Label>
                     <div
@@ -746,7 +758,7 @@ export default function Home() {
                 <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                   <div className="space-y-2">
                     <Label htmlFor="date">
-                      {searchMode === "semana" ? "A partir de" : "Data"}
+                    {searchMode === "semana" ? "A partir de" : "Data"}
                     </Label>
                     <div className="relative">
                       <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
@@ -799,6 +811,8 @@ export default function Home() {
                     )}
                     {recommendationMutation.isPending
                       ? "Calculando..."
+                      : searchMode === "dia"
+                        ? "Consultar dia"
                       : searchMode === "atividades"
                         ? "Ver ranking"
                         : searchMode === "semana"
@@ -901,6 +915,8 @@ export default function Home() {
               <ActivityRankingCard ranking={activityRanking} />
             ) : recommendationMutation.isSuccess && weekComparison ? (
               <WeekComparisonCard comparison={weekComparison} />
+            ) : recommendationMutation.isSuccess && dailyOverview ? (
+              <DailyOverviewCard overview={dailyOverview} />
             ) : (
               <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
                 <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
@@ -910,6 +926,10 @@ export default function Home() {
                       ? selectedDate
                         ? `Ranking em ${selectedDate}`
                         : "Ranking de atividades"
+                      : searchMode === "dia"
+                        ? selectedDate
+                          ? `Clima em ${selectedDate}`
+                          : "Consulta do dia"
                       : selectedActivity
                       ? `${selectedActivity.name} em ${selectedDate || "data"}`
                       : "Aguardando seleção"}
@@ -929,13 +949,13 @@ export default function Home() {
                         <span className="rounded-md bg-background px-3 py-2">
                           1. Cidade
                         </span>
-                        {searchMode !== "atividades" ? (
+                        {modeUsesActivity(searchMode) ? (
                           <span className="rounded-md bg-background px-3 py-2">
                             2. Atividade
                           </span>
                         ) : null}
                         <span className="rounded-md bg-background px-3 py-2">
-                          {searchMode === "atividades" ? "2. Data" : "3. Data"}
+                          {modeUsesActivity(searchMode) ? "3. Data" : "2. Data"}
                         </span>
                       </div>
                     </div>

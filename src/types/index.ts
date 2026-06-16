@@ -8,7 +8,7 @@ export type ActivityId =
   | "lavar_carro"
   | "lavar_roupa";
 
-export type SearchMode = "janela" | "atividades" | "semana";
+export type SearchMode = "janela" | "atividades" | "semana" | "dia";
 
 /** Coordenadas geográficas usadas para consultar previsão meteorológica. */
 export interface Coordinates {
@@ -189,6 +189,28 @@ export interface Recommendation {
   availability?: UserAvailability;
   availabilityNotice?: string;
   timeWindowNotice?: string;
+  disclaimer: string;
+}
+
+/** Visao meteorologica consolidada para um dia, sem depender de atividade. */
+export interface DailyWeatherOverview {
+  city: City;
+  date: string;
+  generatedAt: string;
+  sunrise: string;
+  sunset: string;
+  weatherCode: number | null;
+  weatherLabel: string;
+  temperatureMax: number | null;
+  temperatureMin: number | null;
+  apparentTemperatureMax: number | null;
+  apparentTemperatureMin: number | null;
+  precipitationSum: number | null;
+  precipitationProbabilityMax: number | null;
+  windSpeedMax: number | null;
+  windGustsMax: number | null;
+  uvIndexMax: number | null;
+  hourly: HourlyWeather[];
   disclaimer: string;
 }
 
