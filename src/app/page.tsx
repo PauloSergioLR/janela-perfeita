@@ -19,6 +19,7 @@ import {
   RotateCcw,
   Route,
   Search,
+  Shirt,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -115,6 +116,10 @@ const ACTIVITY_VISUALS = {
   lavar_carro: {
     icon: Car,
     tone: "text-rose-700",
+  },
+  lavar_roupa: {
+    icon: Shirt,
+    tone: "text-violet-700",
   },
 } satisfies Record<ActivityId, ActivityVisual>;
 
@@ -450,15 +455,15 @@ export default function Home() {
               </h1>
               <p className="text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
                 Um painel de decisão para escolher quando correr, caminhar,
-                pedalar, fotografar o pôr do sol, observar estrelas ou lavar o
-                carro.
+                pedalar, fotografar o pôr do sol, observar estrelas, lavar
+                carro ou roupa.
               </p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-2 text-center shadow-sm dark:border-border dark:bg-card">
             <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                6
+                {activities.length}
               </p>
               <p className="text-xs text-muted-foreground">atividades</p>
             </div>

@@ -63,8 +63,8 @@ function calculateWeightedScore(
 }
 
 describe("regras das atividades", () => {
-  it("implementa as seis atividades do MVP", () => {
-    expect(ACTIVITIES).toHaveLength(6);
+  it("implementa as sete atividades do MVP", () => {
+    expect(ACTIVITIES).toHaveLength(7);
     expect(ACTIVITIES.map((activity) => activity.id)).toEqual([
       "correr",
       "caminhar",
@@ -72,6 +72,7 @@ describe("regras das atividades", () => {
       "fotografar_por_do_sol",
       "observar_estrelas",
       "lavar_carro",
+      "lavar_roupa",
     ]);
   });
 
@@ -447,6 +448,60 @@ describe("regras das atividades", () => {
         ).score,
       ).toBeLessThanOrEqual(15);
     }
+  });
+
+  it("configura lavar roupa com janela, duracao e pesos esperados", () => {
+    const activity = getActivityById("lavar_roupa");
+
+    expect(activity).toMatchObject({
+      name: "Lavar roupa",
+      minRecommendedScore: 65,
+      minDurationHours: 3,
+      defaultTimeWindows: [{ start: "07:00", end: "18:00" }],
+    });
+    expect(activity?.rules.map((rule) => [rule.factor, rule.weight])).toEqual([
+      ["chuva", 35],
+      ["umidade", 25],
+      ["vento_secagem", 25],
+      ["temperatura", 15],
+    ]);
+  });
+
+  it("penaliza lavar roupa com umidade alta", () => {
+    const activity = getActivityById("lavar_roupa");
+    const humidWeather: HourlyWeather = {
+      ...idealRunningWeather,
+      relative_humidity_2m: 95,
+    };
+    const humidityRule = activity?.rules.find(
+      (rule) => rule.factor === "umidade",
+    );
+
+    expect(activity).toBeDefined();
+    expect(calculateWeightedScore(activity!, humidWeather)).toBeLessThan(
+      calculateWeightedScore(activity!, idealRunningWeather),
+    );
+    expect(humidityRule?.evaluate(humidWeather, baseContext).score).toBe(17);
+  });
+
+  it("valoriza vento moderado e penaliza vento forte para lavar roupa", () => {
+    const activity = getActivityById("lavar_roupa");
+    const windRule = activity?.rules.find(
+      (rule) => rule.factor === "vento_secagem",
+    );
+    const moderateWind = windRule?.evaluate(
+      { ...idealRunningWeather, wind_speed_10m: 14 },
+      baseContext,
+    );
+    const strongWind = windRule?.evaluate(
+      { ...idealRunningWeather, wind_speed_10m: 40 },
+      baseContext,
+    );
+
+    expect(moderateWind?.score).toBe(100);
+    expect(moderateWind?.reason).toContain("favorece a secagem");
+    expect(strongWind?.score).toBe(10);
+    expect(strongWind?.reason).toContain("pouco seguro");
   });
 
   it("explica diferentes níveis de risco de chuva", () => {

@@ -305,6 +305,42 @@ describe("calculadora de score", () => {
     ).toBe(false);
   });
 
+  it("penaliza lavar roupa quando chuva forte vem nas proximas horas", () => {
+    const activity = getActivityById("lavar_roupa")!;
+    const hourly = [
+      makeHourlyWeather("2026-06-05T09:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T10:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T11:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T12:00", {
+        precipitation: 5,
+        rain: 5,
+        weather_code: 63,
+      }),
+      makeHourlyWeather("2026-06-05T13:00", { precipitation: 0 }),
+    ];
+    const scores = calculateDayScores({
+      activity,
+      hourly,
+      astronomy: baseAstronomy,
+      now: "2026-06-05T08:00",
+    });
+    const windows = findBestWindows(scores, activity);
+    const score09h = scores.find((score) => score.hourLabel === "09:00");
+
+    expect(score09h?.score).toBeLessThan(activity.minRecommendedScore);
+    expect(
+      score09h?.breakdown.find((rule) => rule.factor === "chuva_futura")
+        ?.reason,
+    ).toBe("Chuva relevante às 12:00 pode molhar a roupa no varal.");
+    expect(
+      windows.some(
+        (window) =>
+          window.startTime === "2026-06-05T09:00" &&
+          window.endTime === "2026-06-05T12:00",
+      ),
+    ).toBe(false);
+  });
+
   it("mantem scores e breakdowns dentro de 0 a 100", () => {
     const weatherCases = [
       makeHourlyWeather("2026-06-05T08:00", {

@@ -54,6 +54,7 @@ describe("tipos centrais do domínio", () => {
       | "fotografar_por_do_sol"
       | "observar_estrelas"
       | "lavar_carro"
+      | "lavar_roupa"
     >();
   });
 
