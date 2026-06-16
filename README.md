@@ -131,7 +131,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 - **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
   mostra divergencia, sem fazer media cega.
 - **Provider MET Norway:** segunda fonte gratuita opcional da v1.1 para
-  comparacao e alerta de divergencia quando `MET_NORWAY_USER_AGENT` existe.
+  comparacao e alerta de divergencia quando `MET_NORWAY_USER_AGENT` existe,
+  com score, nivel de concordancia e motivos de divergencia.
   WeatherAPI.com fica apenas como alternativa opcional futura.
 - **Historico local:** salva somente as ultimas buscas no `localStorage`.
 - **Compartilhamento:** gera texto compartilhavel do resultado.
