@@ -538,6 +538,57 @@ describe("rotas internas da API", () => {
     expect(payload.dailyOverview.hourly).toHaveLength(2);
   });
 
+  it("POST /api/recommendation retorna overview semanal sem atividade", async () => {
+    const secondAstronomy: DailyAstronomy = {
+      date: "2030-06-06",
+      sunrise: "2030-06-06T06:30",
+      sunset: "2030-06-06T18:00",
+    };
+    getForecastMock.mockResolvedValueOnce({
+      hourly: [
+        makeWeather("2030-06-05T07:00", {
+          temperature_2m: 18,
+          weather_code: 0,
+        }),
+        makeWeather("2030-06-06T15:00", {
+          temperature_2m: 32,
+          precipitation_probability: 85,
+          precipitation: 4,
+          weather_code: 63,
+          wind_speed_10m: 32,
+        }),
+      ],
+      astronomy,
+      dailyAstronomy: [astronomy, secondAstronomy],
+    });
+
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        mode: "clima_semana",
+        date: astronomy.date,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getForecastMock).toHaveBeenCalledWith({
+      lat: city.coordinates.lat,
+      lon: city.coordinates.lon,
+      date: astronomy.date,
+      endDate: "2030-06-11",
+    });
+    expect(payload.weeklyOverview.days).toHaveLength(2);
+    expect(payload.weeklyOverview.highlights.bestDay.date).toBe("2030-06-05");
+    expect(payload.weeklyOverview.highlights.rainiestDay.date).toBe(
+      "2030-06-06",
+    );
+    expect(payload.weeklyOverview.days[1].summary).toContain(
+      "alta chance de chuva",
+    );
+  });
+
   it("POST /api/recommendation compara dias usando uma chamada de forecast", async () => {
     const secondAstronomy: DailyAstronomy = {
       date: "2030-06-06",

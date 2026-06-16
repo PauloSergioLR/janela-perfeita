@@ -32,6 +32,7 @@ import { RecommendationCard } from "@/components/result/recommendation-card";
 import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { ScoreTimeline } from "@/components/result/score-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
+import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,6 +72,7 @@ import type {
   SearchHistoryEntry,
   SearchMode,
   WeekComparison,
+  WeeklyWeatherOverview,
 } from "@/types";
 
 type GeocodingResponse = {
@@ -82,6 +84,7 @@ type RecommendationResponse = {
   activityRanking?: ActivityRanking;
   weekComparison?: WeekComparison;
   dailyOverview?: DailyWeatherOverview;
+  weeklyOverview?: WeeklyWeatherOverview;
 };
 
 type ActivityVisual = {
@@ -148,9 +151,15 @@ const SEARCH_MODE_OPTIONS = [
   },
   {
     id: "semana",
-    label: "Semana",
+    label: "Melhor dia",
     description: "Melhor dia",
     icon: CalendarSearch,
+  },
+  {
+    id: "clima_semana",
+    label: "Semana",
+    description: "Previsão 7 dias",
+    icon: CloudSun,
   },
 ] satisfies SearchModeOption[];
 
@@ -270,11 +279,13 @@ export default function Home() {
   const activityRanking = recommendationMutation.data?.activityRanking;
   const weekComparison = recommendationMutation.data?.weekComparison;
   const dailyOverview = recommendationMutation.data?.dailyOverview;
+  const weeklyOverview = recommendationMutation.data?.weeklyOverview;
   const resultDisclaimer =
     recommendation?.disclaimer ??
     activityRanking?.disclaimer ??
     weekComparison?.disclaimer ??
-    dailyOverview?.disclaimer;
+    dailyOverview?.disclaimer ??
+    weeklyOverview?.disclaimer;
 
   useEffect(() => {
     const options = buildSearchDateOptions();
@@ -508,7 +519,7 @@ export default function Home() {
                 <div className="space-y-3">
                   <Label id="modo-label">Modo</Label>
                   <div
-                    className="grid gap-2 sm:grid-cols-4"
+                    className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
                     role="radiogroup"
                     aria-labelledby="modo-label"
                   >
@@ -758,7 +769,9 @@ export default function Home() {
                 <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                   <div className="space-y-2">
                     <Label htmlFor="date">
-                    {searchMode === "semana" ? "A partir de" : "Data"}
+                    {searchMode === "semana" || searchMode === "clima_semana"
+                      ? "A partir de"
+                      : "Data"}
                     </Label>
                     <div className="relative">
                       <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
@@ -813,6 +826,8 @@ export default function Home() {
                       ? "Calculando..."
                       : searchMode === "dia"
                         ? "Consultar dia"
+                      : searchMode === "clima_semana"
+                        ? "Consultar semana"
                       : searchMode === "atividades"
                         ? "Ver ranking"
                         : searchMode === "semana"
@@ -917,6 +932,8 @@ export default function Home() {
               <WeekComparisonCard comparison={weekComparison} />
             ) : recommendationMutation.isSuccess && dailyOverview ? (
               <DailyOverviewCard overview={dailyOverview} />
+            ) : recommendationMutation.isSuccess && weeklyOverview ? (
+              <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
               <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
                 <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
@@ -930,6 +947,10 @@ export default function Home() {
                         ? selectedDate
                           ? `Clima em ${selectedDate}`
                           : "Consulta do dia"
+                      : searchMode === "clima_semana"
+                        ? selectedDate
+                          ? `Semana a partir de ${selectedDate}`
+                          : "Consulta da semana"
                       : selectedActivity
                       ? `${selectedActivity.name} em ${selectedDate || "data"}`
                       : "Aguardando seleção"}
