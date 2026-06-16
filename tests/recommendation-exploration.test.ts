@@ -87,6 +87,25 @@ describe("exploração de recomendações", () => {
     expect(recommendation.disclaimer).toContain("Open-Meteo");
   });
 
+  it("mostra aviso dinamico de hora dourada para fotografar por do sol", () => {
+    const activity = {
+      ...makeActivity("fotografar_por_do_sol", 88),
+      defaultTimeWindowStrategy: "golden_hour",
+    } satisfies Activity;
+    const recommendation = buildRecommendation({
+      activity,
+      city: criciumaCity,
+      hourly: makeHourly("2030-06-05", ["17:00", "18:00"]),
+      astronomy: makeAstronomy("2030-06-05"),
+      generatedAt: "2030-06-05T09:00:00.000Z",
+      now: "2030-06-05T07:00:00",
+    });
+
+    expect(recommendation.timeWindowNotice).toBe(
+      "Resultado limitado a hora dourada do por do sol local: 17:00 ate 18:15.",
+    );
+  });
+
   it("ranqueia atividades recomendadas antes das sem janela boa", () => {
     const ranking = buildActivityRanking({
       activities: [makeActivity("caminhar", 40), makeActivity("correr", 90)],

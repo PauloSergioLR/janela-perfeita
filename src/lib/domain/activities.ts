@@ -70,6 +70,7 @@ export const ACTIVITIES = [
       "Valoriza a hora dourada, nuvens interessantes, pouca chuva e boa visibilidade.",
     minRecommendedScore: 60,
     minDurationHours: 1,
+    defaultTimeWindowStrategy: "golden_hour",
     rules: [
       createGoldenHourRule(35),
       createSunsetCloudRule(25),

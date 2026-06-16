@@ -9,6 +9,7 @@ import type {
   WeatherContext,
 } from "@/types";
 import {
+  addMinutesToLocalIso,
   buildWeatherContext,
   formatHourLabel,
   getLocalDatePart,
@@ -32,6 +33,8 @@ const MAX_HOURS_PER_DAY = 24;
 const CAR_WASH_FUTURE_RAIN_LOOKAHEAD_HOURS = 3;
 const FUTURE_RAIN_MAX_SCORE = 30;
 const FUTURE_RAIN_PENALIZED_SCORE = 30;
+const GOLDEN_HOUR_START_OFFSET_MINUTES = -60;
+const GOLDEN_HOUR_END_OFFSET_MINUTES = 15;
 
 type TimeWindowSource = "availability" | "default";
 
@@ -58,6 +61,21 @@ function formatTimeWindow(window: ActivityTimeWindow): string {
   return `${window.start} ate ${window.end}`;
 }
 
+function buildGoldenHourTimeWindow(astronomy: DailyAstronomy): ActivityTimeWindow {
+  return {
+    start: formatHourLabel(
+      addMinutesToLocalIso(
+        astronomy.sunset,
+        GOLDEN_HOUR_START_OFFSET_MINUTES,
+      ),
+    ),
+    end: formatHourLabel(
+      addMinutesToLocalIso(astronomy.sunset, GOLDEN_HOUR_END_OFFSET_MINUTES),
+    ),
+    label: "Hora dourada",
+  };
+}
+
 function buildTimeWindowPenalty(filter: TimeWindowFilter): RuleResult {
   const reason =
     filter.source === "availability"
@@ -76,6 +94,7 @@ function buildTimeWindowPenalty(filter: TimeWindowFilter): RuleResult {
 function getTimeWindowFilter(
   activity: Activity,
   availability: UserAvailability | undefined,
+  astronomy: DailyAstronomy,
 ): TimeWindowFilter | null {
   if (availability) {
     return {
@@ -86,6 +105,13 @@ function getTimeWindowFilter(
           end: availability.availableTo,
         },
       ],
+    };
+  }
+
+  if (activity.defaultTimeWindowStrategy === "golden_hour") {
+    return {
+      source: "default",
+      windows: [buildGoldenHourTimeWindow(astronomy)],
     };
   }
 
@@ -226,7 +252,7 @@ export function calculateDayScores({
   const dailyHourly = hourly
     .filter((weather) => getLocalDatePart(weather.time) === astronomy.date)
     .slice(0, MAX_HOURS_PER_DAY);
-  const timeWindowFilter = getTimeWindowFilter(activity, availability);
+  const timeWindowFilter = getTimeWindowFilter(activity, availability, astronomy);
 
   return dailyHourly.map((weather, index) => {
     const context = buildWeatherContext({ weather, astronomy, now });

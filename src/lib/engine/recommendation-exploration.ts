@@ -12,7 +12,11 @@ import type {
   WeekComparison,
 } from "@/types";
 import { calculateDayScores } from "./score-calculator";
+import { addMinutesToLocalIso, formatHourLabel } from "./weather-context";
 import { findBestWindows } from "./window-finder";
+
+const GOLDEN_HOUR_START_OFFSET_MINUTES = -60;
+const GOLDEN_HOUR_END_OFFSET_MINUTES = 15;
 
 export const RECOMMENDATION_DISCLAIMER =
   "Recomendação estimada com base na previsão meteorológica da Open-Meteo; não substitui avaliação local das condições.";
@@ -59,12 +63,47 @@ function formatActivityTimeWindow(window: ActivityTimeWindow): string {
   return `${window.start} ate ${window.end}`;
 }
 
-function buildDefaultTimeWindowNotice(activity: Activity): string | undefined {
-  if (!activity.defaultTimeWindows?.length) {
+function buildGoldenHourTimeWindow(astronomy: DailyAstronomy): ActivityTimeWindow {
+  return {
+    start: formatHourLabel(
+      addMinutesToLocalIso(
+        astronomy.sunset,
+        GOLDEN_HOUR_START_OFFSET_MINUTES,
+      ),
+    ),
+    end: formatHourLabel(
+      addMinutesToLocalIso(astronomy.sunset, GOLDEN_HOUR_END_OFFSET_MINUTES),
+    ),
+    label: "Hora dourada",
+  };
+}
+
+function getDefaultTimeWindows(
+  activity: Activity,
+  astronomy: DailyAstronomy,
+): ActivityTimeWindow[] {
+  if (activity.defaultTimeWindowStrategy === "golden_hour") {
+    return [buildGoldenHourTimeWindow(astronomy)];
+  }
+
+  return activity.defaultTimeWindows ?? [];
+}
+
+function buildDefaultTimeWindowNotice(
+  activity: Activity,
+  astronomy: DailyAstronomy,
+): string | undefined {
+  const windows = getDefaultTimeWindows(activity, astronomy);
+
+  if (!windows.length) {
     return undefined;
   }
 
-  return `Resultado limitado aos horarios padrao de ${activity.name}: ${activity.defaultTimeWindows.map(formatActivityTimeWindow).join(", ")}.`;
+  if (activity.defaultTimeWindowStrategy === "golden_hour") {
+    return `Resultado limitado a hora dourada do por do sol local: ${windows.map(formatActivityTimeWindow).join(", ")}.`;
+  }
+
+  return `Resultado limitado aos horarios padrao de ${activity.name}: ${windows.map(formatActivityTimeWindow).join(", ")}.`;
 }
 
 function getPeakScore(recommendation: Recommendation): number {
@@ -138,7 +177,7 @@ export function buildRecommendation({
       : undefined,
     timeWindowNotice: availability
       ? undefined
-      : buildDefaultTimeWindowNotice(activity),
+      : buildDefaultTimeWindowNotice(activity, astronomy),
     disclaimer: RECOMMENDATION_DISCLAIMER,
   };
 }

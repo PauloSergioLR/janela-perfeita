@@ -38,6 +38,8 @@ export interface ActivityTimeWindow {
   label?: string;
 }
 
+export type ActivityTimeWindowStrategy = "golden_hour";
+
 /** Dados meteorológicos de uma hora retornados pela previsão. */
 export interface HourlyWeather {
   time: string;
@@ -145,6 +147,7 @@ export interface Activity {
   minRecommendedScore: number;
   minDurationHours: number;
   defaultTimeWindows?: ActivityTimeWindow[];
+  defaultTimeWindowStrategy?: ActivityTimeWindowStrategy;
   rules: ActivityRule[];
 }
 
