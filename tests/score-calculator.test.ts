@@ -59,6 +59,37 @@ describe("calculadora de score", () => {
     expect(scores[4].score).toBeGreaterThan(0);
   });
 
+  it("filtra scores fora da disponibilidade informada", () => {
+    const activity = getActivityById("caminhar")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T07:00"),
+        makeHourlyWeather("2026-06-05T08:00"),
+        makeHourlyWeather("2026-06-05T09:00"),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-05T06:00",
+      availability: {
+        availableFrom: "08:00",
+        availableTo: "10:00",
+      },
+    });
+
+    expect(scores.map((score) => score.score)).toEqual([
+      0,
+      expect.any(Number),
+      expect.any(Number),
+    ]);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "disponibilidade",
+        reason: "Fora da disponibilidade informada (08:00 ate 10:00).",
+      }),
+    );
+    expect(scores[1].score).toBeGreaterThanOrEqual(activity.minRecommendedScore);
+  });
+
   it("pontua corrida com chuva forte como janela ruim", () => {
     const activity = getActivityById("correr")!;
     const weather = makeHourlyWeather("2026-06-05T07:00", {

@@ -7,6 +7,7 @@ import type {
   DayRankingItem,
   HourlyWeather,
   Recommendation,
+  UserAvailability,
   WeekComparison,
 } from "@/types";
 import { calculateDayScores } from "./score-calculator";
@@ -22,6 +23,7 @@ interface BuildRecommendationInput {
   astronomy: DailyAstronomy;
   generatedAt: string;
   now: string;
+  availability?: UserAvailability;
 }
 
 interface BuildActivityRankingInput {
@@ -31,6 +33,7 @@ interface BuildActivityRankingInput {
   astronomy: DailyAstronomy;
   generatedAt: string;
   now: string;
+  availability?: UserAvailability;
 }
 
 interface BuildWeekComparisonInput {
@@ -40,6 +43,11 @@ interface BuildWeekComparisonInput {
   dailyAstronomy: DailyAstronomy[];
   generatedAt: string;
   now: string;
+  availability?: UserAvailability;
+}
+
+function buildAvailabilityNotice(availability: UserAvailability): string {
+  return `Resultado filtrado pela disponibilidade informada: ${availability.availableFrom} ate ${availability.availableTo}.`;
 }
 
 function getPeakScore(recommendation: Recommendation): number {
@@ -88,12 +96,14 @@ export function buildRecommendation({
   astronomy,
   generatedAt,
   now,
+  availability,
 }: BuildRecommendationInput): Recommendation {
   const scores = calculateDayScores({
     activity,
     hourly,
     astronomy,
     now,
+    availability,
   });
   const windows = findBestWindows(scores, activity);
 
@@ -105,6 +115,10 @@ export function buildRecommendation({
     scores,
     windows,
     bestWindow: windows[0] ?? null,
+    availability,
+    availabilityNotice: availability
+      ? buildAvailabilityNotice(availability)
+      : undefined,
     disclaimer: RECOMMENDATION_DISCLAIMER,
   };
 }
@@ -116,6 +130,7 @@ export function buildActivityRanking({
   astronomy,
   generatedAt,
   now,
+  availability,
 }: BuildActivityRankingInput): ActivityRanking {
   const items = withPositions<ActivityRankingItem>(
     activities
@@ -127,6 +142,7 @@ export function buildActivityRanking({
           astronomy,
           generatedAt,
           now,
+          availability,
         });
 
         return {
@@ -144,6 +160,7 @@ export function buildActivityRanking({
     generatedAt,
     items,
     bestActivity: items[0] ?? null,
+    availability,
     disclaimer: RECOMMENDATION_DISCLAIMER,
   };
 }
@@ -155,6 +172,7 @@ export function buildWeekComparison({
   dailyAstronomy,
   generatedAt,
   now,
+  availability,
 }: BuildWeekComparisonInput): WeekComparison {
   const days = withPositions<DayRankingItem>(
     dailyAstronomy
@@ -166,6 +184,7 @@ export function buildWeekComparison({
           astronomy,
           generatedAt,
           now,
+          availability,
         });
 
         return {
@@ -185,6 +204,7 @@ export function buildWeekComparison({
     generatedAt,
     days,
     bestDay: days[0] ?? null,
+    availability,
     disclaimer: RECOMMENDATION_DISCLAIMER,
   };
 }

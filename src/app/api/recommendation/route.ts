@@ -27,6 +27,7 @@ import type {
   City,
   ModelAgreement,
   WeatherProviderComparison,
+  UserAvailability,
 } from "@/types";
 
 const ACTIVITY_IDS = [
@@ -59,6 +60,7 @@ const MODEL_COMPARISON_MODELS = [
 ] as const satisfies readonly WeatherModelId[];
 const weatherProvider = openMeteoWeatherProvider;
 const secondaryWeatherProvider = metNorwayWeatherProvider;
+const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 
 const recommendationRequestSchema = z
   .object({
@@ -67,6 +69,8 @@ const recommendationRequestSchema = z
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     compareModels: z.boolean().optional().default(false),
     demo: z.boolean().optional().default(false),
+    availableFrom: timeSchema.optional(),
+    availableTo: timeSchema.optional(),
     city: citySchema.optional(),
     cityQuery: z.string().trim().min(3).optional(),
   })
@@ -80,6 +84,29 @@ const recommendationRequestSchema = z
         code: z.ZodIssueCode.custom,
         message: "Informe uma atividade para gerar a recomendação.",
         path: ["activityId"],
+      });
+    }
+
+    if (
+      (data.availableFrom && !data.availableTo) ||
+      (!data.availableFrom && data.availableTo)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe inicio e fim da disponibilidade.",
+        path: ["availableFrom"],
+      });
+    }
+
+    if (
+      data.availableFrom &&
+      data.availableTo &&
+      data.availableFrom >= data.availableTo
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A disponibilidade precisa terminar depois do inicio.",
+        path: ["availableTo"],
       });
     }
   });
@@ -107,6 +134,20 @@ function addDaysToDate(date: string, days: number): string {
   parsedDate.setUTCDate(parsedDate.getUTCDate() + days);
 
   return parsedDate.toISOString().slice(0, 10);
+}
+
+function getAvailability(input: {
+  availableFrom?: string;
+  availableTo?: string;
+}): UserAvailability | undefined {
+  if (!input.availableFrom || !input.availableTo) {
+    return undefined;
+  }
+
+  return {
+    availableFrom: input.availableFrom,
+    availableTo: input.availableTo,
+  };
 }
 
 function getLocalDateTimeForZone(date: Date, timeZone?: string): string {
@@ -267,6 +308,7 @@ export async function POST(request: Request) {
     const generatedAtDate = new Date();
     const generatedAt = generatedAtDate.toISOString();
     const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
+    const availability = getAvailability(body);
     const forecastParams: ForecastParams = {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
@@ -304,6 +346,7 @@ export async function POST(request: Request) {
         astronomy: forecast.astronomy,
         generatedAt,
         now,
+        availability,
       });
 
       if (body.demo) {
@@ -326,6 +369,7 @@ export async function POST(request: Request) {
         dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
         generatedAt,
         now,
+        availability,
       });
 
       if (body.demo) {
@@ -345,6 +389,7 @@ export async function POST(request: Request) {
       astronomy: forecast.astronomy,
       generatedAt,
       now,
+      availability,
     });
 
     if (modelAgreement) {

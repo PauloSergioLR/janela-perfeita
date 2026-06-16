@@ -175,6 +175,39 @@ describe("rotas internas da API", () => {
     expect(payload.stack).toBeUndefined();
   });
 
+  it("POST /api/recommendation rejeita disponibilidade incompleta", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+        availableFrom: "08:00",
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error.message).toBe("Dados inválidos para gerar recomendação.");
+  });
+
+  it("POST /api/recommendation rejeita disponibilidade invertida", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+        availableFrom: "18:00",
+        availableTo: "08:00",
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error.message).toBe("Dados inválidos para gerar recomendação.");
+  });
+
   it("POST /api/recommendation retorna 404 para atividade inexistente", async () => {
     const { POST } = await import("@/app/api/recommendation/route");
     const response = await POST(
@@ -261,6 +294,56 @@ describe("rotas internas da API", () => {
     expect(payload.recommendation.providerComparison).toBeUndefined();
     expect(getSecondaryForecastMock).not.toHaveBeenCalled();
     expect(payload.stack).toBeUndefined();
+  });
+
+  it("POST /api/recommendation filtra janelas pela disponibilidade", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+        availableFrom: "08:00",
+        availableTo: "09:00",
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.recommendation.availability).toEqual({
+      availableFrom: "08:00",
+      availableTo: "09:00",
+    });
+    expect(payload.recommendation.availabilityNotice).toContain(
+      "08:00 ate 09:00",
+    );
+    expect(payload.recommendation.scores[0].score).toBe(0);
+    expect(payload.recommendation.bestWindow.startTime).toBe(
+      "2030-06-05T08:00",
+    );
+  });
+
+  it("POST /api/recommendation retorna sem janela quando disponibilidade nao cobre bons horarios", async () => {
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        activityId: "correr",
+        date: astronomy.date,
+        availableFrom: "09:00",
+        availableTo: "10:00",
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.recommendation.bestWindow).toBeNull();
+    expect(payload.recommendation.windows).toEqual([]);
+    expect(
+      payload.recommendation.scores.every(
+        (score: { score: number }) => score.score === 0,
+      ),
+    ).toBe(true);
   });
 
   it("POST /api/recommendation usa forecast local no modo demo", async () => {

@@ -122,14 +122,6 @@ npm run test:coverage
 npm run build
 ```
 
-Regra atual do usuario:
-
-- O Codex nao deve rodar essas validacoes localmente por padrao.
-- O Codex deve informar os comandos para o usuario rodar localmente.
-- O usuario roda as validacoes antes de aprovar, autorizar commit ou seguir com
-  PR/merge.
-- Se o usuario pedir explicitamente, o Codex pode rodar os comandos.
-
 Na PR, aguardar o GitHub Actions passar antes de mergear.
 
 Workflow atual:

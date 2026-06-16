@@ -192,6 +192,8 @@ async function requestRecommendation(input: {
   mode: SearchMode;
   activityId?: ActivityId;
   date: string;
+  availableFrom?: string;
+  availableTo?: string;
   compareModels?: boolean;
   demo?: boolean;
 }): Promise<RecommendationResponse> {
@@ -215,6 +217,8 @@ export default function Home() {
     "",
   );
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableFrom, setAvailableFrom] = useState("");
+  const [availableTo, setAvailableTo] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("janela");
   const [compareModels, setCompareModels] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
@@ -246,6 +250,7 @@ export default function Home() {
   const selectedActivity = activities.find(
     (activity) => activity.id === selectedActivityId,
   );
+  const usesAvailability = searchMode !== "semana";
   const recommendation = recommendationMutation.data?.recommendation;
   const activityRanking = recommendationMutation.data?.activityRanking;
   const weekComparison = recommendationMutation.data?.weekComparison;
@@ -295,6 +300,8 @@ export default function Home() {
     activityId?: ActivityId;
     activityName?: string;
     date: string;
+    availableFrom?: string;
+    availableTo?: string;
   }) {
     const normalizedInput = normalizeSearchHistoryDraft(input);
     const entry = buildSearchHistoryEntry({
@@ -319,6 +326,8 @@ export default function Home() {
       mode: normalizedInput.mode,
       activityId: normalizedInput.activityId,
       date: normalizedInput.date,
+      availableFrom: normalizedInput.availableFrom,
+      availableTo: normalizedInput.availableTo,
       compareModels: input.compareModels,
       demo: input.demo,
     });
@@ -343,6 +352,8 @@ export default function Home() {
         ? selectedActivity?.name
         : undefined,
       date: selectedDate,
+      availableFrom: usesAvailability ? availableFrom || undefined : undefined,
+      availableTo: usesAvailability ? availableTo || undefined : undefined,
       compareModels: searchMode === "janela" ? compareModels : false,
       demo: demoMode,
     });
@@ -371,12 +382,16 @@ export default function Home() {
       activityId: entry.activityId,
       activityName: entry.activityName,
       date,
+      availableFrom: entry.availableFrom,
+      availableTo: entry.availableTo,
     });
 
     setSearchMode(searchInput.mode);
     setSelectedCity(searchInput.city);
     setCityQuery(formatCityLabel(searchInput.city));
     setSelectedDate(searchInput.date);
+    setAvailableFrom(searchInput.availableFrom ?? "");
+    setAvailableTo(searchInput.availableTo ?? "");
     setSelectedActivityId(searchInput.activityId ?? "");
     resetRecommendationState();
 
@@ -680,6 +695,45 @@ export default function Home() {
                           </button>
                         );
                       })}
+                    </div>
+                  </div>
+                ) : null}
+
+                {usesAvailability ? (
+                  <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
+                    <div className="space-y-1">
+                      <Label>Disponibilidade opcional</Label>
+                      <p className="text-xs leading-5 text-muted-foreground">
+                        Limita a busca ao periodo em que voce pode fazer a atividade.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="available-from">Disponivel de</Label>
+                        <Input
+                          id="available-from"
+                          type="time"
+                          value={availableFrom}
+                          onChange={(event) => {
+                            setAvailableFrom(event.target.value);
+                            resetRecommendationState();
+                          }}
+                          className="h-11 rounded-md"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="available-to">Disponivel ate</Label>
+                        <Input
+                          id="available-to"
+                          type="time"
+                          value={availableTo}
+                          onChange={(event) => {
+                            setAvailableTo(event.target.value);
+                            resetRecommendationState();
+                          }}
+                          className="h-11 rounded-md"
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : null}

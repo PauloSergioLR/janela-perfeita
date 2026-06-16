@@ -62,6 +62,24 @@ describe("historico local de buscas", () => {
     expect(entry.id).toContain("2030-06-01");
   });
 
+  it("mantem disponibilidade no id, label e entrada salva", () => {
+    const entry = buildSearchHistoryEntry({
+      mode: "janela",
+      city: criciumaCity,
+      activityId: "correr",
+      activityName: "Correr",
+      date: "2030-06-05",
+      availableFrom: "08:00",
+      availableTo: "10:00",
+      createdAt: "2030-06-01T10:00:00.000Z",
+    });
+
+    expect(entry.id).toContain("08:00");
+    expect(entry.availableFrom).toBe("08:00");
+    expect(entry.availableTo).toBe("10:00");
+    expect(getSearchHistoryLabel(entry)).toContain("(08:00-10:00)");
+  });
+
   it("salva, le e limpa historico no storage informado", () => {
     const storage = new MemoryStorage();
     const entry = makeEntry(0);
@@ -123,6 +141,8 @@ describe("historico local de buscas", () => {
 
     expect(draft.activityId).toBeUndefined();
     expect(draft.activityName).toBeUndefined();
+    expect(draft.availableFrom).toBeUndefined();
+    expect(draft.availableTo).toBeUndefined();
     expect(modeUsesActivity("semana")).toBe(true);
     expect(modeUsesActivity("atividades")).toBe(false);
   });

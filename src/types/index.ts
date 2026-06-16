@@ -25,6 +25,12 @@ export interface City {
   coordinates: Coordinates;
 }
 
+/** Intervalo opcional em que o usuario aceita receber recomendacoes. */
+export interface UserAvailability {
+  availableFrom: string;
+  availableTo: string;
+}
+
 /** Dados meteorológicos de uma hora retornados pela previsão. */
 export interface HourlyWeather {
   time: string;
@@ -168,6 +174,8 @@ export interface Recommendation {
   bestWindow: WindowResult | null;
   modelAgreement?: ModelAgreement;
   providerComparison?: WeatherProviderComparison;
+  availability?: UserAvailability;
+  availabilityNotice?: string;
   disclaimer: string;
 }
 
@@ -186,6 +194,7 @@ export interface ActivityRanking {
   generatedAt: string;
   items: ActivityRankingItem[];
   bestActivity: ActivityRankingItem | null;
+  availability?: UserAvailability;
   disclaimer: string;
 }
 
@@ -206,6 +215,7 @@ export interface WeekComparison {
   generatedAt: string;
   days: DayRankingItem[];
   bestDay: DayRankingItem | null;
+  availability?: UserAvailability;
   disclaimer: string;
 }
 
@@ -217,5 +227,7 @@ export interface SearchHistoryEntry {
   activityId?: ActivityId;
   activityName?: string;
   date: string;
+  availableFrom?: string;
+  availableTo?: string;
   createdAt: string;
 }
