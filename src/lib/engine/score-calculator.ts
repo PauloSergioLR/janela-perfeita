@@ -4,6 +4,7 @@ import type {
   HourlyWeather,
   HourScore,
   RuleResult,
+  UserAvailability,
   WeatherContext,
 } from "@/types";
 import {
@@ -23,6 +24,7 @@ export interface CalculateDayScoresInput {
   hourly: HourlyWeather[];
   astronomy: DailyAstronomy;
   now: string;
+  availability?: UserAvailability;
 }
 
 const MAX_HOURS_PER_DAY = 24;
@@ -42,6 +44,29 @@ function buildFutureRainPenalty(weather: HourlyWeather): RuleResult {
     score: 0,
     reason: `Chuva relevante às ${formatHourLabel(weather.time)} pode comprometer a lavagem do carro.`,
   };
+}
+
+function buildAvailabilityPenalty(availability: UserAvailability): RuleResult {
+  return {
+    factor: "disponibilidade",
+    label: "Disponibilidade",
+    weight: 0,
+    score: 0,
+    reason: `Fora da disponibilidade informada (${availability.availableFrom} ate ${availability.availableTo}).`,
+  };
+}
+
+function isInsideAvailability(
+  weather: HourlyWeather,
+  availability: UserAvailability | undefined,
+): boolean {
+  if (!availability) {
+    return true;
+  }
+
+  const time = weather.time.slice(11, 16);
+
+  return time >= availability.availableFrom && time < availability.availableTo;
 }
 
 function findCarWashFutureRainPenalty(input: {
@@ -95,6 +120,21 @@ function applyFutureRainPenalty(
   };
 }
 
+function applyAvailabilityFilter(
+  score: HourScore,
+  availability: UserAvailability | undefined,
+): HourScore {
+  if (isInsideAvailability(score.weather, availability) || !availability) {
+    return score;
+  }
+
+  return {
+    ...score,
+    score: 0,
+    breakdown: [...score.breakdown, buildAvailabilityPenalty(availability)],
+  };
+}
+
 export function calculateHourScore({
   activity,
   weather,
@@ -126,6 +166,7 @@ export function calculateDayScores({
   hourly,
   astronomy,
   now,
+  availability,
 }: CalculateDayScoresInput): HourScore[] {
   const dailyHourly = hourly
     .filter((weather) => getLocalDatePart(weather.time) === astronomy.date)
@@ -146,7 +187,10 @@ export function calculateDayScores({
       now,
     });
 
-    return applyFutureRainPenalty(score, futureRainPenalty);
+    return applyAvailabilityFilter(
+      applyFutureRainPenalty(score, futureRainPenalty),
+      availability,
+    );
   });
 }
 

@@ -35,6 +35,8 @@ const searchHistoryEntrySchema = z.object({
   activityId: z.enum(ACTIVITY_IDS).optional(),
   activityName: z.string().trim().min(1).optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  availableFrom: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
+  availableTo: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
   createdAt: z.string().trim().min(1),
 });
 
@@ -48,6 +50,8 @@ interface BuildSearchHistoryEntryInput {
   activityId?: ActivityId;
   activityName?: string;
   date: string;
+  availableFrom?: string;
+  availableTo?: string;
   createdAt: string;
 }
 
@@ -57,6 +61,8 @@ export interface SearchHistoryDraft {
   activityId?: ActivityId;
   activityName?: string;
   date: string;
+  availableFrom?: string;
+  availableTo?: string;
 }
 
 export function modeUsesActivity(mode: SearchMode): boolean {
@@ -74,6 +80,8 @@ export function normalizeSearchHistoryDraft(
     mode: input.mode,
     city: input.city,
     date: input.date,
+    availableFrom: input.availableFrom,
+    availableTo: input.availableTo,
   };
 }
 
@@ -84,6 +92,8 @@ function buildSearchId(input: Omit<BuildSearchHistoryEntryInput, "createdAt">) {
     input.city.coordinates.lat,
     input.city.coordinates.lon,
     input.activityId ?? "todas",
+    input.availableFrom ?? "sem-inicio",
+    input.availableTo ?? "sem-fim",
   ].join("|");
 }
 
@@ -99,6 +109,8 @@ export function buildSearchHistoryEntry(
     activityId: normalizedInput.activityId,
     activityName: normalizedInput.activityName,
     date: normalizedInput.date,
+    availableFrom: normalizedInput.availableFrom,
+    availableTo: normalizedInput.availableTo,
     createdAt: input.createdAt,
   };
 }
@@ -162,9 +174,14 @@ export function clearSearchHistory(storage: SearchHistoryStorage) {
 }
 
 export function getSearchHistoryLabel(entry: SearchHistoryEntry): string {
+  const availability =
+    entry.availableFrom && entry.availableTo
+      ? ` (${entry.availableFrom}-${entry.availableTo})`
+      : "";
+
   if (entry.mode === "atividades") {
-    return `Ranking de atividades em ${formatCityLabel(entry.city)}`;
+    return `Ranking de atividades em ${formatCityLabel(entry.city)}${availability}`;
   }
 
-  return `${entry.activityName ?? "Atividade"} em ${formatCityLabel(entry.city)}`;
+  return `${entry.activityName ?? "Atividade"} em ${formatCityLabel(entry.city)}${availability}`;
 }

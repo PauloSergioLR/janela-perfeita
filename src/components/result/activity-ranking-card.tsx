@@ -43,6 +43,9 @@ function RecommendationBadge({ item }: { item: ActivityRankingItem }) {
 export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
   const bestRecommendation = ranking.bestActivity?.recommendation;
   const shareText = buildActivityRankingShareText(ranking);
+  const availabilityNotice = ranking.availability
+    ? `Ranking filtrado pela disponibilidade informada: ${ranking.availability.availableFrom} ate ${ranking.availability.availableTo}.`
+    : null;
 
   return (
     <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
@@ -54,6 +57,12 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
         <ShareResultButton title="Janela Perfeita" text={shareText} />
       </CardHeader>
       <CardContent className="space-y-4 p-4 sm:p-5">
+        {availabilityNotice ? (
+          <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
+            {availabilityNotice}
+          </div>
+        ) : null}
+
         {bestRecommendation ? (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-50">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal">
