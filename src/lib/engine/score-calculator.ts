@@ -1,5 +1,6 @@
 import type {
   Activity,
+  ActivityTimeWindow,
   DailyAstronomy,
   HourlyWeather,
   HourScore,
@@ -32,6 +33,13 @@ const CAR_WASH_FUTURE_RAIN_LOOKAHEAD_HOURS = 3;
 const FUTURE_RAIN_MAX_SCORE = 30;
 const FUTURE_RAIN_PENALIZED_SCORE = 30;
 
+type TimeWindowSource = "availability" | "default";
+
+interface TimeWindowFilter {
+  source: TimeWindowSource;
+  windows: ActivityTimeWindow[];
+}
+
 function clampScore(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
@@ -46,27 +54,74 @@ function buildFutureRainPenalty(weather: HourlyWeather): RuleResult {
   };
 }
 
-function buildAvailabilityPenalty(availability: UserAvailability): RuleResult {
+function formatTimeWindow(window: ActivityTimeWindow): string {
+  return `${window.start} ate ${window.end}`;
+}
+
+function buildTimeWindowPenalty(filter: TimeWindowFilter): RuleResult {
+  const reason =
+    filter.source === "availability"
+      ? `Fora da disponibilidade informada (${formatTimeWindow(filter.windows[0])}).`
+      : `Fora do horario padrao da atividade (${filter.windows.map(formatTimeWindow).join(", ")}).`;
+
   return {
-    factor: "disponibilidade",
-    label: "Disponibilidade",
+    factor: filter.source === "availability" ? "disponibilidade" : "horario_padrao",
+    label: filter.source === "availability" ? "Disponibilidade" : "Horario padrao",
     weight: 0,
     score: 0,
-    reason: `Fora da disponibilidade informada (${availability.availableFrom} ate ${availability.availableTo}).`,
+    reason,
   };
 }
 
-function isInsideAvailability(
-  weather: HourlyWeather,
+function getTimeWindowFilter(
+  activity: Activity,
   availability: UserAvailability | undefined,
+): TimeWindowFilter | null {
+  if (availability) {
+    return {
+      source: "availability",
+      windows: [
+        {
+          start: availability.availableFrom,
+          end: availability.availableTo,
+        },
+      ],
+    };
+  }
+
+  if (activity.defaultTimeWindows?.length) {
+    return {
+      source: "default",
+      windows: activity.defaultTimeWindows,
+    };
+  }
+
+  return null;
+}
+
+function isInsideTimeWindow(time: string, window: ActivityTimeWindow): boolean {
+  if (window.start === window.end) {
+    return true;
+  }
+
+  if (window.start < window.end) {
+    return time >= window.start && time < window.end;
+  }
+
+  return time >= window.start || time < window.end;
+}
+
+function isInsideTimeWindowFilter(
+  weather: HourlyWeather,
+  filter: TimeWindowFilter | null,
 ): boolean {
-  if (!availability) {
+  if (!filter) {
     return true;
   }
 
   const time = weather.time.slice(11, 16);
 
-  return time >= availability.availableFrom && time < availability.availableTo;
+  return filter.windows.some((window) => isInsideTimeWindow(time, window));
 }
 
 function findCarWashFutureRainPenalty(input: {
@@ -122,16 +177,16 @@ function applyFutureRainPenalty(
 
 function applyAvailabilityFilter(
   score: HourScore,
-  availability: UserAvailability | undefined,
+  filter: TimeWindowFilter | null,
 ): HourScore {
-  if (isInsideAvailability(score.weather, availability) || !availability) {
+  if (isInsideTimeWindowFilter(score.weather, filter) || !filter) {
     return score;
   }
 
   return {
     ...score,
     score: 0,
-    breakdown: [...score.breakdown, buildAvailabilityPenalty(availability)],
+    breakdown: [...score.breakdown, buildTimeWindowPenalty(filter)],
   };
 }
 
@@ -171,6 +226,7 @@ export function calculateDayScores({
   const dailyHourly = hourly
     .filter((weather) => getLocalDatePart(weather.time) === astronomy.date)
     .slice(0, MAX_HOURS_PER_DAY);
+  const timeWindowFilter = getTimeWindowFilter(activity, availability);
 
   return dailyHourly.map((weather, index) => {
     const context = buildWeatherContext({ weather, astronomy, now });
@@ -189,7 +245,7 @@ export function calculateDayScores({
 
     return applyAvailabilityFilter(
       applyFutureRainPenalty(score, futureRainPenalty),
-      availability,
+      timeWindowFilter,
     );
   });
 }

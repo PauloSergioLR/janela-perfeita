@@ -1,5 +1,6 @@
 import type {
   Activity,
+  ActivityTimeWindow,
   ActivityRanking,
   ActivityRankingItem,
   City,
@@ -48,6 +49,22 @@ interface BuildWeekComparisonInput {
 
 function buildAvailabilityNotice(availability: UserAvailability): string {
   return `Resultado filtrado pela disponibilidade informada: ${availability.availableFrom} ate ${availability.availableTo}.`;
+}
+
+function formatActivityTimeWindow(window: ActivityTimeWindow): string {
+  if (window.start === window.end) {
+    return "Dia inteiro";
+  }
+
+  return `${window.start} ate ${window.end}`;
+}
+
+function buildDefaultTimeWindowNotice(activity: Activity): string | undefined {
+  if (!activity.defaultTimeWindows?.length) {
+    return undefined;
+  }
+
+  return `Resultado limitado aos horarios padrao de ${activity.name}: ${activity.defaultTimeWindows.map(formatActivityTimeWindow).join(", ")}.`;
 }
 
 function getPeakScore(recommendation: Recommendation): number {
@@ -119,6 +136,9 @@ export function buildRecommendation({
     availabilityNotice: availability
       ? buildAvailabilityNotice(availability)
       : undefined,
+    timeWindowNotice: availability
+      ? undefined
+      : buildDefaultTimeWindowNotice(activity),
     disclaimer: RECOMMENDATION_DISCLAIMER,
   };
 }
