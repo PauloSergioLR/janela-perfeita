@@ -439,6 +439,55 @@ export function createWindRule(weight: number, idealMax: number): ActivityRule {
   };
 }
 
+export function createDryingWindRule(weight: number): ActivityRule {
+  return {
+    factor: "vento_secagem",
+    label: "Vento para secagem",
+    weight,
+    evaluate: (weather: HourlyWeather) => {
+      const wind = weather.wind_speed_10m;
+
+      if (wind < 5) {
+        return createRuleResult({
+          factor: "vento_secagem",
+          label: "Vento para secagem",
+          weight,
+          score: 65,
+          reason: `Vento de ${wind} km/h ajuda pouco na secagem da roupa.`,
+        });
+      }
+
+      if (wind <= 22) {
+        return createRuleResult({
+          factor: "vento_secagem",
+          label: "Vento para secagem",
+          weight,
+          score: 100,
+          reason: `Vento de ${wind} km/h favorece a secagem da roupa.`,
+        });
+      }
+
+      if (wind <= 35) {
+        return createRuleResult({
+          factor: "vento_secagem",
+          label: "Vento para secagem",
+          weight,
+          score: 45,
+          reason: `Vento de ${wind} km/h pode derrubar ou embolar roupas no varal.`,
+        });
+      }
+
+      return createRuleResult({
+        factor: "vento_secagem",
+        label: "Vento para secagem",
+        weight,
+        score: 10,
+        reason: `Vento de ${wind} km/h torna o varal pouco seguro.`,
+      });
+    },
+  };
+}
+
 export function createWindGustRule(
   weight: number,
   idealMax: number,

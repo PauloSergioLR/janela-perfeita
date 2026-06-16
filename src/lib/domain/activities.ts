@@ -1,5 +1,6 @@
 import type { Activity, ActivityId } from "@/types";
 import {
+  createDryingWindRule,
   createGoldenHourRule,
   createHumidityRule,
   createNightRule,
@@ -106,6 +107,21 @@ export const ACTIVITIES = [
       createHumidityRule(20),
       createTemperatureRule(20, 18, 28),
       createWindRule(10, 15),
+    ],
+  },
+  {
+    id: "lavar_roupa",
+    name: "Lavar roupa",
+    shortDescription:
+      "Busca janelas secas, com baixa umidade, vento util para secagem e temperatura amena.",
+    minRecommendedScore: 65,
+    minDurationHours: 3,
+    defaultTimeWindows: [{ start: "07:00", end: "18:00" }],
+    rules: [
+      createPrecipitationRule(35),
+      createHumidityRule(25),
+      createDryingWindRule(25),
+      createTemperatureRule(15, 18, 30),
     ],
   },
 ] satisfies Activity[];

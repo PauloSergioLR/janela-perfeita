@@ -476,7 +476,7 @@ describe("rotas internas da API", () => {
 
     expect(response.status).toBe(200);
     expect(getForecastMock).toHaveBeenCalledTimes(1);
-    expect(payload.activityRanking.items).toHaveLength(6);
+    expect(payload.activityRanking.items).toHaveLength(7);
     expect(payload.activityRanking.bestActivity).toEqual(
       expect.objectContaining({
         position: 1,

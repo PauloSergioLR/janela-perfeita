@@ -30,11 +30,15 @@ export interface CalculateDayScoresInput {
 }
 
 const MAX_HOURS_PER_DAY = 24;
-const CAR_WASH_FUTURE_RAIN_LOOKAHEAD_HOURS = 3;
+const FUTURE_RAIN_LOOKAHEAD_HOURS = 3;
 const FUTURE_RAIN_MAX_SCORE = 30;
 const FUTURE_RAIN_PENALIZED_SCORE = 30;
 const GOLDEN_HOUR_START_OFFSET_MINUTES = -60;
 const GOLDEN_HOUR_END_OFFSET_MINUTES = 15;
+const FUTURE_RAIN_ACTIVITY_IDS = new Set<Activity["id"]>([
+  "lavar_carro",
+  "lavar_roupa",
+]);
 
 type TimeWindowSource = "availability" | "default";
 
@@ -47,13 +51,21 @@ function clampScore(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-function buildFutureRainPenalty(weather: HourlyWeather): RuleResult {
+function buildFutureRainPenalty(
+  activity: Activity,
+  weather: HourlyWeather,
+): RuleResult {
+  const impactReason =
+    activity.id === "lavar_roupa"
+      ? "pode molhar a roupa no varal"
+      : "pode comprometer a lavagem do carro";
+
   return {
     factor: "chuva_futura",
     label: "Chuva futura",
     weight: 0,
     score: 0,
-    reason: `Chuva relevante às ${formatHourLabel(weather.time)} pode comprometer a lavagem do carro.`,
+    reason: `Chuva relevante às ${formatHourLabel(weather.time)} ${impactReason}.`,
   };
 }
 
@@ -161,7 +173,7 @@ function findCarWashFutureRainPenalty(input: {
   astronomy: DailyAstronomy;
   now: string;
 }): RuleResult | null {
-  if (input.activity.id !== "lavar_carro") {
+  if (!FUTURE_RAIN_ACTIVITY_IDS.has(input.activity.id)) {
     return null;
   }
 
@@ -174,7 +186,7 @@ function findCarWashFutureRainPenalty(input: {
   const futureWeather = input.hourly
     .slice(
       input.currentIndex + 1,
-      input.currentIndex + 1 + CAR_WASH_FUTURE_RAIN_LOOKAHEAD_HOURS,
+      input.currentIndex + 1 + FUTURE_RAIN_LOOKAHEAD_HOURS,
     )
     .find((weather) => {
       const context = buildWeatherContext({
@@ -187,7 +199,9 @@ function findCarWashFutureRainPenalty(input: {
       return rainResult.score <= FUTURE_RAIN_MAX_SCORE;
     });
 
-  return futureWeather ? buildFutureRainPenalty(futureWeather) : null;
+  return futureWeather
+    ? buildFutureRainPenalty(input.activity, futureWeather)
+    : null;
 }
 
 function applyFutureRainPenalty(

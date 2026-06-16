@@ -6,7 +6,7 @@ describe("conteúdo técnico do score", () => {
   it("resume pesos e mínimos das atividades sem alterar regras", () => {
     const activities = buildScoreExplainerActivities(getAllActivities());
 
-    expect(activities).toHaveLength(6);
+    expect(activities).toHaveLength(7);
     expect(activities.map((activity) => activity.id)).toEqual([
       "correr",
       "caminhar",
@@ -14,6 +14,7 @@ describe("conteúdo técnico do score", () => {
       "fotografar_por_do_sol",
       "observar_estrelas",
       "lavar_carro",
+      "lavar_roupa",
     ]);
     expect(activities.every((activity) => activity.totalWeight === 100)).toBe(
       true,
@@ -25,6 +26,16 @@ describe("conteúdo técnico do score", () => {
         expect.objectContaining({
           factor: "chuva",
           weight: 50,
+        }),
+      ]),
+    );
+    expect(
+      activities.find((activity) => activity.id === "lavar_roupa")?.rules,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          factor: "vento_secagem",
+          weight: 25,
         }),
       ]),
     );

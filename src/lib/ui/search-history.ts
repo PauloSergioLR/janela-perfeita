@@ -12,6 +12,7 @@ const ACTIVITY_IDS = [
   "fotografar_por_do_sol",
   "observar_estrelas",
   "lavar_carro",
+  "lavar_roupa",
 ] as const satisfies readonly ActivityId[];
 
 const SEARCH_MODES = ["janela", "atividades", "semana"] as const satisfies readonly SearchMode[];

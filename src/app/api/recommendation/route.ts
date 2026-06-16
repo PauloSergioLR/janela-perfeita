@@ -37,6 +37,7 @@ const ACTIVITY_IDS = [
   "fotografar_por_do_sol",
   "observar_estrelas",
   "lavar_carro",
+  "lavar_roupa",
 ] as const satisfies readonly ActivityId[];
 
 const citySchema = z.object({

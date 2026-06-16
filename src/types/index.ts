@@ -5,7 +5,8 @@ export type ActivityId =
   | "pedalar"
   | "fotografar_por_do_sol"
   | "observar_estrelas"
-  | "lavar_carro";
+  | "lavar_carro"
+  | "lavar_roupa";
 
 export type SearchMode = "janela" | "atividades" | "semana";
 

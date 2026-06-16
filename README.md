@@ -20,13 +20,14 @@ esta atividade?".
 
 - Busca cidade por nome, sem exigir GPS.
 - Recomenda datas de hoje ate hoje+6.
-- Suporta seis atividades:
+- Suporta sete atividades:
   - correr
   - caminhar
   - pedalar
   - fotografar por do sol
   - observar estrelas
   - lavar carro
+  - lavar roupa
 - Calcula score de 0 a 100 por hora.
 - Mostra melhor janela do dia, alternativas e timeline.
 - Explica os principais motivos da recomendacao.
@@ -117,6 +118,7 @@ O score usa dados horarios normalizados:
 | Fotografar por do sol | hora dourada 35, nuvens 25, visibilidade 20, chuva 15, sol 5 | 60 | 1h |
 | Observar estrelas | noite 45, qualidade do ceu 45, chuva 10 | 70 | 2h |
 | Lavar carro | chuva 50, umidade 20, temperatura 20, vento 10 | 65 | 2h |
+| Lavar roupa | chuva 35, umidade 25, vento para secagem 25, temperatura 15 | 65 | 3h |
 
 Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 0 a 100.
@@ -125,7 +127,7 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 
 - **Confianca da previsao:** mostra se a janela e estavel ou se ha variacao
   relevante de chuva, vento, temperatura e nuvens.
-- **Modo inverso:** ranqueia as seis atividades para a mesma cidade e data.
+- **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
 - **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
   de uma atividade.
 - **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
