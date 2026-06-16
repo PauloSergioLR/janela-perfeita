@@ -20,6 +20,7 @@ esta atividade?".
 
 - Busca cidade por nome, sem exigir GPS.
 - Recomenda datas de hoje ate hoje+6.
+- Permite consultar o clima completo de um dia sem escolher atividade.
 - Suporta sete atividades:
   - correr
   - caminhar
@@ -78,7 +79,7 @@ flowchart LR
 
 ## Como a recomendacao funciona
 
-1. A UI envia cidade, modo, atividade e data para a API interna.
+1. A UI envia cidade, modo, atividade quando necessaria e data para a API interna.
 2. A API consulta forecast e astronomia diaria via `WeatherProvider`.
 3. A engine monta contexto por hora:
    - hora local
@@ -92,7 +93,8 @@ flowchart LR
 6. As janelas sao ordenadas por media, pico, duracao e horario inicial.
 7. A melhor janela recebe confianca baseada na estabilidade dos fatores.
 8. Em modos extras, a mesma engine gera ranking de atividades ou comparacao da
-   semana.
+   semana; o modo "Consulta do dia" consolida os dados horarios em um overview
+   diario sem depender de atividade.
 
 ## Dados meteorologicos usados
 
@@ -127,6 +129,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 
 - **Confianca da previsao:** mostra se a janela e estavel ou se ha variacao
   relevante de chuva, vento, temperatura e nuvens.
+- **Consulta do dia:** mostra resumo diario com temperatura, sensacao termica,
+  chuva, vento, rajadas, UV, nascer/por do sol, weather code e timeline horaria.
 - **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
 - **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
   de uma atividade.

@@ -130,6 +130,24 @@ describe("historico local de buscas", () => {
     expect(getSearchHistoryLabel(entry)).toContain("Ranking de atividades");
   });
 
+  it("formata consulta do dia sem atividade e disponibilidade", () => {
+    const entry = buildSearchHistoryEntry({
+      mode: "dia",
+      city: criciumaCity,
+      activityId: "correr",
+      activityName: "Correr",
+      date: "2030-06-05",
+      availableFrom: "08:00",
+      availableTo: "10:00",
+      createdAt: "2030-06-01T10:00:00.000Z",
+    });
+
+    expect(entry.activityId).toBeUndefined();
+    expect(entry.availableFrom).toBeUndefined();
+    expect(getSearchHistoryLabel(entry)).toContain("Clima do dia");
+    expect(modeUsesActivity("dia")).toBe(false);
+  });
+
   it("remove atividade escondida do modo o que fazer", () => {
     const draft = normalizeSearchHistoryDraft({
       mode: "atividades",

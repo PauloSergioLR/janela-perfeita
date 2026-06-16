@@ -489,6 +489,55 @@ describe("rotas internas da API", () => {
     );
   });
 
+  it("POST /api/recommendation retorna overview diario sem atividade", async () => {
+    getForecastMock.mockResolvedValueOnce({
+      hourly: [
+        makeWeather("2030-06-05T07:00", {
+          temperature_2m: 14,
+          weather_code: 3,
+        }),
+        makeWeather("2030-06-05T15:00", {
+          temperature_2m: 25,
+          precipitation_probability: 80,
+          precipitation: 2,
+          weather_code: 63,
+        }),
+      ],
+      astronomy,
+      dailyAstronomy: [astronomy],
+    });
+
+    const { POST } = await import("@/app/api/recommendation/route");
+    const response = await POST(
+      makePostRequest({
+        city,
+        mode: "dia",
+        date: astronomy.date,
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(getForecastMock).toHaveBeenCalledWith({
+      lat: city.coordinates.lat,
+      lon: city.coordinates.lon,
+      date: astronomy.date,
+      endDate: undefined,
+    });
+    expect(payload.dailyOverview).toEqual(
+      expect.objectContaining({
+        city,
+        date: astronomy.date,
+        weatherCode: 63,
+        weatherLabel: "Chuva",
+        temperatureMin: 14,
+        temperatureMax: 25,
+        precipitationProbabilityMax: 80,
+      }),
+    );
+    expect(payload.dailyOverview.hourly).toHaveLength(2);
+  });
+
   it("POST /api/recommendation compara dias usando uma chamada de forecast", async () => {
     const secondAstronomy: DailyAstronomy = {
       date: "2030-06-06",

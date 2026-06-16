@@ -11,6 +11,7 @@ import {
   buildRecommendation,
   buildWeekComparison,
 } from "@/lib/engine/recommendation-exploration";
+import { buildDailyWeatherOverview } from "@/lib/engine/daily-weather-overview";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
 import { calculateModelAgreement } from "@/lib/weather/model-agreement";
 import { metNorwayWeatherProvider } from "@/lib/weather/met-norway-weather-provider";
@@ -52,7 +53,7 @@ const citySchema = z.object({
   }),
 });
 
-const recommendationModeSchema = z.enum(["janela", "atividades", "semana"]);
+const recommendationModeSchema = z.enum(["janela", "atividades", "semana", "dia"]);
 const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
 const WEEK_COMPARISON_DAYS = 7;
 const MODEL_COMPARISON_MODELS = [
@@ -358,6 +359,21 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({ activityRanking });
+    }
+
+    if (body.mode === "dia") {
+      const dailyOverview = buildDailyWeatherOverview({
+        city,
+        hourly: forecast.hourly,
+        astronomy: forecast.astronomy,
+        generatedAt,
+      });
+
+      if (body.demo) {
+        dailyOverview.disclaimer = DEMO_DISCLAIMER;
+      }
+
+      return NextResponse.json({ dailyOverview });
     }
 
     const activity = resolveActivity(body.activityId);

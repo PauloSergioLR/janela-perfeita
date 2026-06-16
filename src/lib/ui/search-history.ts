@@ -15,7 +15,12 @@ const ACTIVITY_IDS = [
   "lavar_roupa",
 ] as const satisfies readonly ActivityId[];
 
-const SEARCH_MODES = ["janela", "atividades", "semana"] as const satisfies readonly SearchMode[];
+const SEARCH_MODES = [
+  "janela",
+  "atividades",
+  "semana",
+  "dia",
+] as const satisfies readonly SearchMode[];
 
 const citySchema = z.object({
   id: z.number().int().optional(),
@@ -67,7 +72,7 @@ export interface SearchHistoryDraft {
 }
 
 export function modeUsesActivity(mode: SearchMode): boolean {
-  return mode !== "atividades";
+  return mode === "janela" || mode === "semana";
 }
 
 export function normalizeSearchHistoryDraft(
@@ -75,6 +80,14 @@ export function normalizeSearchHistoryDraft(
 ): SearchHistoryDraft {
   if (modeUsesActivity(input.mode)) {
     return input;
+  }
+
+  if (input.mode === "dia") {
+    return {
+      mode: input.mode,
+      city: input.city,
+      date: input.date,
+    };
   }
 
   return {
@@ -182,6 +195,10 @@ export function getSearchHistoryLabel(entry: SearchHistoryEntry): string {
 
   if (entry.mode === "atividades") {
     return `Ranking de atividades em ${formatCityLabel(entry.city)}${availability}`;
+  }
+
+  if (entry.mode === "dia") {
+    return `Clima do dia em ${formatCityLabel(entry.city)}${availability}`;
   }
 
   return `${entry.activityName ?? "Atividade"} em ${formatCityLabel(entry.city)}${availability}`;
