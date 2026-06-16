@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  formatAvailabilityNotice,
   formatForecastConfidenceLevel,
   formatRecommendationDate,
 } from "@/lib/ui/recommendation-result";
@@ -44,7 +45,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
   const bestRecommendation = ranking.bestActivity?.recommendation;
   const shareText = buildActivityRankingShareText(ranking);
   const availabilityNotice = ranking.availability
-    ? `Ranking filtrado pela disponibilidade informada: ${ranking.availability.availableFrom} ate ${ranking.availability.availableTo}.`
+    ? formatAvailabilityNotice(ranking.availability)
     : null;
 
   return (

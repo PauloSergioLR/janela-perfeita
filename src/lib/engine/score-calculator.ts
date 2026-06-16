@@ -58,7 +58,11 @@ function buildFutureRainPenalty(weather: HourlyWeather): RuleResult {
 }
 
 function formatTimeWindow(window: ActivityTimeWindow): string {
-  return `${window.start} ate ${window.end}`;
+  if (window.start === window.end) {
+    return "Dia inteiro";
+  }
+
+  return `Das ${window.start} às ${window.end}`;
 }
 
 function buildGoldenHourTimeWindow(astronomy: DailyAstronomy): ActivityTimeWindow {

@@ -4,6 +4,8 @@ import {
   buildTimelineData,
   formatForecastConfidenceLevel,
   formatDurationHours,
+  formatTimeRange,
+  formatWindowTimeRange,
   getAlternativeWindows,
   getBreakdownSource,
   getPrimaryReason,
@@ -176,6 +178,26 @@ describe("helpers da visualizacao de resultado", () => {
   it("formata duracao de janela no singular e plural", () => {
     expect(formatDurationHours(1)).toBe("1 hora");
     expect(formatDurationHours(2)).toBe("2 horas");
+    expect(formatDurationHours(24)).toBe("dia inteiro");
+  });
+
+  it("formata horarios sem mostrar meia-noite duplicada", () => {
+    expect(formatTimeRange("08:00", "17:00")).toBe("Das 08:00 às 17:00");
+    expect(formatTimeRange("21:00", "02:00")).toBe("Das 21:00 às 02:00");
+    expect(formatTimeRange("00:00", "00:00")).toBe("Dia inteiro");
+  });
+
+  it("formata janela quase inteira como dia inteiro", () => {
+    const window = makeWindow([
+      makeScore("00:00", 80),
+      makeScore("01:00", 80),
+    ]);
+
+    window.startLabel = "00:00";
+    window.endLabel = "00:00";
+    window.durationHours = 24;
+
+    expect(formatWindowTimeRange(window)).toBe("Dia inteiro");
   });
 
   it("formata nivel de confianca da previsao", () => {

@@ -102,7 +102,7 @@ describe("exploração de recomendações", () => {
     });
 
     expect(recommendation.timeWindowNotice).toBe(
-      "Resultado limitado a hora dourada do por do sol local: 17:00 ate 18:15.",
+      "Dentro do horário recomendado para esta atividade: Das 17:00 às 18:15.",
     );
   });
 

@@ -315,7 +315,7 @@ describe("rotas internas da API", () => {
       availableTo: "09:00",
     });
     expect(payload.recommendation.availabilityNotice).toContain(
-      "08:00 ate 09:00",
+      "Das 08:00 às 09:00",
     );
     expect(payload.recommendation.scores[0].score).toBe(0);
     expect(payload.recommendation.bestWindow.startTime).toBe(

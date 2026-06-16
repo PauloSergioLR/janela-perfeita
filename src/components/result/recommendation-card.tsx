@@ -24,6 +24,7 @@ import {
   formatForecastConfidenceLevel,
   formatRecommendationDate,
   formatRecommendationLocation,
+  formatWindowTimeRange,
   getAlternativeWindows,
   getPeakHourScore,
   getPrimaryReason,
@@ -160,9 +161,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const displayScore = bestWindow?.avgScore ?? fallbackScore?.score ?? 0;
   const alternatives = getAlternativeWindows(recommendation.windows);
   const timeLabel = bestWindow
-    ? `${bestWindow.startLabel} - ${bestWindow.endLabel}`
+    ? formatWindowTimeRange(bestWindow)
     : fallbackScore
-      ? `${fallbackScore.hourLabel} foi o melhor horário isolado`
+      ? "Nenhuma janela ideal encontrada"
       : "Sem horário avaliado";
   const factorGroups = getFactorGroups(recommendation);
   const primaryReason =
@@ -243,6 +244,11 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">
                 {timeLabel}
               </p>
+              {bestWindow ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Duração: {formatDurationHours(bestWindow.durationHours)}
+                </p>
+              ) : null}
               <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
                 <div className="flex items-center gap-2">
                   <CalendarDays className="size-4 text-cyan-700" aria-hidden="true" />
@@ -384,7 +390,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 >
                   <div className="min-w-0 space-y-1">
                     <p className="font-medium text-slate-950 dark:text-slate-50">
-                      {window.startLabel} - {window.endLabel}
+                      {formatWindowTimeRange(window)}
                     </p>
                     <p className="line-clamp-2 text-muted-foreground">
                       {formatDurationHours(window.durationHours)}

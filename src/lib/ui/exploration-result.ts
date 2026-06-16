@@ -1,6 +1,7 @@
 import type { Recommendation, WindowResult } from "@/types";
 import {
   formatDurationHours,
+  formatWindowTimeRange,
   getPeakHourScore,
   getPrimaryReason,
 } from "./recommendation-result";
@@ -23,10 +24,16 @@ export function getRecommendationRankingReason(
 
 export function formatWindowSummary(window: WindowResult | null): string {
   if (!window) {
-    return "Não recomendado";
+    return "Nenhuma janela ideal encontrada";
   }
 
-  return `${window.startLabel} às ${window.endLabel} (${formatDurationHours(
+  const timeRange = formatWindowTimeRange(window);
+
+  if (timeRange === "Dia inteiro") {
+    return "Dia inteiro";
+  }
+
+  return `${timeRange} (${formatDurationHours(
     window.durationHours,
   )})`;
 }
