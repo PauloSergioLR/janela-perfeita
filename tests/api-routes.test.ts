@@ -372,6 +372,9 @@ describe("rotas internas da API", () => {
     expect(payload.recommendation.providerComparison).toEqual(
       expect.objectContaining({
         comparedProviders: ["Open-Meteo", "MET Norway"],
+        providerAgreementLevel: expect.any(String),
+        providerAgreementScore: expect.any(Number),
+        providerDisagreementReasons: expect.any(Array),
         score: expect.any(Number),
       }),
     );

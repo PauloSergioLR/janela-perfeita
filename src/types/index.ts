@@ -116,6 +116,9 @@ export interface ModelAgreement {
 export interface WeatherProviderComparison {
   level: ModelAgreementLevel;
   score: number;
+  providerAgreementLevel: ModelAgreementLevel;
+  providerAgreementScore: number;
+  providerDisagreementReasons: string[];
   comparedProviders: string[];
   divergences: ModelDivergence[];
   reason: string;

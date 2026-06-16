@@ -87,6 +87,15 @@ const DIVERGENCE_RULES = [
     buildReason: (maxDifference, comparedLabel) =>
       `${comparedLabel} diferem em até ${Math.round(maxDifference)}% na cobertura de nuvens.`,
   },
+  {
+    factor: "relative_humidity",
+    label: "Umidade",
+    threshold: 25,
+    getDifference: (base, compared) =>
+      Math.abs(base.relative_humidity_2m - compared.relative_humidity_2m),
+    buildReason: (maxDifference, comparedLabel) =>
+      `${comparedLabel} diferem em ate ${Math.round(maxDifference)} p.p. na umidade.`,
+  },
 ] satisfies DivergenceRule[];
 
 function getForecastByTime(forecast: NormalizedForecast): Map<string, HourlyWeather> {

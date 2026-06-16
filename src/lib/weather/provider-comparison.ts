@@ -30,6 +30,11 @@ export function calculateProviderComparison(
   return {
     level: comparison.level,
     score: comparison.score,
+    providerAgreementLevel: comparison.level,
+    providerAgreementScore: comparison.score,
+    providerDisagreementReasons: comparison.divergences
+      .filter((divergence) => divergence.score < 75)
+      .map((divergence) => divergence.reason),
     comparedProviders: comparison.comparedItems,
     divergences: comparison.divergences,
     reason: comparison.reason,
