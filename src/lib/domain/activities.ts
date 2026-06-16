@@ -22,6 +22,10 @@ export const ACTIVITIES = [
       "Busca horários com temperatura confortável, pouca chuva, vento baixo e UV moderado.",
     minRecommendedScore: 60,
     minDurationHours: 1,
+    defaultTimeWindows: [
+      { start: "05:00", end: "10:00", label: "Manha" },
+      { start: "16:00", end: "21:00", label: "Fim de tarde" },
+    ],
     rules: [
       createTemperatureRule(40, 16, 22, { useApparentTemperature: true }),
       createPrecipitationRule(30),
@@ -36,6 +40,7 @@ export const ACTIVITIES = [
       "Prioriza conforto térmico, baixa chance de chuva e vento tranquilo.",
     minRecommendedScore: 60,
     minDurationHours: 1,
+    defaultTimeWindows: [{ start: "05:00", end: "21:00" }],
     rules: [
       createTemperatureRule(40, 15, 25, { useApparentTemperature: true }),
       createPrecipitationRule(35),
@@ -49,6 +54,7 @@ export const ACTIVITIES = [
       "Evita chuva e vento forte, com atenção a temperatura e índice UV.",
     minRecommendedScore: 65,
     minDurationHours: 1,
+    defaultTimeWindows: [{ start: "05:00", end: "20:00" }],
     rules: [
       createPrecipitationRule(35),
       createTemperatureRule(25, 15, 25),
@@ -64,6 +70,7 @@ export const ACTIVITIES = [
       "Valoriza a hora dourada, nuvens interessantes, pouca chuva e boa visibilidade.",
     minRecommendedScore: 60,
     minDurationHours: 1,
+    defaultTimeWindowStrategy: "golden_hour",
     rules: [
       createGoldenHourRule(35),
       createSunsetCloudRule(25),
@@ -79,6 +86,7 @@ export const ACTIVITIES = [
       "Procura noite, boa visibilidade, poucas nuvens baixas e baixa umidade.",
     minRecommendedScore: 70,
     minDurationHours: 2,
+    defaultTimeWindows: [{ start: "19:00", end: "05:00", label: "Noite" }],
     rules: [
       createNightRule(45),
       createStargazingQualityRule(45),
@@ -92,6 +100,7 @@ export const ACTIVITIES = [
       "Prefere janelas secas, com umidade menor, temperatura amena e pouco vento.",
     minRecommendedScore: 65,
     minDurationHours: 2,
+    defaultTimeWindows: [{ start: "07:00", end: "18:00" }],
     rules: [
       createPrecipitationRule(50),
       createHumidityRule(20),

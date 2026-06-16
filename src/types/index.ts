@@ -31,6 +31,15 @@ export interface UserAvailability {
   availableTo: string;
 }
 
+/** Janela de horario pratica associada a uma atividade. */
+export interface ActivityTimeWindow {
+  start: string;
+  end: string;
+  label?: string;
+}
+
+export type ActivityTimeWindowStrategy = "golden_hour";
+
 /** Dados meteorológicos de uma hora retornados pela previsão. */
 export interface HourlyWeather {
   time: string;
@@ -137,6 +146,8 @@ export interface Activity {
   shortDescription: string;
   minRecommendedScore: number;
   minDurationHours: number;
+  defaultTimeWindows?: ActivityTimeWindow[];
+  defaultTimeWindowStrategy?: ActivityTimeWindowStrategy;
   rules: ActivityRule[];
 }
 
@@ -176,6 +187,7 @@ export interface Recommendation {
   providerComparison?: WeatherProviderComparison;
   availability?: UserAvailability;
   availabilityNotice?: string;
+  timeWindowNotice?: string;
   disclaimer: string;
 }
 

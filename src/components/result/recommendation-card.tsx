@@ -173,6 +173,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const providerComparison = recommendation.providerComparison;
   const worstProviderDivergence = providerComparison?.divergences[0];
   const shareText = buildRecommendationShareText(recommendation);
+  const timeFilterNotice =
+    recommendation.availabilityNotice ?? recommendation.timeWindowNotice;
 
   return (
     <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
@@ -286,9 +288,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           </div>
         </div>
 
-        {recommendation.availabilityNotice ? (
+        {timeFilterNotice ? (
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
-            {recommendation.availabilityNotice}
+            {timeFilterNotice}
           </div>
         ) : null}
 
