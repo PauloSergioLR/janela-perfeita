@@ -24,7 +24,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
@@ -45,6 +45,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getAllActivities } from "@/lib/domain/activities";
+import {
+  buildCurrentLocationCity,
+  canUseBrowserGeolocation,
+  CURRENT_LOCATION_CITY_NAME,
+  CURRENT_LOCATION_PRIVACY_NOTE,
+  CURRENT_LOCATION_SUCCESS_MESSAGE,
+  GEOLOCATION_UNSUPPORTED_MESSAGE,
+  getGeolocationErrorMessage,
+  isCurrentLocationCity,
+} from "@/lib/ui/current-location";
 import {
   buildSearchDateOptions,
   canSubmitSearch,
@@ -98,6 +108,8 @@ type SearchModeOption = {
   description: string;
   icon: typeof Search;
 };
+
+type LocationDetectionStatus = "idle" | "loading" | "success" | "error";
 
 const ACTIVITY_VISUALS = {
   correr: {
@@ -247,10 +259,15 @@ export default function Home() {
   const [compareModels, setCompareModels] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
+  const [locationStatus, setLocationStatus] =
+    useState<LocationDetectionStatus>("idle");
+  const [locationMessage, setLocationMessage] = useState("");
+  const locationRequestIdRef = useRef(0);
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
     SEARCH_DEBOUNCE_MS,
   );
+  const isDetectingLocation = locationStatus === "loading";
   const canSearch =
     !modeUsesActivity(searchMode)
       ? selectedCity !== null && selectedDate !== ""
@@ -310,16 +327,75 @@ export default function Home() {
     }
   }
 
+  function resetLocationFeedback() {
+    setLocationStatus("idle");
+    setLocationMessage("");
+  }
+
   function handleCityQueryChange(value: string) {
+    locationRequestIdRef.current += 1;
+    resetLocationFeedback();
     setCityQuery(value);
     setSelectedCity(null);
     resetRecommendationState();
   }
 
   function handleCitySelect(city: City) {
+    locationRequestIdRef.current += 1;
+    resetLocationFeedback();
     setSelectedCity(city);
     setCityQuery(formatCityLabel(city));
     resetRecommendationState();
+  }
+
+  function handleUseCurrentLocation() {
+    const requestId = locationRequestIdRef.current + 1;
+
+    locationRequestIdRef.current = requestId;
+    setLocationStatus("loading");
+    setLocationMessage("");
+    resetRecommendationState();
+
+    if (!canUseBrowserGeolocation(window.navigator)) {
+      setLocationStatus("error");
+      setLocationMessage(GEOLOCATION_UNSUPPORTED_MESSAGE);
+      return;
+    }
+
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (locationRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const city = buildCurrentLocationCity(
+          {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          },
+          timezone,
+        );
+
+        setSelectedCity(city);
+        setCityQuery(CURRENT_LOCATION_CITY_NAME);
+        setLocationStatus("success");
+        setLocationMessage(CURRENT_LOCATION_SUCCESS_MESSAGE);
+      },
+      (error) => {
+        if (locationRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        setLocationStatus("error");
+        setLocationMessage(getGeolocationErrorMessage(error.code));
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 5 * 60 * 1000,
+        timeout: 10000,
+      },
+    );
   }
 
   function saveSearch(input: {
@@ -345,7 +421,7 @@ export default function Home() {
   ) {
     const normalizedInput = normalizeSearchHistoryDraft(input);
 
-    if (!input.demo) {
+    if (!input.demo && !isCurrentLocationCity(normalizedInput.city)) {
       saveSearch(normalizedInput);
     }
 
@@ -414,6 +490,8 @@ export default function Home() {
       availableTo: entry.availableTo,
     });
 
+    locationRequestIdRef.current += 1;
+    resetLocationFeedback();
     setSearchMode(searchInput.mode);
     setSelectedCity(searchInput.city);
     setCityQuery(formatCityLabel(searchInput.city));
@@ -662,6 +740,41 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-9 w-fit rounded-md"
+                      disabled={isDetectingLocation}
+                      onClick={handleUseCurrentLocation}
+                    >
+                      {isDetectingLocation ? (
+                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <MapPin className="size-3.5" aria-hidden="true" />
+                      )}
+                      {isDetectingLocation
+                        ? "Detectando..."
+                        : "Usar minha localização atual"}
+                    </Button>
+                    <p className="max-w-md text-xs leading-5 text-muted-foreground sm:text-right">
+                      {CURRENT_LOCATION_PRIVACY_NOTE}
+                    </p>
+                  </div>
+                  {locationMessage ? (
+                    <p
+                      role={locationStatus === "error" ? "alert" : "status"}
+                      className={cn(
+                        "text-xs leading-5",
+                        locationStatus === "error"
+                          ? "text-destructive"
+                          : "text-emerald-700 dark:text-emerald-300",
+                      )}
+                    >
+                      {locationMessage}
+                    </p>
+                  ) : null}
                 </div>
 
                 {modeUsesActivity(searchMode) ? (

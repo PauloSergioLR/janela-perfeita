@@ -1,4 +1,5 @@
 import type { ActivityId, City } from "@/types";
+import { isCurrentLocationCity } from "./current-location";
 
 export const SEARCH_DEBOUNCE_MS = 300;
 export const SEARCH_DATE_RANGE_DAYS = 6;
@@ -45,6 +46,10 @@ export function buildSearchDateOptions(
 }
 
 export function formatCityLabel(city: City): string {
+  if (isCurrentLocationCity(city)) {
+    return city.name;
+  }
+
   return [city.name, city.admin1, city.country].filter(Boolean).join(", ");
 }
 
