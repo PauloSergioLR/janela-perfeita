@@ -3,9 +3,15 @@ import type { City, Coordinates } from "@/types";
 export const CURRENT_LOCATION_CITY_NAME = "Localização atual";
 export const CURRENT_LOCATION_CITY_COUNTRY = "Coordenadas do navegador";
 export const CURRENT_LOCATION_PRIVACY_NOTE =
-  "Usamos sua latitude e longitude só nesta consulta; elas não entram no histórico local.";
+  "Ao abrir, o navegador pode pedir permissão para sugerir sua cidade. Você pode negar e digitar manualmente.";
+export const CURRENT_LOCATION_ATTRIBUTION =
+  "Cidade aproximada por OpenStreetMap/Nominatim.";
+export const CURRENT_LOCATION_WAITING_MESSAGE =
+  "Aguardando permissão do navegador para sugerir sua cidade.";
+export const CURRENT_LOCATION_RESOLVING_MESSAGE =
+  "Localização recebida. Detectando nome da cidade...";
 export const CURRENT_LOCATION_SUCCESS_MESSAGE =
-  "Localização atual selecionada. Você ainda pode digitar outra cidade.";
+  "Cidade detectada. Você ainda pode digitar outra cidade.";
 export const GEOLOCATION_UNSUPPORTED_MESSAGE =
   "Seu navegador não oferece geolocalização. Busque a cidade manualmente.";
 

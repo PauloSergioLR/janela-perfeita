@@ -19,7 +19,8 @@ esta atividade?".
 ## O que o app faz hoje
 
 - Busca cidade por nome, sem exigir GPS.
-- Permite usar a localizacao atual somente apos clique explicito do usuario.
+- Pode sugerir a cidade pela localizacao atual quando o navegador pedir
+  permissao ao abrir o site.
 - Recomenda datas de hoje ate hoje+6.
 - Permite consultar o clima completo de um dia sem escolher atividade.
 - Permite consultar um resumo visual dos proximos 7 dias sem escolher atividade.
@@ -135,8 +136,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
   chuva, vento, rajadas, UV, nascer/por do sol, weather code e timeline horaria.
 - **Consulta da semana:** mostra cards diarios com icone do clima, minima,
   maxima, chuva, vento, UV, resumo curto e destaques da semana.
-- **Localizacao atual:** usa a Geolocation API do navegador apenas apos clique
-  do usuario, sem salvar coordenadas no historico local.
+- **Localizacao atual:** usa a Geolocation API do navegador, resolve o nome da
+  cidade por Nominatim/OpenStreetMap e nao salva coordenadas no historico local.
 - **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
 - **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
   de uma atividade.
@@ -395,6 +396,18 @@ Referencias oficiais:
 - MET Norway: https://api.met.no/weatherapi/locationforecast/2.0/documentation
 - Getting Started MET Norway: https://api.met.no/doc/GettingStarted
 - WeatherAPI.com: https://www.weatherapi.com/docs/
+
+## Reverse geocoding
+
+Quando o usuario permite a localizacao atual, o app usa Nominatim/OpenStreetMap
+para transformar latitude/longitude em nome de cidade. Essa consulta nao salva
+coordenadas no servidor nem no historico local.
+
+Referencias:
+
+- Nominatim Reverse API: https://nominatim.org/release-docs/latest/api/Reverse/
+- Nominatim Usage Policy: https://operations.osmfoundation.org/policies/nominatim/
+- OpenStreetMap: https://www.openstreetmap.org/copyright
 
 ## Privacidade
 

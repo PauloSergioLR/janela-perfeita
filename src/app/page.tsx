@@ -48,9 +48,11 @@ import { getAllActivities } from "@/lib/domain/activities";
 import {
   buildCurrentLocationCity,
   canUseBrowserGeolocation,
-  CURRENT_LOCATION_CITY_NAME,
+  CURRENT_LOCATION_ATTRIBUTION,
   CURRENT_LOCATION_PRIVACY_NOTE,
+  CURRENT_LOCATION_RESOLVING_MESSAGE,
   CURRENT_LOCATION_SUCCESS_MESSAGE,
+  CURRENT_LOCATION_WAITING_MESSAGE,
   GEOLOCATION_UNSUPPORTED_MESSAGE,
   getGeolocationErrorMessage,
   isCurrentLocationCity,
@@ -223,6 +225,26 @@ async function fetchCities(query: string, demoMode: boolean): Promise<City[]> {
   return payload.cities;
 }
 
+async function fetchCurrentLocationCity(input: {
+  lat: number;
+  lon: number;
+  timezone?: string;
+}): Promise<City> {
+  const params = new URLSearchParams({
+    lat: String(input.lat),
+    lon: String(input.lon),
+  });
+
+  if (input.timezone) {
+    params.set("timezone", input.timezone);
+  }
+
+  const response = await fetch(`/api/reverse-geocoding?${params.toString()}`);
+  const payload = await readApiResponse<{ city: City }>(response);
+
+  return payload.city;
+}
+
 async function requestRecommendation(input: {
   city: City;
   mode: SearchMode;
@@ -262,6 +284,7 @@ export default function Home() {
   const [locationStatus, setLocationStatus] =
     useState<LocationDetectionStatus>("idle");
   const [locationMessage, setLocationMessage] = useState("");
+  const autoLocationRequestedRef = useRef(false);
   const locationRequestIdRef = useRef(0);
   const debouncedCityQuery = useDebouncedValue(
     cityQuery.trim(),
@@ -321,6 +344,85 @@ export default function Home() {
     setSearchHistory(readSearchHistory(window.localStorage));
   }, []);
 
+  useEffect(() => {
+    if (autoLocationRequestedRef.current) {
+      return;
+    }
+
+    if (new URLSearchParams(window.location.search).get("demo") === "true") {
+      return;
+    }
+
+    const requestId = locationRequestIdRef.current + 1;
+
+    autoLocationRequestedRef.current = true;
+    locationRequestIdRef.current = requestId;
+    setLocationStatus("loading");
+    setLocationMessage(CURRENT_LOCATION_WAITING_MESSAGE);
+
+    if (!canUseBrowserGeolocation(window.navigator)) {
+      setLocationStatus("error");
+      setLocationMessage(GEOLOCATION_UNSUPPORTED_MESSAGE);
+      return;
+    }
+
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (locationRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const coordinates = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+
+        setLocationMessage(CURRENT_LOCATION_RESOLVING_MESSAGE);
+        void fetchCurrentLocationCity({ ...coordinates, timezone })
+          .then((city) => {
+            if (locationRequestIdRef.current !== requestId) {
+              return;
+            }
+
+            setSelectedCity(city);
+            setCityQuery(formatCityLabel(city));
+            setLocationStatus("success");
+            setLocationMessage(
+              `${CURRENT_LOCATION_SUCCESS_MESSAGE} ${formatCityLabel(city)}.`,
+            );
+          })
+          .catch(() => {
+            if (locationRequestIdRef.current !== requestId) {
+              return;
+            }
+
+            const city = buildCurrentLocationCity(coordinates, timezone);
+
+            setSelectedCity(city);
+            setCityQuery(formatCityLabel(city));
+            setLocationStatus("error");
+            setLocationMessage(
+              "Não foi possível nomear sua cidade; usando coordenadas da localização atual.",
+            );
+          });
+      },
+      (error) => {
+        if (locationRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        setLocationStatus("error");
+        setLocationMessage(getGeolocationErrorMessage(error.code));
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 5 * 60 * 1000,
+        timeout: 10000,
+      },
+    );
+  }, []);
+
   function resetRecommendationState() {
     if (!recommendationMutation.isIdle) {
       recommendationMutation.reset();
@@ -346,56 +448,6 @@ export default function Home() {
     setSelectedCity(city);
     setCityQuery(formatCityLabel(city));
     resetRecommendationState();
-  }
-
-  function handleUseCurrentLocation() {
-    const requestId = locationRequestIdRef.current + 1;
-
-    locationRequestIdRef.current = requestId;
-    setLocationStatus("loading");
-    setLocationMessage("");
-    resetRecommendationState();
-
-    if (!canUseBrowserGeolocation(window.navigator)) {
-      setLocationStatus("error");
-      setLocationMessage(GEOLOCATION_UNSUPPORTED_MESSAGE);
-      return;
-    }
-
-    window.navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (locationRequestIdRef.current !== requestId) {
-          return;
-        }
-
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const city = buildCurrentLocationCity(
-          {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          },
-          timezone,
-        );
-
-        setSelectedCity(city);
-        setCityQuery(CURRENT_LOCATION_CITY_NAME);
-        setLocationStatus("success");
-        setLocationMessage(CURRENT_LOCATION_SUCCESS_MESSAGE);
-      },
-      (error) => {
-        if (locationRequestIdRef.current !== requestId) {
-          return;
-        }
-
-        setLocationStatus("error");
-        setLocationMessage(getGeolocationErrorMessage(error.code));
-      },
-      {
-        enableHighAccuracy: false,
-        maximumAge: 5 * 60 * 1000,
-        timeout: 10000,
-      },
-    );
   }
 
   function saveSearch(input: {
@@ -740,41 +792,31 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-9 w-fit rounded-md"
-                      disabled={isDetectingLocation}
-                      onClick={handleUseCurrentLocation}
-                    >
+                  <div className="flex items-start gap-3 rounded-lg border border-sky-100 bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-950 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100">
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-white/80 dark:bg-sky-950">
                       {isDetectingLocation ? (
                         <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
                       ) : (
                         <MapPin className="size-3.5" aria-hidden="true" />
                       )}
-                      {isDetectingLocation
-                        ? "Detectando..."
-                        : "Usar minha localização atual"}
-                    </Button>
-                    <p className="max-w-md text-xs leading-5 text-muted-foreground sm:text-right">
-                      {CURRENT_LOCATION_PRIVACY_NOTE}
-                    </p>
-                  </div>
-                  {locationMessage ? (
-                    <p
+                    </span>
+                    <span
                       role={locationStatus === "error" ? "alert" : "status"}
                       className={cn(
-                        "text-xs leading-5",
+                        "min-w-0",
                         locationStatus === "error"
-                          ? "text-destructive"
-                          : "text-emerald-700 dark:text-emerald-300",
+                          ? "text-destructive dark:text-red-300"
+                          : "",
                       )}
                     >
-                      {locationMessage}
-                    </p>
-                  ) : null}
+                      <span className="block">
+                        {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
+                      </span>
+                      <span className="block text-sky-800/80 dark:text-sky-200/80">
+                        {CURRENT_LOCATION_ATTRIBUTION}
+                      </span>
+                    </span>
+                  </div>
                 </div>
 
                 {modeUsesActivity(searchMode) ? (
