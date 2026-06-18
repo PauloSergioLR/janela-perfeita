@@ -178,6 +178,45 @@ describe("calculadora de score", () => {
     expect(scores[2].score).toBeGreaterThan(0);
   });
 
+  it("mantem fotografia do por do sol presa a hora dourada mesmo com disponibilidade", () => {
+    const activity = getActivityById("fotografar_por_do_sol")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T09:00", {
+          cloud_cover: 35,
+          visibility: 23000,
+        }),
+        makeHourlyWeather("2026-06-05T17:00", {
+          cloud_cover: 35,
+          visibility: 23000,
+        }),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-05T08:00",
+      availability: {
+        availableFrom: "09:00",
+        availableTo: "10:00",
+      },
+    });
+    const windows = findBestWindows(scores, activity);
+
+    expect(scores[0].score).toBe(0);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "horario_padrao",
+        reason: "Fora do horario padrao da atividade (Das 17:00 às 18:15).",
+      }),
+    );
+    expect(scores[1].score).toBe(0);
+    expect(scores[1].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "disponibilidade",
+      }),
+    );
+    expect(windows).toEqual([]);
+  });
+
   it("pontua corrida com chuva forte como janela ruim", () => {
     const activity = getActivityById("correr")!;
     const weather = makeHourlyWeather("2026-06-05T07:00", {
