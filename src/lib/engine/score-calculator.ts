@@ -109,21 +109,8 @@ function buildTimeWindowPenalty(filter: TimeWindowFilter): RuleResult {
 
 function getTimeWindowFilter(
   activity: Activity,
-  availability: UserAvailability | undefined,
   astronomy: DailyAstronomy,
 ): TimeWindowFilter | null {
-  if (availability) {
-    return {
-      source: "availability",
-      windows: [
-        {
-          start: availability.availableFrom,
-          end: availability.availableTo,
-        },
-      ],
-    };
-  }
-
   if (activity.defaultTimeWindowStrategy === "golden_hour") {
     return {
       source: "default",
@@ -139,6 +126,36 @@ function getTimeWindowFilter(
   }
 
   return null;
+}
+
+function getTimeWindowFilters(
+  activity: Activity,
+  availability: UserAvailability | undefined,
+  astronomy: DailyAstronomy,
+): TimeWindowFilter[] {
+  const defaultFilter = getTimeWindowFilter(activity, astronomy);
+  const filters: TimeWindowFilter[] = [];
+
+  if (
+    defaultFilter &&
+    (!availability || activity.defaultTimeWindowStrategy === "golden_hour")
+  ) {
+    filters.push(defaultFilter);
+  }
+
+  if (availability) {
+    filters.push({
+      source: "availability",
+      windows: [
+        {
+          start: availability.availableFrom,
+          end: availability.availableTo,
+        },
+      ],
+    });
+  }
+
+  return filters;
 }
 
 function isInsideTimeWindow(time: string, window: ActivityTimeWindow): boolean {
@@ -221,16 +238,20 @@ function applyFutureRainPenalty(
 
 function applyAvailabilityFilter(
   score: HourScore,
-  filter: TimeWindowFilter | null,
+  filters: TimeWindowFilter[],
 ): HourScore {
-  if (isInsideTimeWindowFilter(score.weather, filter) || !filter) {
+  const failedFilter = filters.find(
+    (filter) => !isInsideTimeWindowFilter(score.weather, filter),
+  );
+
+  if (!failedFilter) {
     return score;
   }
 
   return {
     ...score,
     score: 0,
-    breakdown: [...score.breakdown, buildTimeWindowPenalty(filter)],
+    breakdown: [...score.breakdown, buildTimeWindowPenalty(failedFilter)],
   };
 }
 
@@ -270,7 +291,11 @@ export function calculateDayScores({
   const dailyHourly = hourly
     .filter((weather) => getLocalDatePart(weather.time) === astronomy.date)
     .slice(0, MAX_HOURS_PER_DAY);
-  const timeWindowFilter = getTimeWindowFilter(activity, availability, astronomy);
+  const timeWindowFilters = getTimeWindowFilters(
+    activity,
+    availability,
+    astronomy,
+  );
 
   return dailyHourly.map((weather, index) => {
     const context = buildWeatherContext({ weather, astronomy, now });
@@ -289,7 +314,7 @@ export function calculateDayScores({
 
     return applyAvailabilityFilter(
       applyFutureRainPenalty(score, futureRainPenalty),
-      timeWindowFilter,
+      timeWindowFilters,
     );
   });
 }
