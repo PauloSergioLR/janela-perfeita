@@ -10,7 +10,8 @@ describe("layout Weather Decision Cockpit", () => {
   const page = readHomePage();
 
   it("usa a base visual climatica no layout principal", () => {
-    expect(page).toContain("bg-weather-stage");
+    expect(page).toContain("<WeatherStage variant={weatherStageVariant} />");
+    expect(page).toContain("weatherStageVariant");
     expect(page).toContain("glass-panel");
     expect(page).toContain("glass-card");
     expect(page).toContain("bg-weather-card");
