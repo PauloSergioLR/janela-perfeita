@@ -32,24 +32,36 @@ projeto Janela Perfeita para continuidade em novas sessões do Codex.
 - Cada tarefa deve ter commits pequenos e separados por intenção.
 - Antes de iniciar nova tarefa:
   - sincronizar `develop`
-  - mover a issue para `In Progress`
-  - criar/vincular branch pela issue quando possível
-  - comentar na issue o início da etapa
+  - não mover status da issue ou card no Project; isso cabe ao usuário
+  - não comentar início de etapa na issue, salvo pedido explícito
+  - criar branch curta a partir de `develop`
 - Ao finalizar:
-  - marcar checklist da issue
   - abrir PR para `develop`
   - aguardar CI verde
-  - aprovar a PR após testes/checks passarem e antes do merge
-  - se o GitHub bloquear autoaprovação, registrar a limitação na PR
-  - fazer merge sem excluir branch
-  - fechar issue
-  - mover card para `Done`
+  - não aprovar PR, fazer merge, fechar issue ou mover card; isso cabe ao usuário
   - sincronizar `develop` local
+
+## Economia de tokens e processo
+
+- Usar Caveman Ultra por padrão.
+- Não enviar atualizações intermediárias enquanto executa tarefas, salvo bloqueio,
+  aprovação obrigatória ou pedido explícito do usuário.
+- Responder no final, de forma resumida.
+- Não executar comandos de status do Project/Kanban, como `gh project item-list`,
+  `gh project item-edit` ou `gh issue comment`, salvo pedido explícito.
+- Não mexer em status, checklist, fechamento ou comentários de issues, salvo
+  pedido explícito.
+- Não atualizar `AGENTS.md` a cada branch; atualizar somente quando o usuário
+  pedir ou quando houver regra nova que precise persistir.
+- Evitar leituras amplas e listas grandes do GitHub; preferir arquivos locais,
+  `rg` e trechos específicos.
+- Economizar tokens no processo, mas não economizar análise, testes e qualidade
+  de implementação.
 
 ## Contexto de sessões
 
-- Ao fim de cada branch/tarefa, consolidar no `AGENTS.md` o contexto relevante
-  da sessão:
+- Só consolidar no `AGENTS.md` quando o usuário pedir ou quando houver regra nova
+  que precise persistir:
   - decisões novas
   - status de issues, PRs e branches
   - validações executadas
@@ -538,9 +550,9 @@ Próximos passos recomendados:
 ## Observações importantes para novas sessões
 
 - Não avançar várias issues sem finalizar a anterior.
-- Não fechar issue sem checklist marcado.
+- Não fechar issue nem mexer em checklist/status sem pedido explícito.
 - Não fazer merge se CI falhar.
 - Não deletar branch remota após merge.
-- Sempre atualizar o Project/Kanban.
-- Sempre documentar decisões relevantes na issue ou PR.
+- O usuário atualiza o Project/Kanban.
+- Documentar decisões relevantes no PR; usar issue somente se o usuário pedir.
 - Sempre preservar o escopo do MVP.
