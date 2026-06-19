@@ -33,6 +33,7 @@ import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { ScoreTimeline } from "@/components/result/score-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
+import { WeatherStage } from "@/components/weather/weather-stage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,6 +64,7 @@ import {
   SEARCH_DEBOUNCE_MS,
   type SearchDateOption,
 } from "@/lib/ui/search-page";
+import { getWeatherStageVariant } from "@/lib/ui/weather-stage";
 import {
   buildSearchHistoryEntry,
   clearSearchHistory,
@@ -596,9 +598,19 @@ export default function Home() {
               : recommendationMutation.isError
                 ? "Atenção"
                 : "Aguardando busca";
+  const weatherStageVariant = getWeatherStageVariant({
+    activityId: selectedActivityId || undefined,
+    recommendation,
+    activityRanking,
+    weekComparison,
+    dailyOverview,
+    weeklyOverview,
+  });
 
   return (
-    <main className="min-h-screen bg-weather-stage px-4 py-5 text-foreground sm:px-6 lg:px-8">
+    <>
+      <WeatherStage variant={weatherStageVariant} />
+      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="space-y-3">
@@ -1273,6 +1285,7 @@ export default function Home() {
 
         <AttributionFooter disclaimer={resultDisclaimer} />
       </div>
-    </main>
+      </main>
+    </>
   );
 }
