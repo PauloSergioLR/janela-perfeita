@@ -8,6 +8,7 @@ import {
   CalendarSearch,
   Camera,
   Car,
+  CircleHelp,
   Clock3,
   CloudSun,
   Footprints,
@@ -612,61 +613,71 @@ export default function Home() {
       <WeatherStage variant={weatherStageVariant} />
       <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                className="h-7 border-weather-accent/50 bg-weather-card px-3 text-weather-accent"
-              >
-                Dashboard meteorológico
-              </Badge>
-              <Badge
-                variant="outline"
-                className="h-7 border-success/45 bg-success/10 px-3 text-success"
-              >
-                Open-Meteo
-              </Badge>
-              {demoMode ? (
-                <Badge
-                  variant="outline"
-                  className="h-7 border-warning/45 bg-warning/10 px-3 text-warning"
-                >
-                  Modo demo
-                </Badge>
-              ) : null}
-              <Link
-                href="/como-funciona"
-                className="inline-flex h-7 items-center rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-              >
-                Como funciona
-              </Link>
+        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+              <CloudSun
+                className="size-6 text-weather-accent"
+                aria-hidden="true"
+              />
             </div>
-            <div className="max-w-3xl space-y-2">
-              <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-5xl">
+            <div className="min-w-0 space-y-1">
+              <p className="text-sm font-medium text-weather-accent">
+                Clima por decisão
+              </p>
+              <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-50 sm:text-3xl">
                 Janela Perfeita
               </h1>
-              <p className="text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
-                Um painel de decisão para escolher quando correr, caminhar,
-                pedalar, fotografar o pôr do sol, observar estrelas, lavar
-                carro ou roupa.
+              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 rounded-lg border border-soft bg-weather-card p-2 text-center shadow-weather-soft">
-            <div className="rounded-md bg-background/55 px-3 py-2">
+
+          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            <Badge
+              variant="outline"
+              className="h-7 border-weather-accent/50 bg-weather-card px-3 text-weather-accent"
+            >
+              Previsão por hora
+            </Badge>
+            <Badge
+              variant="outline"
+              className="h-7 border-success/45 bg-success/10 px-3 text-success"
+            >
+              Open-Meteo
+            </Badge>
+            {demoMode ? (
+              <Badge
+                variant="outline"
+                className="h-7 border-warning/45 bg-warning/10 px-3 text-warning"
+              >
+                Modo demo
+              </Badge>
+            ) : null}
+            <Link
+              href="/como-funciona"
+              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <CircleHelp className="size-3.5" aria-hidden="true" />
+              Como funciona
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2">
+            <div className="rounded-md bg-background/45 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 {activities.length}
               </p>
               <p className="text-xs text-muted-foreground">atividades</p>
             </div>
-            <div className="rounded-md bg-background/55 px-3 py-2">
+            <div className="rounded-md bg-background/45 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 7
               </p>
               <p className="text-xs text-muted-foreground">dias</p>
             </div>
-            <div className="rounded-md bg-background/55 px-3 py-2">
+            <div className="rounded-md bg-background/45 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 0-100
               </p>

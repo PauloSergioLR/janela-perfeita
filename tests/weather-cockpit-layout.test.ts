@@ -32,4 +32,11 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).not.toContain("maptiler");
     expect(page).not.toContain("google.maps");
   });
+
+  it("apresenta marca, subtitulo e acao discreta no header", () => {
+    expect(page).toContain("CircleHelp");
+    expect(page).toContain("Clima por decisão");
+    expect(page).toContain("Previsão por hora");
+    expect(page).toContain("glow-primary");
+  });
 });
