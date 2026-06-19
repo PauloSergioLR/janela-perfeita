@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { City, DailyAstronomy, HourlyWeather } from "@/types";
 
 const getCitySuggestionsMock = vi.fn();
@@ -539,6 +539,8 @@ describe("rotas internas da API", () => {
   });
 
   it("POST /api/recommendation retorna overview semanal sem atividade", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2030-06-05T12:00:00.000Z"));
     const secondAstronomy: DailyAstronomy = {
       date: "2030-06-06",
       sunrise: "2030-06-06T06:30",
@@ -567,7 +569,6 @@ describe("rotas internas da API", () => {
       makePostRequest({
         city,
         mode: "clima_semana",
-        date: astronomy.date,
       }),
     );
     const payload = await response.json();
@@ -587,6 +588,11 @@ describe("rotas internas da API", () => {
     expect(payload.weeklyOverview.days[1].summary).toContain(
       "alta chance de chuva",
     );
+    vi.useRealTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("POST /api/recommendation compara dias usando uma chamada de forecast", async () => {

@@ -22,6 +22,8 @@ esta atividade?".
 - Pode sugerir a cidade pela localizacao atual quando o navegador pedir
   permissao ao abrir o site.
 - Recomenda datas de hoje ate hoje+6.
+- Organiza o fluxo em quatro modos: Janela perfeita, O que fazer hoje?,
+  Consulta do dia e Consulta da semana.
 - Permite consultar o clima completo de um dia sem escolher atividade.
 - Permite consultar um resumo visual dos proximos 7 dias sem escolher atividade.
 - Suporta sete atividades:
@@ -135,7 +137,8 @@ Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 - **Consulta do dia:** mostra resumo diario com temperatura, sensacao termica,
   chuva, vento, rajadas, UV, nascer/por do sol, weather code e timeline horaria.
 - **Consulta da semana:** mostra cards diarios com icone do clima, minima,
-  maxima, chuva, vento, UV, resumo curto e destaques da semana.
+  maxima, chuva, vento, UV, resumo curto e destaques da semana; exige somente
+  cidade na interface.
 - **Localizacao atual:** usa a Geolocation API do navegador, resolve o nome da
   cidade por Nominatim/OpenStreetMap e nao salva coordenadas no historico local.
 - **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
