@@ -428,10 +428,91 @@ Concluído:
   - `npm run test:coverage`
   - `npm run build`
 
+## Redesign visual
+
+Roteiro novo recebido:
+
+```text
+C:\Users\lll\Downloads\Janela_Perfeita_Roteiro_Redesign_Visual.md
+```
+
+Direção aprovada:
+
+- `Weather Decision Cockpit`.
+- Interface escura, premium e climática.
+- Fundo dark navy / midnight blue.
+- Glassmorphism discreto.
+- Gradientes climáticos.
+- Glow suave.
+- Score grande como protagonista.
+- Painel lateral moderno.
+- Resultado como área principal.
+- Timeline visual.
+- Cards climáticos.
+
+Regras do roteiro visual:
+
+- Trabalhar uma issue por vez.
+- Não inventar escopo.
+- Não adicionar mapas.
+- Não adicionar MapLibre.
+- Não adicionar MapTiler.
+- Não adicionar Google Maps.
+- Não adicionar API paga.
+- Não adicionar API obrigatória com chave paga.
+- Não alterar backend sem necessidade.
+- Não reescrever a engine sem necessidade.
+- Não alterar regra de negócio em tarefas puramente visuais.
+- Não remover testes existentes.
+- Não usar `any`.
+- Preservar TypeScript strict.
+- Manter português brasileiro.
+- Manter Open-Meteo como fonte principal.
+- Qualquer API adicional deve ser gratuita e opcional.
+- Preferir CSS/Tailwind/shadcn antes de adicionar bibliotecas.
+- Usar animações leves.
+- Respeitar `prefers-reduced-motion`.
+- Manter acessibilidade e responsividade.
+- Rodar `npm run lint`, `npm test`, `npm run test:coverage` e `npm run build`
+  antes de finalizar PR.
+
+Issues do redesign visual criadas e adicionadas ao Project #2 em `Todo`:
+
+- #120 UI01 - Criar design system visual do Janela Perfeita.
+- #121 UI02 - Criar layout base Weather Decision Cockpit.
+- #122 UI03 - Criar Weather Stage de fundo climático.
+- #123 UI04 - Redesenhar header e identidade visual.
+- #124 UI05 - Criar seletor visual de modos.
+- #125 UI06 - Redesenhar painel lateral de controle.
+- #126 UI07 - Redesenhar cards de atividade.
+- #127 UI08 - Criar card principal de decisão.
+- #128 UI09 - Criar score ring circular.
+- #129 UI10 - Criar chips de motivos positivos e negativos.
+- #130 UI11 - Criar painel de estatísticas climáticas.
+- #131 UI12 - Criar timeline de oportunidade.
+- #132 UI13 - Criar faixa inferior de próximos dias.
+- #133 UI14 - Criar ícones climáticos e de atividades.
+- #134 UI15 - Criar consulta do dia com visual premium.
+- #135 UI16 - Criar consulta da semana com visual premium.
+- #136 UI17 - Criar loading, empty e error states premium.
+- #137 UI18 - Adicionar microinterações leves.
+- #138 UI19 - Revisar responsividade mobile.
+- #139 UI20 - Revisar acessibilidade do redesign.
+- #140 UI21 - Atualizar documentação e screenshots do README.
+- #141 UI22 - Preparar release visual v1.1.
+
+Ordem do Project ajustada:
+
+- UI01 a UI22 ficam antes de T47, T48 e T49.
+- #103 T47, #104 T48 e #105 T49 foram movidas para o fim da lista.
+
+Próxima etapa recomendada do redesign:
+
+- Iniciar pela #120 UI01 - Criar design system visual do Janela Perfeita.
+
 ## Próxima etapa recomendada
 
-MVP concluído. Continuação pós-MVP em andamento com issues #35 a #57 abertas no
-Project.
+MVP concluído. Continuação pós-MVP e redesign visual em andamento no Project.
 
 Branches principais:
 
@@ -448,7 +529,9 @@ https://janela-perfeita.vercel.app
 
 Próximos passos recomendados:
 
-- Iniciar pela issue #35, T14 - Adicionar sensação térmica e rajadas de vento.
+- Iniciar pela #120 UI01 - Criar design system visual do Janela Perfeita.
+- Seguir UI01 a UI22 em ordem, uma issue por vez.
+- Manter #103 T47, #104 T48 e #105 T49 no fim da lista.
 - Manter `develop` e `main` sincronizadas antes de novas tarefas.
 - Preservar branches remotas de feature, teste, docs e contexto.
 
