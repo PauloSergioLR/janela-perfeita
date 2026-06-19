@@ -566,35 +566,66 @@ export default function Home() {
     setSearchHistory([]);
   }
 
+  const selectedModeOption = SEARCH_MODE_OPTIONS.find(
+    (option) => option.id === searchMode,
+  );
+  const cockpitCityLabel = selectedCity
+    ? formatCityLabel(selectedCity)
+    : "Cidade pendente";
+  const cockpitDateLabel =
+    searchMode === "clima_semana"
+      ? "Próximos 7 dias"
+      : selectedDate || "Data pendente";
+  const cockpitActivityLabel = modeUsesActivity(searchMode)
+    ? selectedActivity?.name ?? "Atividade pendente"
+    : "Sem atividade obrigatória";
+  const cockpitResultLabel = recommendation
+    ? recommendation.bestWindow
+      ? `Das ${recommendation.bestWindow.startLabel} às ${recommendation.bestWindow.endLabel}`
+      : "Sem janela boa"
+    : activityRanking
+      ? "Ranking calculado"
+      : weekComparison
+        ? "Semana comparada"
+        : dailyOverview
+          ? "Dia consultado"
+          : weeklyOverview
+            ? "Semana consultada"
+            : recommendationMutation.isPending
+              ? "Calculando"
+              : recommendationMutation.isError
+                ? "Atenção"
+                : "Aguardando busca";
+
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#eef6f5_100%)] px-4 py-5 text-foreground dark:bg-[linear-gradient(180deg,#101b2b_0%,#172339_52%,#102525_100%)] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-weather-stage px-4 py-5 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="grid gap-4 border-b border-border pb-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="h-7 border-sky-200 bg-sky-50 px-3 text-sky-900"
+                className="h-7 border-weather-accent/50 bg-weather-card px-3 text-weather-accent"
               >
                 Dashboard meteorológico
               </Badge>
               <Badge
                 variant="outline"
-                className="h-7 border-emerald-200 bg-emerald-50 px-3 text-emerald-800"
+                className="h-7 border-success/45 bg-success/10 px-3 text-success"
               >
                 Open-Meteo
               </Badge>
               {demoMode ? (
                 <Badge
                   variant="outline"
-                  className="h-7 border-amber-200 bg-amber-50 px-3 text-amber-900"
+                  className="h-7 border-warning/45 bg-warning/10 px-3 text-warning"
                 >
                   Modo demo
                 </Badge>
               ) : null}
               <Link
                 href="/como-funciona"
-                className="inline-flex h-7 items-center rounded-md border border-border bg-white px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground dark:bg-card"
+                className="inline-flex h-7 items-center rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground"
               >
                 Como funciona
               </Link>
@@ -610,20 +641,20 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-2 text-center shadow-sm dark:border-border dark:bg-card">
-            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-soft bg-weather-card p-2 text-center shadow-weather-soft">
+            <div className="rounded-md bg-background/55 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 {activities.length}
               </p>
               <p className="text-xs text-muted-foreground">atividades</p>
             </div>
-            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+            <div className="rounded-md bg-background/55 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 7
               </p>
               <p className="text-xs text-muted-foreground">dias</p>
             </div>
-            <div className="rounded-md bg-slate-50 px-3 py-2 dark:bg-muted/60">
+            <div className="rounded-md bg-background/55 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 0-100
               </p>
@@ -632,10 +663,65 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(390px,0.95fr)]">
-          <div className="flex flex-col gap-4">
-          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-            <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+        <section
+          className="glass-card rounded-xl p-3 sm:p-4"
+          aria-labelledby="modo-label"
+        >
+          <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center">
+            <div className="space-y-1">
+              <Label id="modo-label">Modo</Label>
+              <p className="text-xs leading-5 text-muted-foreground">
+                Cidade, data, atividade e previsão no mesmo painel.
+              </p>
+            </div>
+            <div
+              className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4"
+              role="radiogroup"
+              aria-labelledby="modo-label"
+            >
+              {SEARCH_MODE_OPTIONS.map((mode) => {
+                const Icon = mode.icon;
+                const selected = searchMode === mode.id;
+
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    className={cn(
+                      "min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition hover:-translate-y-0.5 hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                      selected
+                        ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow"
+                        : "",
+                    )}
+                    onClick={() => {
+                      setSearchMode(mode.id);
+                      resetRecommendationState();
+                    }}
+                  >
+                    <span className="flex items-start gap-3">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55">
+                        <Icon className="size-4 text-weather-accent" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block font-medium">{mode.label}</span>
+                        <span className="block text-xs leading-5 text-muted-foreground">
+                          {mode.description}
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start">
+          <aside className="flex flex-col gap-4 xl:sticky xl:top-6">
+          <Card className="glass-card overflow-hidden rounded-xl">
+            <CardHeader className="border-b border-soft bg-weather-card">
               <CardTitle>Planejar janela</CardTitle>
               <CardDescription>
                 {searchMode === "clima_semana"
@@ -649,53 +735,6 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-5">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                <div className="space-y-3">
-                  <Label id="modo-label">Modo</Label>
-                  <div
-                    className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
-                    role="radiogroup"
-                    aria-labelledby="modo-label"
-                  >
-                    {SEARCH_MODE_OPTIONS.map((mode) => {
-                      const Icon = mode.icon;
-                      const selected = searchMode === mode.id;
-
-                      return (
-                        <button
-                          key={mode.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={selected}
-                          className={cn(
-                            "min-h-20 rounded-lg border bg-background p-3 text-left transition hover:border-foreground/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
-                            selected
-                              ? "border-sky-600 bg-sky-50 text-sky-950 shadow-sm dark:border-sky-800 dark:bg-sky-950/30 dark:text-sky-50"
-                              : "border-border",
-                          )}
-                          onClick={() => {
-                            setSearchMode(mode.id);
-                            resetRecommendationState();
-                          }}
-                        >
-                          <span className="flex items-start gap-3">
-                            <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                              <Icon className="size-4 text-sky-700" aria-hidden="true" />
-                            </span>
-                            <span className="min-w-0">
-                              <span className="block font-medium">
-                                {mode.label}
-                              </span>
-                              <span className="block text-xs leading-5 text-muted-foreground">
-                                {mode.description}
-                              </span>
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
                   <div className="relative">
@@ -1026,8 +1065,8 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-            <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+          <Card className="glass-card overflow-hidden rounded-xl">
+            <CardHeader className="border-b border-soft bg-weather-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle>Buscas recentes</CardTitle>
@@ -1086,9 +1125,12 @@ export default function Home() {
               )}
             </CardContent>
           </Card>
-          </div>
+          </aside>
 
-          <aside className="flex flex-col gap-4">
+          <section
+            className="flex min-w-0 flex-col gap-4"
+            aria-label="Resultado da decisão"
+          >
             {recommendationMutation.isSuccess && recommendation ? (
               <RecommendationCard recommendation={recommendation} />
             ) : recommendationMutation.isSuccess && activityRanking ? (
@@ -1100,8 +1142,8 @@ export default function Home() {
             ) : recommendationMutation.isSuccess && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-                <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl">
+                <CardHeader className="border-b border-soft bg-weather-card">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
                     {searchMode === "atividades"
@@ -1185,15 +1227,49 @@ export default function Home() {
                 </CardContent>
               </Card>
             )}
-          </aside>
+
+            {recommendationMutation.isSuccess && recommendation ? (
+              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+                <ScoreTimeline recommendation={recommendation} />
+                <ScoreBreakdown recommendation={recommendation} />
+              </section>
+            ) : null}
+          </section>
         </section>
 
-        {recommendationMutation.isSuccess && recommendation ? (
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-            <ScoreTimeline recommendation={recommendation} />
-            <ScoreBreakdown recommendation={recommendation} />
-          </section>
-        ) : null}
+        <section
+          className="glass-panel rounded-xl p-3 sm:p-4"
+          aria-label="Resumo da consulta"
+        >
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <p className="text-xs text-muted-foreground">Modo</p>
+              <p className="truncate text-sm font-medium">
+                {selectedModeOption?.label ?? "Janela perfeita"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <p className="text-xs text-muted-foreground">Cidade</p>
+              <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
+            </div>
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <p className="text-xs text-muted-foreground">Período</p>
+              <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
+            </div>
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <p className="text-xs text-muted-foreground">Atividade</p>
+              <p className="truncate text-sm font-medium">
+                {cockpitActivityLabel}
+              </p>
+            </div>
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <p className="text-xs text-muted-foreground">Resultado</p>
+              <p className="truncate text-sm font-medium">
+                {cockpitResultLabel}
+              </p>
+            </div>
+          </div>
+        </section>
 
         <AttributionFooter disclaimer={resultDisclaimer} />
       </div>
