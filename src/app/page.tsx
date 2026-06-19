@@ -35,6 +35,10 @@ import { ScoreTimeline } from "@/components/result/score-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
 import { WeatherStage } from "@/components/weather/weather-stage";
+import {
+  ModeSelector,
+  type ModeSelectorOption,
+} from "@/components/search/mode-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -106,13 +110,6 @@ type ActivityVisual = {
   tone: string;
 };
 
-type SearchModeOption = {
-  id: SearchMode;
-  label: string;
-  description: string;
-  icon: typeof Search;
-};
-
 type LocationDetectionStatus = "idle" | "loading" | "success" | "error";
 
 const ACTIVITY_VISUALS = {
@@ -171,7 +168,7 @@ const SEARCH_MODE_OPTIONS = [
     description: "Previsão 7 dias",
     icon: CalendarSearch,
   },
-] satisfies SearchModeOption[];
+] satisfies ModeSelectorOption[];
 
 function useDebouncedValue(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -686,60 +683,14 @@ export default function Home() {
           </div>
         </header>
 
-        <section
-          className="glass-card rounded-xl p-3 sm:p-4"
-          aria-labelledby="modo-label"
-        >
-          <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center">
-            <div className="space-y-1">
-              <Label id="modo-label">Modo</Label>
-              <p className="text-xs leading-5 text-muted-foreground">
-                Cidade, data, atividade e previsão no mesmo painel.
-              </p>
-            </div>
-            <div
-              className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4"
-              role="radiogroup"
-              aria-labelledby="modo-label"
-            >
-              {SEARCH_MODE_OPTIONS.map((mode) => {
-                const Icon = mode.icon;
-                const selected = searchMode === mode.id;
-
-                return (
-                  <button
-                    key={mode.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    className={cn(
-                      "min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition hover:-translate-y-0.5 hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
-                      selected
-                        ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow"
-                        : "",
-                    )}
-                    onClick={() => {
-                      setSearchMode(mode.id);
-                      resetRecommendationState();
-                    }}
-                  >
-                    <span className="flex items-start gap-3">
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55">
-                        <Icon className="size-4 text-weather-accent" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block font-medium">{mode.label}</span>
-                        <span className="block text-xs leading-5 text-muted-foreground">
-                          {mode.description}
-                        </span>
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <ModeSelector
+          options={SEARCH_MODE_OPTIONS}
+          value={searchMode}
+          onChange={(mode) => {
+            setSearchMode(mode);
+            resetRecommendationState();
+          }}
+        />
 
         <section className="grid gap-6 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start">
           <aside className="flex flex-col gap-4 xl:sticky xl:top-6">

@@ -18,7 +18,7 @@ describe("layout Weather Decision Cockpit", () => {
   });
 
   it("separa seletor de modo, painel lateral e area de resultado", () => {
-    expect(page).toContain('aria-labelledby="modo-label"');
+    expect(page).toContain("<ModeSelector");
     expect(page).toContain("xl:sticky xl:top-6");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain(
