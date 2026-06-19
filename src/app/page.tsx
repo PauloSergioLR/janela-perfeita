@@ -59,7 +59,6 @@ import {
 } from "@/lib/ui/current-location";
 import {
   buildSearchDateOptions,
-  canSubmitSearch,
   formatCityLabel,
   SEARCH_DEBOUNCE_MS,
   type SearchDateOption,
@@ -146,34 +145,28 @@ const ACTIVITY_VISUALS = {
 
 const SEARCH_MODE_OPTIONS = [
   {
-    id: "dia",
-    label: "Dia",
-    description: "Clima completo",
-    icon: CloudSun,
-  },
-  {
     id: "janela",
-    label: "Janela",
+    label: "Janela perfeita",
     description: "Atividade e data",
     icon: Search,
   },
   {
     id: "atividades",
-    label: "O que fazer",
+    label: "O que fazer hoje?",
     description: "Ranking do dia",
     icon: ListChecks,
   },
   {
-    id: "semana",
-    label: "Melhor dia",
-    description: "Melhor dia",
-    icon: CalendarSearch,
+    id: "dia",
+    label: "Consulta do dia",
+    description: "Clima completo",
+    icon: CloudSun,
   },
   {
     id: "clima_semana",
-    label: "Semana",
+    label: "Consulta da semana",
     description: "Previsão 7 dias",
-    icon: CloudSun,
+    icon: CalendarSearch,
   },
 ] satisfies SearchModeOption[];
 
@@ -249,7 +242,7 @@ async function requestRecommendation(input: {
   city: City;
   mode: SearchMode;
   activityId?: ActivityId;
-  date: string;
+  date?: string;
   availableFrom?: string;
   availableTo?: string;
   compareModels?: boolean;
@@ -291,14 +284,12 @@ export default function Home() {
     SEARCH_DEBOUNCE_MS,
   );
   const isDetectingLocation = locationStatus === "loading";
+  const usesDate = searchMode !== "clima_semana";
+  const usesAvailability = searchMode === "janela" || searchMode === "atividades";
   const canSearch =
-    !modeUsesActivity(searchMode)
-      ? selectedCity !== null && selectedDate !== ""
-      : canSubmitSearch({
-          city: selectedCity,
-          activityId: selectedActivityId,
-          date: selectedDate,
-        });
+    selectedCity !== null &&
+    (!usesDate || selectedDate !== "") &&
+    (!modeUsesActivity(searchMode) || selectedActivityId !== "");
   const minDate = dateOptions[0]?.value ?? "";
   const maxDate = dateOptions[dateOptions.length - 1]?.value ?? "";
   const cityQueryEnabled =
@@ -314,7 +305,6 @@ export default function Home() {
   const selectedActivity = activities.find(
     (activity) => activity.id === selectedActivityId,
   );
-  const usesAvailability = searchMode === "janela" || searchMode === "atividades";
   const recommendation = recommendationMutation.data?.recommendation;
   const activityRanking = recommendationMutation.data?.activityRanking;
   const weekComparison = recommendationMutation.data?.weekComparison;
@@ -481,7 +471,10 @@ export default function Home() {
       city: normalizedInput.city,
       mode: normalizedInput.mode,
       activityId: normalizedInput.activityId,
-      date: normalizedInput.date,
+      date:
+        normalizedInput.mode === "clima_semana"
+          ? undefined
+          : normalizedInput.date,
       availableFrom: normalizedInput.availableFrom,
       availableTo: normalizedInput.availableTo,
       compareModels: input.compareModels,
@@ -498,6 +491,10 @@ export default function Home() {
       return;
     }
 
+    const searchDate = usesDate
+      ? selectedDate
+      : selectedDate || dateOptions[0]?.value || "";
+
     runSearch({
       city: selectedCity,
       mode: searchMode,
@@ -507,7 +504,7 @@ export default function Home() {
       activityName: modeUsesActivity(searchMode)
         ? selectedActivity?.name
         : undefined,
-      date: selectedDate,
+      date: searchDate,
       availableFrom: usesAvailability ? availableFrom || undefined : undefined,
       availableTo: usesAvailability ? availableTo || undefined : undefined,
       compareModels: searchMode === "janela" ? compareModels : false,
@@ -641,7 +638,13 @@ export default function Home() {
             <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
               <CardTitle>Planejar janela</CardTitle>
               <CardDescription>
-                Cidade, atividade e data definem a recomendação do dia.
+                {searchMode === "clima_semana"
+                  ? "Cidade define a consulta dos próximos 7 dias."
+                  : searchMode === "dia"
+                    ? "Cidade e data definem a consulta do dia."
+                    : searchMode === "atividades"
+                      ? "Cidade e data definem o ranking de atividades."
+                      : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-5">
@@ -649,7 +652,7 @@ export default function Home() {
                 <div className="space-y-3">
                   <Label id="modo-label">Modo</Label>
                   <div
-                    className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
+                    className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
                     role="radiogroup"
                     aria-labelledby="modo-label"
                   >
@@ -921,55 +924,62 @@ export default function Home() {
                   </div>
                 ) : null}
 
-                <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-                  <div className="space-y-2">
-                    <Label htmlFor="date">
-                    {searchMode === "semana" || searchMode === "clima_semana"
-                      ? "A partir de"
-                      : "Data"}
-                    </Label>
-                    <div className="relative">
-                      <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
-                      <Input
-                        id="date"
-                        type="date"
-                        min={minDate}
-                        max={maxDate}
-                        value={selectedDate}
-                        onChange={(event) => {
-                          setSelectedDate(event.target.value);
-                          resetRecommendationState();
-                        }}
-                        className="h-11 rounded-md pl-8"
-                      />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {dateOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          className={cn(
-                            "h-8 rounded-md border px-3 text-xs font-medium transition hover:border-foreground/30",
-                            selectedDate === option.value
-                              ? "border-sky-600 bg-sky-50 text-sky-900"
-                              : "border-border bg-background text-muted-foreground",
-                          )}
-                          aria-pressed={selectedDate === option.value}
-                          onClick={() => {
-                            setSelectedDate(option.value);
+                <div
+                  className={cn(
+                    "grid gap-4 sm:items-end",
+                    usesDate
+                      ? "sm:grid-cols-[minmax(0,1fr)_auto]"
+                      : "sm:grid-cols-1",
+                  )}
+                >
+                  {usesDate ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="date">
+                        {searchMode === "semana" ? "A partir de" : "Data"}
+                      </Label>
+                      <div className="relative">
+                        <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
+                        <Input
+                          id="date"
+                          type="date"
+                          min={minDate}
+                          max={maxDate}
+                          value={selectedDate}
+                          onChange={(event) => {
+                            setSelectedDate(event.target.value);
                             resetRecommendationState();
                           }}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
+                          className="h-11 rounded-md pl-8"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {dateOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={cn(
+                              "h-8 rounded-md border px-3 text-xs font-medium transition hover:border-foreground/30",
+                              selectedDate === option.value
+                                ? "border-sky-600 bg-sky-50 text-sky-900"
+                                : "border-border bg-background text-muted-foreground",
+                            )}
+                            aria-pressed={selectedDate === option.value}
+                            onClick={() => {
+                              setSelectedDate(option.value);
+                              resetRecommendationState();
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
                   <Button
                     type="submit"
                     size="lg"
-                    className="h-11 min-w-44 rounded-md"
+                    className="h-11 min-w-44 rounded-md sm:justify-self-end"
                     disabled={!canSearch || recommendationMutation.isPending}
                   >
                     {recommendationMutation.isPending ? (
@@ -984,7 +994,7 @@ export default function Home() {
                       : searchMode === "clima_semana"
                         ? "Consultar semana"
                       : searchMode === "atividades"
-                        ? "Ver ranking"
+                        ? "Ver o que fazer"
                         : searchMode === "semana"
                           ? "Comparar semana"
                           : "Encontrar janela"}
@@ -1103,9 +1113,7 @@ export default function Home() {
                           ? `Clima em ${selectedDate}`
                           : "Consulta do dia"
                       : searchMode === "clima_semana"
-                        ? selectedDate
-                          ? `Semana a partir de ${selectedDate}`
-                          : "Consulta da semana"
+                        ? "Consulta da semana"
                       : selectedActivity
                       ? `${selectedActivity.name} em ${selectedDate || "data"}`
                       : "Aguardando seleção"}
@@ -1130,9 +1138,11 @@ export default function Home() {
                             2. Atividade
                           </span>
                         ) : null}
-                        <span className="rounded-md bg-background px-3 py-2">
-                          {modeUsesActivity(searchMode) ? "3. Data" : "2. Data"}
-                        </span>
+                        {usesDate ? (
+                          <span className="rounded-md bg-background px-3 py-2">
+                            {modeUsesActivity(searchMode) ? "3. Data" : "2. Data"}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   ) : null}

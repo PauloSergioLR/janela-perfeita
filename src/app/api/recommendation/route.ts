@@ -70,12 +70,13 @@ const MODEL_COMPARISON_MODELS = [
 const weatherProvider = openMeteoWeatherProvider;
 const secondaryWeatherProvider = metNorwayWeatherProvider;
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const recommendationRequestSchema = z
   .object({
     mode: recommendationModeSchema.default("janela"),
     activityId: z.string().trim().min(1).optional(),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    date: dateSchema.optional(),
     compareModels: z.boolean().optional().default(false),
     demo: z.boolean().optional().default(false),
     availableFrom: timeSchema.optional(),
@@ -93,6 +94,14 @@ const recommendationRequestSchema = z
         code: z.ZodIssueCode.custom,
         message: "Informe uma atividade para gerar a recomendação.",
         path: ["activityId"],
+      });
+    }
+
+    if (data.mode !== "clima_semana" && !data.date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe uma data para gerar a recomendação.",
+        path: ["date"],
       });
     }
 
@@ -317,14 +326,15 @@ export async function POST(request: Request) {
     const generatedAtDate = new Date();
     const generatedAt = generatedAtDate.toISOString();
     const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
+    const date = body.date ?? now.slice(0, 10);
     const availability = getAvailability(body);
     const forecastParams: ForecastParams = {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
-      date: body.date,
+      date,
       endDate:
         body.mode === "semana" || body.mode === "clima_semana"
-          ? addDaysToDate(body.date, WEEK_COMPARISON_DAYS - 1)
+          ? addDaysToDate(date, WEEK_COMPARISON_DAYS - 1)
           : undefined,
     };
     const forecast = body.demo
