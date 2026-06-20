@@ -192,8 +192,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             <p className="text-sm font-medium text-weather-accent">
               Decisão principal
             </p>
-            <CardTitle className="mt-1">{recommendation.activity.name}</CardTitle>
+            <CardTitle className="mt-1">Recomendação</CardTitle>
             <CardDescription>
+              {recommendation.activity.name} ·{" "}
               {formatRecommendationLocation(recommendation)} ·{" "}
               {formatRecommendationDate(recommendation.date)}
             </CardDescription>
@@ -231,10 +232,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             aria-label={`Score ${displayScore} de 100: ${qualityLabel}`}
           >
             <span className="text-xs font-medium">
-              Qualidade da decisão
+              Score
             </span>
             <div>
-              <span className="text-2xl font-semibold">{qualityLabel}</span>
+              <span className="text-2xl font-semibold">
+                Qualidade da decisão: {qualityLabel}
+              </span>
               <div className="mt-3">
               <span className="text-7xl leading-none font-semibold">
                 {displayScore}
@@ -251,7 +254,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             <div className="border-y border-soft py-4">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
                 <Timer className="size-4 text-weather-accent" aria-hidden="true" />
-                Melhor janela
+                Janela recomendada
               </div>
               <p className="mt-2 text-4xl font-semibold text-slate-950 dark:text-slate-50">
                 {decisionWindow}
