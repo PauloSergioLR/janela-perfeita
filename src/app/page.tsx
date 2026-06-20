@@ -39,6 +39,7 @@ import {
   ModeSelector,
   type ModeSelectorOption,
 } from "@/components/search/mode-selector";
+import { ControlPanelSection } from "@/components/search/control-panel-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -696,7 +697,7 @@ export default function Home() {
           <aside className="flex flex-col gap-4 xl:sticky xl:top-6">
           <Card className="glass-card overflow-hidden rounded-xl">
             <CardHeader className="border-b border-soft bg-weather-card">
-              <CardTitle>Planejar janela</CardTitle>
+              <CardTitle>Painel de controle</CardTitle>
               <CardDescription>
                 {searchMode === "clima_semana"
                   ? "Cidade define a consulta dos próximos 7 dias."
@@ -709,6 +710,12 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-5">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                <ControlPanelSection
+                  number="1"
+                  title="Onde?"
+                  description="Busque uma cidade ou use a localização atual."
+                  className="order-1"
+                >
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
                   <div className="relative">
@@ -834,8 +841,15 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
+                </ControlPanelSection>
 
                 {modeUsesActivity(searchMode) ? (
+                  <ControlPanelSection
+                    number="3"
+                    title="O que você quer fazer?"
+                    description="Escolha uma atividade para receber a melhor janela."
+                    className="order-3"
+                  >
                   <div className="space-y-3">
                     <Label id="atividade-label">Atividade</Label>
                     <div
@@ -896,10 +910,17 @@ export default function Home() {
                       })}
                     </div>
                   </div>
+                  </ControlPanelSection>
                 ) : null}
 
+                <ControlPanelSection
+                  number="2"
+                  title="Quando?"
+                  description="Defina a data e, se quiser, sua disponibilidade."
+                  className="order-2"
+                >
                 {usesAvailability ? (
-                  <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
+                  <div className="space-y-3 border-t border-soft pt-3">
                     <div className="space-y-1">
                       <Label>Disponibilidade opcional</Label>
                       <p className="text-xs leading-5 text-muted-foreground">
@@ -937,14 +958,7 @@ export default function Home() {
                   </div>
                 ) : null}
 
-                <div
-                  className={cn(
-                    "grid gap-4 sm:items-end",
-                    usesDate
-                      ? "sm:grid-cols-[minmax(0,1fr)_auto]"
-                      : "sm:grid-cols-1",
-                  )}
-                >
+                <div className="grid gap-4">
                   {usesDate ? (
                     <div className="space-y-2">
                       <Label htmlFor="date">
@@ -989,33 +1003,11 @@ export default function Home() {
                     </div>
                   ) : null}
 
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="h-11 min-w-44 rounded-md sm:justify-self-end"
-                    disabled={!canSearch || recommendationMutation.isPending}
-                  >
-                    {recommendationMutation.isPending ? (
-                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Search className="size-4" aria-hidden="true" />
-                    )}
-                    {recommendationMutation.isPending
-                      ? "Calculando..."
-                      : searchMode === "dia"
-                        ? "Consultar dia"
-                      : searchMode === "clima_semana"
-                        ? "Consultar semana"
-                      : searchMode === "atividades"
-                        ? "Ver o que fazer"
-                        : searchMode === "semana"
-                          ? "Comparar semana"
-                          : "Encontrar janela"}
-                  </Button>
                 </div>
+                </ControlPanelSection>
 
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 text-sm">
+                  <label className="order-4 flex items-start gap-3 rounded-lg border border-soft bg-background/35 p-3 text-sm">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -1035,6 +1027,30 @@ export default function Home() {
                     </span>
                   </label>
                 ) : null}
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="glow-primary order-4 h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
+                  disabled={!canSearch || recommendationMutation.isPending}
+                >
+                  {recommendationMutation.isPending ? (
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Search className="size-4" aria-hidden="true" />
+                  )}
+                  {recommendationMutation.isPending
+                    ? "Calculando..."
+                    : searchMode === "dia"
+                      ? "Consultar dia"
+                      : searchMode === "clima_semana"
+                        ? "Consultar semana"
+                      : searchMode === "atividades"
+                        ? "Ver o que fazer"
+                        : searchMode === "semana"
+                          ? "Comparar semana"
+                          : "Encontrar janela"}
+                </Button>
               </form>
             </CardContent>
           </Card>
