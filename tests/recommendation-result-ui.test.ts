@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import { getActivityById } from "@/lib/domain/activities";
 import {
   buildTimelineData,
+  formatDecisionWindow,
   formatForecastConfidenceLevel,
   formatDurationHours,
   formatTimeRange,
   formatWindowTimeRange,
   getAlternativeWindows,
+  getDecisionQualityLabel,
   getBreakdownSource,
   getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
@@ -185,6 +187,22 @@ describe("helpers da visualizacao de resultado", () => {
     expect(formatTimeRange("08:00", "17:00")).toBe("Das 08:00 às 17:00");
     expect(formatTimeRange("21:00", "02:00")).toBe("Das 21:00 às 02:00");
     expect(formatTimeRange("00:00", "00:00")).toBe("Dia inteiro");
+  });
+
+  it("formata janela principal com seta e estado sem janela", () => {
+    const window = makeWindow([makeScore("07:00", 90)]);
+    window.endLabel = "09:00";
+
+    expect(formatDecisionWindow(window)).toBe("07:00 → 09:00");
+    expect(formatDecisionWindow(null)).toBe("Sem janela ideal");
+  });
+
+  it("classifica a qualidade da decisao pelo score", () => {
+    expect(getDecisionQualityLabel(85)).toBe("Excelente");
+    expect(getDecisionQualityLabel(70)).toBe("Boa");
+    expect(getDecisionQualityLabel(60)).toBe("Aceitável");
+    expect(getDecisionQualityLabel(40)).toBe("Fraca");
+    expect(getDecisionQualityLabel(39)).toBe("Não recomendado");
   });
 
   it("formata janela quase inteira como dia inteiro", () => {

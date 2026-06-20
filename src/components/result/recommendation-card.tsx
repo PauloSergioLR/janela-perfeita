@@ -21,10 +21,12 @@ import {
 } from "@/components/ui/card";
 import {
   formatDurationHours,
+  formatDecisionWindow,
   formatForecastConfidenceLevel,
   formatRecommendationDate,
   formatRecommendationLocation,
   formatWindowTimeRange,
+  getDecisionQualityLabel,
   getAlternativeWindows,
   getPeakHourScore,
   getPrimaryReason,
@@ -38,15 +40,23 @@ interface RecommendationCardProps {
 }
 
 function getScoreTone(score: number): string {
-  if (score >= 75) {
-    return "border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-50";
+  if (score >= 85) {
+    return "border-success/55 bg-success/10 text-success";
   }
 
-  if (score >= 55) {
-    return "border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-50";
+  if (score >= 70) {
+    return "border-weather-accent/55 bg-weather-accent/10 text-weather-accent";
   }
 
-  return "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-50";
+  if (score >= 60) {
+    return "border-warning/55 bg-warning/10 text-warning";
+  }
+
+  if (score >= 40) {
+    return "border-amber-400/55 bg-amber-400/10 text-amber-300";
+  }
+
+  return "border-danger/55 bg-danger/10 text-danger";
 }
 
 function getConfidenceTone(level: string): string {
@@ -160,11 +170,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const fallbackScore = getPeakHourScore(recommendation.scores);
   const displayScore = bestWindow?.avgScore ?? fallbackScore?.score ?? 0;
   const alternatives = getAlternativeWindows(recommendation.windows);
-  const timeLabel = bestWindow
-    ? formatWindowTimeRange(bestWindow)
-    : fallbackScore
-      ? "Nenhuma janela ideal encontrada"
-      : "Sem horário avaliado";
+  const decisionWindow = formatDecisionWindow(bestWindow);
+  const qualityLabel = getDecisionQualityLabel(displayScore);
   const factorGroups = getFactorGroups(recommendation);
   const primaryReason =
     bestWindow?.highlights[0] ??
@@ -178,14 +185,17 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
     recommendation.availabilityNotice ?? recommendation.timeWindowNotice;
 
   return (
-    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-      <CardHeader className="gap-3 border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+    <Card className="glass-card overflow-hidden rounded-xl">
+      <CardHeader className="gap-3 border-b border-soft bg-weather-card">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle>Recomendação</CardTitle>
+            <p className="text-sm font-medium text-weather-accent">
+              Decisão principal
+            </p>
+            <CardTitle className="mt-1">{recommendation.activity.name}</CardTitle>
             <CardDescription>
-              {recommendation.activity.name} em{" "}
-              {formatRecommendationLocation(recommendation)}
+              {formatRecommendationLocation(recommendation)} ·{" "}
+              {formatRecommendationDate(recommendation.date)}
             </CardDescription>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
@@ -193,9 +203,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               variant="outline"
               className={cn(
                 "h-7 px-3",
-                bestWindow
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100"
-                  : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100",
+                getScoreTone(displayScore),
               )}
             >
               {bestWindow ? (
@@ -203,7 +211,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               ) : (
                 <AlertTriangle className="size-3" aria-hidden="true" />
               )}
-              {bestWindow ? "Janela ideal" : "Sem janela ideal"}
+              {qualityLabel}
             </Badge>
             <ShareResultButton
               title="Janela Perfeita"
@@ -214,21 +222,25 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
       </CardHeader>
 
       <CardContent className="space-y-5 p-4 sm:p-5">
-        <div className="grid gap-4 lg:grid-cols-[minmax(130px,0.45fr)_minmax(0,1fr)]">
+        <div className="grid gap-5 lg:grid-cols-[minmax(180px,0.48fr)_minmax(0,1fr)]">
           <div
             className={cn(
-              "flex min-h-36 flex-col justify-between rounded-lg border p-4",
+              "flex min-h-52 flex-col justify-between rounded-lg border p-5",
               getScoreTone(displayScore),
             )}
+            aria-label={`Score ${displayScore} de 100: ${qualityLabel}`}
           >
-            <span className="text-xs font-medium uppercase tracking-wider">
-              Score
+            <span className="text-xs font-medium">
+              Qualidade da decisão
             </span>
             <div>
-              <span className="text-5xl leading-none font-semibold">
+              <span className="text-2xl font-semibold">{qualityLabel}</span>
+              <div className="mt-3">
+              <span className="text-7xl leading-none font-semibold">
                 {displayScore}
               </span>
               <span className="ml-1 text-sm font-medium">/100</span>
+              </div>
             </div>
             <span className="text-xs">
               Mínimo {recommendation.activity.minRecommendedScore}/100
@@ -236,13 +248,13 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           </div>
 
           <div className="grid gap-3">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
+            <div className="border-y border-soft py-4">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
-                <Timer className="size-4 text-sky-700" aria-hidden="true" />
-                Janela recomendada
+                <Timer className="size-4 text-weather-accent" aria-hidden="true" />
+                Melhor janela
               </div>
-              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">
-                {timeLabel}
+              <p className="mt-2 text-4xl font-semibold text-slate-950 dark:text-slate-50">
+                {decisionWindow}
               </p>
               {bestWindow ? (
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -262,9 +274,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
 
             {bestWindow ? (
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20">
+              <div className="border-b border-soft pb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-                  <ShieldCheck className="size-4 text-emerald-700" aria-hidden="true" />
+                  <ShieldCheck className="size-4 text-success" aria-hidden="true" />
                   Confiança da previsão
                 </div>
                 <div className="mt-2 flex flex-wrap items-start gap-2">
@@ -285,10 +297,16 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 </div>
               </div>
             ) : (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100">
+              <div className="border-b border-warning/45 pb-4 text-sm leading-6 text-warning">
+                <div className="flex items-center gap-2 font-medium">
+                  <AlertTriangle className="size-4" aria-hidden="true" />
+                  Sem janela ideal
+                </div>
+                <p className="mt-2">
                 Nenhuma janela atingiu o mínimo de{" "}
                 {recommendation.activity.minRecommendedScore}/100. O melhor
                 horário isolado ainda aparece para comparação.
+                </p>
               </div>
             )}
           </div>
@@ -301,10 +319,10 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         ) : null}
 
         {primaryReason ? (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-border dark:bg-muted/30">
+          <div className="border-y border-soft py-4">
             <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-              <Gauge className="size-4 text-emerald-700" aria-hidden="true" />
-              Motivo principal
+              <Gauge className="size-4 text-weather-accent" aria-hidden="true" />
+              Principal motivo
             </div>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {primaryReason}
