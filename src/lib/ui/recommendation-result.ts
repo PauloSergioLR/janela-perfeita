@@ -119,6 +119,38 @@ export function formatWindowTimeRange(window: WindowDisplayInput): string {
     : formatTimeRange(window.startLabel, window.endLabel);
 }
 
+export function formatDecisionWindow(
+  window: WindowDisplayInput | null,
+): string {
+  if (!window) {
+    return "Sem janela ideal";
+  }
+
+  return isWholeDayWindow(window)
+    ? "Dia inteiro"
+    : `${window.startLabel} → ${window.endLabel}`;
+}
+
+export function getDecisionQualityLabel(score: number): string {
+  if (score >= 85) {
+    return "Excelente";
+  }
+
+  if (score >= 70) {
+    return "Boa";
+  }
+
+  if (score >= 60) {
+    return "Aceitável";
+  }
+
+  if (score >= 40) {
+    return "Fraca";
+  }
+
+  return "Não recomendado";
+}
+
 export function formatAvailabilityNotice(
   availability: UserAvailability,
 ): string {
