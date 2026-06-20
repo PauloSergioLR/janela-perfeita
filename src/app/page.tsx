@@ -3,25 +3,18 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
-  Bike,
   CalendarDays,
   CalendarSearch,
-  Camera,
-  Car,
   CircleHelp,
   Clock3,
   CloudSun,
-  Footprints,
   History,
   ListChecks,
   Loader2,
   MapPin,
-  Moon,
   RefreshCw,
   RotateCcw,
-  Route,
   Search,
-  Shirt,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -40,6 +33,7 @@ import {
   type ModeSelectorOption,
 } from "@/components/search/mode-selector";
 import { ControlPanelSection } from "@/components/search/control-panel-section";
+import { ActivitySelector } from "@/components/search/activity-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -106,43 +100,7 @@ type RecommendationResponse = {
   weeklyOverview?: WeeklyWeatherOverview;
 };
 
-type ActivityVisual = {
-  icon: typeof Footprints;
-  tone: string;
-};
-
 type LocationDetectionStatus = "idle" | "loading" | "success" | "error";
-
-const ACTIVITY_VISUALS = {
-  correr: {
-    icon: Footprints,
-    tone: "text-emerald-700",
-  },
-  caminhar: {
-    icon: Route,
-    tone: "text-sky-700",
-  },
-  pedalar: {
-    icon: Bike,
-    tone: "text-cyan-700",
-  },
-  fotografar_por_do_sol: {
-    icon: Camera,
-    tone: "text-amber-700",
-  },
-  observar_estrelas: {
-    icon: Moon,
-    tone: "text-indigo-700",
-  },
-  lavar_carro: {
-    icon: Car,
-    tone: "text-rose-700",
-  },
-  lavar_roupa: {
-    icon: Shirt,
-    tone: "text-violet-700",
-  },
-} satisfies Record<ActivityId, ActivityVisual>;
 
 const SEARCH_MODE_OPTIONS = [
   {
@@ -852,63 +810,14 @@ export default function Home() {
                   >
                   <div className="space-y-3">
                     <Label id="atividade-label">Atividade</Label>
-                    <div
-                      className="grid gap-2 sm:grid-cols-2"
-                      role="radiogroup"
-                      aria-labelledby="atividade-label"
-                    >
-                      {activities.map((activity) => {
-                        const visual = ACTIVITY_VISUALS[activity.id];
-                        const Icon = visual.icon;
-                        const selected = selectedActivityId === activity.id;
-
-                        return (
-                          <button
-                            key={activity.id}
-                            type="button"
-                            className={cn(
-                              "min-h-28 rounded-lg border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
-                              selected
-                                ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-50"
-                                : "border-border",
-                            )}
-                            role="radio"
-                            aria-checked={selected}
-                            onClick={() => {
-                              setSelectedActivityId(activity.id);
-                              resetRecommendationState();
-                            }}
-                          >
-                            <span className="flex items-start gap-3">
-                              <span
-                                className={cn(
-                                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-muted",
-                                  selected
-                                    ? "bg-emerald-100 dark:bg-emerald-900/50"
-                                    : "",
-                                )}
-                              >
-                                <Icon
-                                  className={cn(
-                                    "size-4",
-                                    selected ? "text-emerald-700" : visual.tone,
-                                  )}
-                                  aria-hidden="true"
-                                />
-                              </span>
-                              <span className="min-w-0 space-y-1">
-                                <span className="block font-medium">
-                                  {activity.name}
-                                </span>
-                                <span className="line-clamp-2 text-xs leading-5 text-muted-foreground">
-                                  {activity.shortDescription}
-                                </span>
-                              </span>
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <ActivitySelector
+                      activities={activities}
+                      value={selectedActivityId}
+                      onChange={(activityId) => {
+                        setSelectedActivityId(activityId);
+                        resetRecommendationState();
+                      }}
+                    />
                   </div>
                   </ControlPanelSection>
                 ) : null}
