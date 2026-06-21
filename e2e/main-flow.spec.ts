@@ -39,6 +39,7 @@ test("fluxo principal gera recomendação real", async ({ page }) => {
   const timeline = page.getByLabel("Timeline de oportunidade");
   await timeline.getByRole("button", { name: /score \d+ de 100/i }).nth(1).click();
   await expect(timeline.getByLabel(/Detalhes de/)).toBeVisible();
+  await expect(page.getByLabel("Previsão dos próximos dias")).toBeVisible();
   await expect(page.getByText(/\/100/).first()).toBeVisible();
   await expect(page.getByText("Timeline de scores")).toBeVisible();
 });

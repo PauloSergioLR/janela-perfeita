@@ -274,7 +274,7 @@ describe("rotas internas da API", () => {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: astronomy.date,
-      endDate: undefined,
+      endDate: "2030-06-11",
     });
     expect(getForecastMock).toHaveBeenCalledTimes(1);
     expect(payload.recommendation.activity.id).toBe("correr");
@@ -291,6 +291,7 @@ describe("rotas internas da API", () => {
       }),
     );
     expect(payload.recommendation.disclaimer).toContain("Open-Meteo");
+    expect(payload.forecastStrip.days).toHaveLength(1);
     expect(payload.recommendation.providerComparison).toBeUndefined();
     expect(getSecondaryForecastMock).not.toHaveBeenCalled();
     expect(payload.stack).toBeUndefined();
@@ -448,7 +449,7 @@ describe("rotas internas da API", () => {
       lat: city.coordinates.lat,
       lon: city.coordinates.lon,
       date: astronomy.date,
-      endDate: undefined,
+      endDate: "2030-06-11",
       timezone: city.timezone,
       referenceAstronomy: [astronomy],
     });

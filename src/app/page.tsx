@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
+import { ForecastStrip } from "@/components/result/forecast-strip";
 import { RecommendationCard } from "@/components/result/recommendation-card";
 import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { OpportunityTimeline } from "@/components/result/opportunity-timeline";
@@ -98,6 +99,7 @@ type RecommendationResponse = {
   weekComparison?: WeekComparison;
   dailyOverview?: DailyWeatherOverview;
   weeklyOverview?: WeeklyWeatherOverview;
+  forecastStrip?: WeeklyWeatherOverview;
 };
 
 type LocationDetectionStatus = "idle" | "loading" | "success" | "error";
@@ -269,6 +271,7 @@ export default function Home() {
   const weekComparison = recommendationMutation.data?.weekComparison;
   const dailyOverview = recommendationMutation.data?.dailyOverview;
   const weeklyOverview = recommendationMutation.data?.weeklyOverview;
+  const forecastStrip = recommendationMutation.data?.forecastStrip;
   const resultDisclaimer =
     recommendation?.disclaimer ??
     activityRanking?.disclaimer ??
@@ -1128,9 +1131,12 @@ export default function Home() {
             )}
 
             {recommendationMutation.isSuccess && recommendation ? (
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-                <OpportunityTimeline recommendation={recommendation} />
-                <ScoreBreakdown recommendation={recommendation} />
+              <section className="space-y-4">
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+                  <OpportunityTimeline recommendation={recommendation} />
+                  <ScoreBreakdown recommendation={recommendation} />
+                </div>
+                {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
               </section>
             ) : null}
           </section>

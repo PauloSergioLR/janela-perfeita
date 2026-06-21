@@ -333,7 +333,9 @@ export async function POST(request: Request) {
       lon: city.coordinates.lon,
       date,
       endDate:
-        body.mode === "semana" || body.mode === "clima_semana"
+        body.mode === "janela" ||
+        body.mode === "semana" ||
+        body.mode === "clima_semana"
           ? addDaysToDate(date, WEEK_COMPARISON_DAYS - 1)
           : undefined,
     };
@@ -456,7 +458,21 @@ export async function POST(request: Request) {
       applyDemoDisclaimer(recommendation);
     }
 
-    return NextResponse.json({ recommendation });
+    const forecastStrip = buildWeeklyWeatherOverview({
+      city,
+      hourly: forecast.hourly,
+      dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
+      generatedAt,
+    });
+
+    if (body.demo) {
+      forecastStrip.disclaimer = DEMO_DISCLAIMER;
+      forecastStrip.days.forEach((day) => {
+        day.disclaimer = DEMO_DISCLAIMER;
+      });
+    }
+
+    return NextResponse.json({ recommendation, forecastStrip });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return jsonError(400, "Dados inválidos para gerar recomendação.");
