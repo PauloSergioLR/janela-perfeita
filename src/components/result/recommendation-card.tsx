@@ -28,6 +28,7 @@ import {
   getAlternativeWindows,
   getPeakHourScore,
 } from "@/lib/ui/recommendation-result";
+import { getForecastConfidenceIcon } from "@/lib/ui/icon-system";
 import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
@@ -113,6 +114,15 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const shareText = buildRecommendationShareText(recommendation);
   const timeFilterNotice =
     recommendation.availabilityNotice ?? recommendation.timeWindowNotice;
+  const ConfidenceIcon = bestWindow
+    ? getForecastConfidenceIcon(bestWindow.confidence.level)
+    : null;
+  const confidenceIconClassName =
+    bestWindow?.confidence.level === "alta"
+      ? "text-success"
+      : bestWindow?.confidence.level === "media"
+        ? "text-warning"
+        : "text-danger";
 
   return (
     <Card className="glass-card overflow-hidden rounded-xl">
@@ -192,7 +202,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             {bestWindow ? (
               <div className="border-b border-soft pb-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-                  <ShieldCheck className="size-4 text-success" aria-hidden="true" />
+                  {ConfidenceIcon ? (
+                    <ConfidenceIcon
+                      className={cn("size-4", confidenceIconClassName)}
+                      aria-hidden="true"
+                    />
+                  ) : null}
                   Confiança da previsão
                 </div>
                 <div className="mt-2 flex flex-wrap items-start gap-2">

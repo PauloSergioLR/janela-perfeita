@@ -1,18 +1,6 @@
-import {
-  Cloud,
-  CloudRain,
-  Droplets,
-  Gauge,
-  SunMedium,
-  Sunrise,
-  Sunset,
-  Thermometer,
-  Wind,
-  type LucideIcon,
-} from "lucide-react";
+import { getWeatherIcon, getWeatherMetricIcon } from "@/lib/ui/icon-system";
 import {
   getWeatherStats,
-  type WeatherStatId,
 } from "@/lib/ui/weather-stats";
 import type { HourlyWeather } from "@/types";
 
@@ -22,37 +10,25 @@ interface WeatherStatsPanelProps {
   sunset?: string | null;
 }
 
-const statIcons: Record<WeatherStatId, LucideIcon> = {
-  temperature: Thermometer,
-  "apparent-temperature": Gauge,
-  precipitation: CloudRain,
-  wind: Wind,
-  gusts: Wind,
-  humidity: Droplets,
-  uv: SunMedium,
-  "cloud-cover": Cloud,
-  sunrise: Sunrise,
-  sunset: Sunset,
-};
-
 export function WeatherStatsPanel({
   weather,
   sunrise,
   sunset,
 }: WeatherStatsPanelProps) {
   const stats = getWeatherStats({ weather, sunrise, sunset });
+  const HeaderIcon = getWeatherIcon(null);
 
   return (
     <section className="space-y-3" aria-label="Estatísticas climáticas">
       <div className="flex items-center gap-2">
-        <Cloud className="size-4 text-weather-accent" aria-hidden="true" />
+        <HeaderIcon className="size-4 text-weather-accent" aria-hidden="true" />
         <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
           Estatísticas climáticas
         </h3>
       </div>
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border sm:grid-cols-3 lg:grid-cols-5">
         {stats.map((stat) => {
-          const Icon = statIcons[stat.id];
+          const Icon = getWeatherMetricIcon(stat.id);
 
           return (
             <div

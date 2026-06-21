@@ -22,6 +22,7 @@ describe("ModeSelector", () => {
   it("destaca modo ativo com icone e sem mapa", () => {
     expect(source).toContain("Check");
     expect(source).toContain("shadow-weather-glow");
+    expect(source).toContain("getSearchModeIcon");
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
   });
