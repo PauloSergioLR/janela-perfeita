@@ -30,6 +30,9 @@ test("fluxo principal gera recomendação real", async ({ page }) => {
   await expect(page.getByText("Recomendação", { exact: true })).toBeVisible();
   await expect(page.getByText("Score", { exact: true })).toBeVisible();
   await expect(page.getByText("Janela recomendada")).toBeVisible();
+  await expect(
+    page.getByText("Motivos da recomendação", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText(/\/100/).first()).toBeVisible();
   await expect(page.getByText("Timeline de scores")).toBeVisible();
 });
