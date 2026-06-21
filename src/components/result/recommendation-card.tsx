@@ -2,14 +2,11 @@ import {
   AlertTriangle,
   CalendarDays,
   CheckCircle2,
-  Gauge,
   MapPin,
   ShieldCheck,
   Timer,
-  TrendingDown,
-  TrendingUp,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { ReasonChips } from "@/components/result/reason-chips";
 import { ShareResultButton } from "@/components/result/share-result-button";
 import { ScoreRing } from "@/components/result/score-ring";
 import { Badge } from "@/components/ui/badge";
@@ -29,12 +26,11 @@ import {
   formatWindowTimeRange,
   getAlternativeWindows,
   getPeakHourScore,
-  getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
 import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
-import type { ModelAgreement, Recommendation, RuleResult } from "@/types";
+import type { ModelAgreement, Recommendation } from "@/types";
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -96,76 +92,6 @@ function getAgreementTone(level: ModelAgreement["level"]): string {
   return "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
 }
 
-function sortByImpact(a: RuleResult, b: RuleResult): number {
-  return (
-    b.score - a.score || b.weight - a.weight || a.label.localeCompare(b.label)
-  );
-}
-
-function sortByPenalty(a: RuleResult, b: RuleResult): number {
-  return (
-    a.score - b.score || b.weight - a.weight || a.label.localeCompare(b.label)
-  );
-}
-
-function getFactorGroups(recommendation: Recommendation): {
-  positive: RuleResult[];
-  attention: RuleResult[];
-} {
-  const sourceScore = recommendation.bestWindow
-    ? getPeakHourScore(recommendation.bestWindow.scores)
-    : getPeakHourScore(recommendation.scores);
-  const rules = sourceScore?.breakdown ?? [];
-
-  return {
-    positive: rules
-      .filter((rule) => rule.score >= 70)
-      .sort(sortByImpact)
-      .slice(0, 3),
-    attention: rules
-      .filter((rule) => rule.score < 70)
-      .sort(sortByPenalty)
-      .slice(0, 3),
-  };
-}
-
-function FactorList({
-  title,
-  icon,
-  rules,
-}: {
-  title: string;
-  icon: ReactNode;
-  rules: RuleResult[];
-}) {
-  if (rules.length === 0) {
-    return null;
-  }
-
-  return (
-      <div className="space-y-2">
-      <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-        {icon}
-        {title}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {rules.map((rule) => (
-          <Badge
-            key={`${rule.factor}-${rule.score}`}
-            variant="outline"
-            className="min-h-8 max-w-full justify-start gap-2 whitespace-normal border-slate-200 bg-white px-3 py-1 text-left text-slate-700 dark:border-border dark:bg-muted/30 dark:text-slate-200"
-          >
-            <span className="font-medium text-slate-950 dark:text-slate-50">
-              {rule.label}
-            </span>
-            <span>{rule.score}/100</span>
-          </Badge>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
   const bestWindow = recommendation.bestWindow;
   const fallbackScore = getPeakHourScore(recommendation.scores);
@@ -175,10 +101,10 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const scoreBand = getScoreRingBand(displayScore);
   const qualityLabel = scoreBand.label;
   const scoreTone = getScoreTone(scoreBand.tone);
-  const factorGroups = getFactorGroups(recommendation);
-  const primaryReason =
-    bestWindow?.highlights[0] ??
-    (fallbackScore ? getPrimaryReason(fallbackScore) : null);
+  const reasonRules = (bestWindow
+    ? getPeakHourScore(bestWindow.scores)
+    : fallbackScore
+  )?.breakdown ?? [];
   const modelAgreement = recommendation.modelAgreement;
   const worstDivergence = modelAgreement?.divergences[0];
   const providerComparison = recommendation.providerComparison;
@@ -307,17 +233,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
           </div>
         ) : null}
 
-        {primaryReason ? (
-          <div className="border-y border-soft py-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
-              <Gauge className="size-4 text-weather-accent" aria-hidden="true" />
-              Principal motivo
-            </div>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {primaryReason}
-            </p>
-          </div>
-        ) : null}
+        <ReasonChips rules={reasonRules} />
 
         {modelAgreement ? (
           <div
@@ -370,19 +286,6 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             ) : null}
           </div>
         ) : null}
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <FactorList
-            title="Fatores a favor"
-            icon={<TrendingUp className="size-4 text-emerald-700" aria-hidden="true" />}
-            rules={factorGroups.positive}
-          />
-          <FactorList
-            title="Pontos de atenção"
-            icon={<TrendingDown className="size-4 text-amber-700" aria-hidden="true" />}
-            rules={factorGroups.attention}
-          />
-        </div>
 
         {alternatives.length > 0 ? (
           <div className="space-y-3">
