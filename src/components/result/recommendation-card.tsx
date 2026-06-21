@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { ShareResultButton } from "@/components/result/share-result-button";
+import { ScoreRing } from "@/components/result/score-ring";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,11 +27,11 @@ import {
   formatRecommendationDate,
   formatRecommendationLocation,
   formatWindowTimeRange,
-  getDecisionQualityLabel,
   getAlternativeWindows,
   getPeakHourScore,
   getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
+import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
 import type { ModelAgreement, Recommendation, RuleResult } from "@/types";
@@ -39,20 +40,20 @@ interface RecommendationCardProps {
   recommendation: Recommendation;
 }
 
-function getScoreTone(score: number): string {
-  if (score >= 85) {
+function getScoreTone(tone: ScoreRingTone): string {
+  if (tone === "success") {
     return "border-success/55 bg-success/10 text-success";
   }
 
-  if (score >= 70) {
+  if (tone === "accent") {
     return "border-weather-accent/55 bg-weather-accent/10 text-weather-accent";
   }
 
-  if (score >= 60) {
+  if (tone === "warning") {
     return "border-warning/55 bg-warning/10 text-warning";
   }
 
-  if (score >= 40) {
+  if (tone === "caution") {
     return "border-amber-400/55 bg-amber-400/10 text-amber-300";
   }
 
@@ -171,7 +172,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const displayScore = bestWindow?.avgScore ?? fallbackScore?.score ?? 0;
   const alternatives = getAlternativeWindows(recommendation.windows);
   const decisionWindow = formatDecisionWindow(bestWindow);
-  const qualityLabel = getDecisionQualityLabel(displayScore);
+  const scoreBand = getScoreRingBand(displayScore);
+  const qualityLabel = scoreBand.label;
+  const scoreTone = getScoreTone(scoreBand.tone);
   const factorGroups = getFactorGroups(recommendation);
   const primaryReason =
     bestWindow?.highlights[0] ??
@@ -204,7 +207,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               variant="outline"
               className={cn(
                 "h-7 px-3",
-                getScoreTone(displayScore),
+                scoreTone,
               )}
             >
               {bestWindow ? (
@@ -224,30 +227,13 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
 
       <CardContent className="space-y-5 p-4 sm:p-5">
         <div className="grid gap-5 lg:grid-cols-[minmax(180px,0.48fr)_minmax(0,1fr)]">
-          <div
-            className={cn(
-              "flex min-h-52 flex-col justify-between rounded-lg border p-5",
-              getScoreTone(displayScore),
-            )}
-            aria-label={`Score ${displayScore} de 100: ${qualityLabel}`}
-          >
-            <span className="text-xs font-medium">
-              Score
-            </span>
-            <div>
-              <span className="text-2xl font-semibold">
-                Qualidade da decisão: {qualityLabel}
+          <div className="grid min-h-52 place-items-center rounded-lg border border-soft bg-weather-card/65 p-4">
+            <div className="grid place-items-center gap-2">
+              <ScoreRing score={displayScore} />
+              <span className="text-xs text-muted-foreground">
+                Mínimo {recommendation.activity.minRecommendedScore}/100
               </span>
-              <div className="mt-3">
-              <span className="text-7xl leading-none font-semibold">
-                {displayScore}
-              </span>
-              <span className="ml-1 text-sm font-medium">/100</span>
-              </div>
             </div>
-            <span className="text-xs">
-              Mínimo {recommendation.activity.minRecommendedScore}/100
-            </span>
           </div>
 
           <div className="grid gap-3">
