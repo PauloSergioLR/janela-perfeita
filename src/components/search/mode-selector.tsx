@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, type LucideIcon } from "lucide-react";
+import { getSearchModeIcon } from "@/lib/ui/icon-system";
 import { cn } from "@/lib/utils";
 import type { SearchMode } from "@/types";
 
@@ -42,7 +43,7 @@ export function ModeSelector({
           aria-labelledby="modo-label"
         >
           {options.map((mode) => {
-            const Icon = mode.icon;
+            const Icon = getSearchModeIcon(mode.id);
             const selected = value === mode.id;
 
             return (

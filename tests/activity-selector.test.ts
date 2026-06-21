@@ -27,9 +27,7 @@ describe("ActivitySelector", () => {
       expect(source).toContain(activityId);
     }
 
-    expect(source).toContain("Footprints");
-    expect(source).toContain("Camera");
-    expect(source).toContain("Moon");
+    expect(source).toContain("getActivityIcon");
   });
 
   it("mantem estados acessiveis de selecao, foco e disabled", () => {

@@ -63,8 +63,7 @@ describe("ForecastStrip", () => {
     expect(source).toContain('aria-label="Previsão dos próximos dias"');
     expect(source).toContain("overflow-x-auto");
     expect(source).toContain("w-44 shrink-0");
-    expect(source).toContain("CloudRain");
-    expect(source).toContain("CloudSnow");
+    expect(source).toContain("getWeatherIcon");
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
   });

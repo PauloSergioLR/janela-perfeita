@@ -61,10 +61,8 @@ describe("WeatherStatsPanel", () => {
     const source = readWeatherStatsPanel();
 
     expect(source).toContain('aria-label="Estatísticas climáticas"');
-    expect(source).toContain("Thermometer");
-    expect(source).toContain("CloudRain");
-    expect(source).toContain("Sunrise");
-    expect(source).toContain("Sunset");
+    expect(source).toContain("getWeatherMetricIcon");
+    expect(source).toContain("getWeatherIcon");
     expect(source).toContain("grid-cols-2");
     expect(source).toContain("sm:grid-cols-3 lg:grid-cols-5");
     expect(source).not.toContain("MapLibre");

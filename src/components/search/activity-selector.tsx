@@ -1,64 +1,47 @@
 "use client";
 
-import {
-  Bike,
-  Camera,
-  Car,
-  Check,
-  Footprints,
-  Moon,
-  Route,
-  Shirt,
-  type LucideIcon,
-} from "lucide-react";
+import { Check } from "lucide-react";
+import { getActivityIcon } from "@/lib/ui/icon-system";
 import { cn } from "@/lib/utils";
 import type { Activity, ActivityId } from "@/types";
 
 type ActivityVisual = {
-  icon: LucideIcon;
   iconClassName: string;
   selectedClassName: string;
 };
 
 const ACTIVITY_VISUALS = {
   correr: {
-    icon: Footprints,
     iconClassName: "text-emerald-400",
     selectedClassName:
       "border-emerald-400/70 bg-emerald-400/10 text-emerald-50 shadow-[0_0_30px_oklch(0.72_0.15_155_/_22%)]",
   },
   caminhar: {
-    icon: Route,
     iconClassName: "text-sky-400",
     selectedClassName:
       "border-sky-400/70 bg-sky-400/10 text-sky-50 shadow-[0_0_30px_oklch(0.72_0.13_220_/_22%)]",
   },
   pedalar: {
-    icon: Bike,
     iconClassName: "text-cyan-400",
     selectedClassName:
       "border-cyan-400/70 bg-cyan-400/10 text-cyan-50 shadow-[0_0_30px_oklch(0.75_0.12_205_/_22%)]",
   },
   fotografar_por_do_sol: {
-    icon: Camera,
     iconClassName: "text-amber-400",
     selectedClassName:
       "border-amber-400/70 bg-amber-400/10 text-amber-50 shadow-[0_0_30px_oklch(0.82_0.15_78_/_22%)]",
   },
   observar_estrelas: {
-    icon: Moon,
     iconClassName: "text-violet-400",
     selectedClassName:
       "border-violet-400/70 bg-violet-400/10 text-violet-50 shadow-[0_0_30px_oklch(0.7_0.15_295_/_22%)]",
   },
   lavar_carro: {
-    icon: Car,
     iconClassName: "text-rose-400",
     selectedClassName:
       "border-rose-400/70 bg-rose-400/10 text-rose-50 shadow-[0_0_30px_oklch(0.7_0.16_15_/_22%)]",
   },
   lavar_roupa: {
-    icon: Shirt,
     iconClassName: "text-fuchsia-400",
     selectedClassName:
       "border-fuchsia-400/70 bg-fuchsia-400/10 text-fuchsia-50 shadow-[0_0_30px_oklch(0.7_0.16_335_/_22%)]",
@@ -86,7 +69,7 @@ export function ActivitySelector({
     >
       {activities.map((activity) => {
         const visual = ACTIVITY_VISUALS[activity.id];
-        const Icon = visual.icon;
+        const Icon = getActivityIcon(activity.id);
         const selected = value === activity.id;
 
         return (

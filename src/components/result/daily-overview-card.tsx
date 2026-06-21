@@ -1,15 +1,8 @@
 import {
   CalendarDays,
-  Cloud,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
   Droplets,
   Gauge,
   MapPin,
-  Sun,
   Sunrise,
   Sunset,
   Thermometer,
@@ -26,41 +19,12 @@ import {
 import {
   formatRecommendationDate,
 } from "@/lib/ui/recommendation-result";
+import { getWeatherIcon } from "@/lib/ui/icon-system";
 import { formatCityLabel } from "@/lib/ui/search-page";
 import type { DailyWeatherOverview, HourlyWeather } from "@/types";
 
 interface DailyOverviewCardProps {
   overview: DailyWeatherOverview;
-}
-
-type WeatherIcon = typeof Sun;
-
-function getWeatherIcon(code: number | null): WeatherIcon {
-  if (code === null) {
-    return Cloud;
-  }
-
-  if ([95, 96, 99].includes(code)) {
-    return CloudLightning;
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(code)) {
-    return CloudSnow;
-  }
-
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
-    return CloudRain;
-  }
-
-  if ([45, 48].includes(code)) {
-    return CloudFog;
-  }
-
-  if (code === 0) {
-    return Sun;
-  }
-
-  return CloudSun;
 }
 
 function formatValue(value: number | null, suffix: string): string {

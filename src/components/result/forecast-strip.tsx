@@ -1,15 +1,4 @@
-import {
-  CalendarDays,
-  Cloud,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
-  Sun,
-  Thermometer,
-  type LucideIcon,
-} from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import {
   formatForecastDate,
   formatForecastDayLabel,
@@ -18,6 +7,7 @@ import {
   getForecastShortSummary,
   type ForecastClassificationTone,
 } from "@/lib/ui/forecast-strip";
+import { getWeatherIcon, getWeatherMetricIcon } from "@/lib/ui/icon-system";
 import { formatCityLabel } from "@/lib/ui/search-page";
 import { cn } from "@/lib/utils";
 import type { WeeklyWeatherOverview } from "@/types";
@@ -33,29 +23,7 @@ const classificationClasses: Record<ForecastClassificationTone, string> = {
   rain: "border-danger/45 bg-danger/10 text-danger",
 };
 
-function getWeatherIcon(weatherCode: number | null): LucideIcon {
-  if (weatherCode === null) {
-    return Cloud;
-  }
-
-  if ([95, 96, 99].includes(weatherCode)) {
-    return CloudLightning;
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) {
-    return CloudSnow;
-  }
-
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) {
-    return CloudRain;
-  }
-
-  if ([45, 48].includes(weatherCode)) {
-    return CloudFog;
-  }
-
-  return weatherCode === 0 ? Sun : CloudSun;
-}
+const TemperatureIcon = getWeatherMetricIcon("temperature");
 
 export function ForecastStrip({ overview }: ForecastStripProps) {
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -125,7 +93,7 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
                 </p>
 
                 <p className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Thermometer className="size-3.5 text-weather-accent" aria-hidden="true" />
+                  <TemperatureIcon className="size-3.5 text-weather-accent" aria-hidden="true" />
                   {day.weatherLabel}
                 </p>
               </article>
