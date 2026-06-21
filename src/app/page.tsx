@@ -24,7 +24,7 @@ import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
 import { RecommendationCard } from "@/components/result/recommendation-card";
 import { ScoreBreakdown } from "@/components/result/score-breakdown";
-import { ScoreTimeline } from "@/components/result/score-timeline";
+import { OpportunityTimeline } from "@/components/result/opportunity-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
 import { WeatherStage } from "@/components/weather/weather-stage";
@@ -1129,7 +1129,7 @@ export default function Home() {
 
             {recommendationMutation.isSuccess && recommendation ? (
               <section className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-                <ScoreTimeline recommendation={recommendation} />
+                <OpportunityTimeline recommendation={recommendation} />
                 <ScoreBreakdown recommendation={recommendation} />
               </section>
             ) : null}
