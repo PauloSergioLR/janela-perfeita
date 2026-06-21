@@ -6,6 +6,7 @@ import type {
   UserAvailability,
   WindowResult,
 } from "@/types";
+import { getScoreRingBand } from "./score-ring";
 import { formatCityLabel } from "./search-page";
 
 export interface TimelineDatum {
@@ -132,23 +133,7 @@ export function formatDecisionWindow(
 }
 
 export function getDecisionQualityLabel(score: number): string {
-  if (score >= 85) {
-    return "Excelente";
-  }
-
-  if (score >= 70) {
-    return "Boa";
-  }
-
-  if (score >= 60) {
-    return "Aceitável";
-  }
-
-  if (score >= 40) {
-    return "Fraca";
-  }
-
-  return "Não recomendado";
+  return getScoreRingBand(score).label;
 }
 
 export function formatAvailabilityNotice(
