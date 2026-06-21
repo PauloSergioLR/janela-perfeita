@@ -17,6 +17,7 @@ export interface TimelineDatum {
   isRecommended: boolean;
   isBestWindow: boolean;
   rainRisk: string | null;
+  wind: string | null;
   confidenceLevel: ForecastConfidenceLevel | null;
 }
 
@@ -70,11 +71,27 @@ export function buildTimelineData(
     isRecommended: score.score >= minRecommendedScore,
     isBestWindow: bestWindowTimes.has(score.time),
     rainRisk: getRainRiskLabel(score),
+    wind: getWindLabel(score),
     confidenceLevel:
       bestWindowTimes.has(score.time) && bestWindow
         ? bestWindow.confidence.level
         : null,
   }));
+}
+
+function getWindLabel(score: HourScore): string | null {
+  const wind = score.weather.wind_speed_10m;
+  const gusts = score.weather.wind_gusts_10m;
+
+  if (!Number.isFinite(wind)) {
+    return null;
+  }
+
+  const windLabel = `Vento: ${Math.round(wind)} km/h`;
+
+  return Number.isFinite(gusts) && gusts > wind
+    ? `${windLabel}, rajadas ${Math.round(gusts)} km/h`
+    : windLabel;
 }
 
 function getRainRiskLabel(score: HourScore): string | null {
