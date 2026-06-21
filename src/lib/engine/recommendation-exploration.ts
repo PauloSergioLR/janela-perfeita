@@ -166,6 +166,8 @@ export function buildRecommendation({
     activity,
     city,
     date: astronomy.date,
+    sunrise: astronomy.sunrise,
+    sunset: astronomy.sunset,
     generatedAt,
     scores,
     windows,
