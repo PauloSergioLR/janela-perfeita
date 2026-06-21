@@ -185,6 +185,8 @@ export interface Recommendation {
   activity: Activity;
   city: City;
   date: string;
+  sunrise?: string;
+  sunset?: string;
   generatedAt: string;
   scores: HourScore[];
   windows: WindowResult[];

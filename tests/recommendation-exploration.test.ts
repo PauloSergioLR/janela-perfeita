@@ -84,6 +84,8 @@ describe("exploração de recomendações", () => {
 
     expect(recommendation.bestWindow?.avgScore).toBe(88);
     expect(recommendation.bestWindow?.startLabel).toBe("08:00");
+    expect(recommendation.sunrise).toBe("2030-06-05T06:30");
+    expect(recommendation.sunset).toBe("2030-06-05T18:00");
     expect(recommendation.disclaimer).toContain("Open-Meteo");
   });
 

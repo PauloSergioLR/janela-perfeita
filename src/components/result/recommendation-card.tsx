@@ -9,6 +9,7 @@ import {
 import { ReasonChips } from "@/components/result/reason-chips";
 import { ShareResultButton } from "@/components/result/share-result-button";
 import { ScoreRing } from "@/components/result/score-ring";
+import { WeatherStatsPanel } from "@/components/result/weather-stats-panel";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -95,16 +96,16 @@ function getAgreementTone(level: ModelAgreement["level"]): string {
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
   const bestWindow = recommendation.bestWindow;
   const fallbackScore = getPeakHourScore(recommendation.scores);
-  const displayScore = bestWindow?.avgScore ?? fallbackScore?.score ?? 0;
+  const resultScore = bestWindow
+    ? getPeakHourScore(bestWindow.scores)
+    : fallbackScore;
+  const displayScore = bestWindow?.avgScore ?? resultScore?.score ?? 0;
   const alternatives = getAlternativeWindows(recommendation.windows);
   const decisionWindow = formatDecisionWindow(bestWindow);
   const scoreBand = getScoreRingBand(displayScore);
   const qualityLabel = scoreBand.label;
   const scoreTone = getScoreTone(scoreBand.tone);
-  const reasonRules = (bestWindow
-    ? getPeakHourScore(bestWindow.scores)
-    : fallbackScore
-  )?.breakdown ?? [];
+  const reasonRules = resultScore?.breakdown ?? [];
   const modelAgreement = recommendation.modelAgreement;
   const worstDivergence = modelAgreement?.divergences[0];
   const providerComparison = recommendation.providerComparison;
@@ -234,6 +235,12 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         ) : null}
 
         <ReasonChips rules={reasonRules} />
+
+        <WeatherStatsPanel
+          weather={resultScore?.weather ?? null}
+          sunrise={recommendation.sunrise}
+          sunset={recommendation.sunset}
+        />
 
         {modelAgreement ? (
           <div

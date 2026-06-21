@@ -33,6 +33,9 @@ test("fluxo principal gera recomendação real", async ({ page }) => {
   await expect(
     page.getByText("Motivos da recomendação", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Estatísticas climáticas", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText(/\/100/).first()).toBeVisible();
   await expect(page.getByText("Timeline de scores")).toBeVisible();
 });
