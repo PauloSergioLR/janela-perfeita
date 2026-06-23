@@ -2,12 +2,10 @@ import {
   CalendarDays,
   CloudRain,
   Droplets,
-  Flame,
-  Snowflake,
+  Sparkles,
   Thermometer,
   ThumbsDown,
   ThumbsUp,
-  Wind,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -26,12 +24,10 @@ interface WeeklyOverviewCardProps {
   overview: WeeklyWeatherOverview;
 }
 
+type HighlightTone = "success" | "danger" | "warning";
+
 function formatNumber(value: number | null, suffix: string): string {
   return value === null ? "Sem dados" : `${Math.round(value)}${suffix}`;
-}
-
-function formatDecimal(value: number | null, suffix: string): string {
-  return value === null ? "Sem dados" : `${value.toFixed(1)}${suffix}`;
 }
 
 function formatWeekday(date: string): string {
@@ -55,34 +51,54 @@ function formatShortDate(date: string): string {
   }).format(new Date(`${date}T00:00:00`));
 }
 
+function getHighlightClasses(tone: HighlightTone): string {
+  const tones = {
+    success: "border-emerald-400/30 bg-emerald-400/10 text-emerald-600 dark:text-emerald-300",
+    danger: "border-rose-400/30 bg-rose-400/10 text-rose-600 dark:text-rose-300",
+    warning: "border-sky-400/30 bg-sky-400/10 text-sky-600 dark:text-sky-300",
+  };
+
+  return tones[tone];
+}
+
 function Highlight({
   label,
   icon,
   day,
   value,
+  tone,
 }: {
   label: string;
   icon: ReactNode;
   day: WeeklyWeatherDayOverview | null;
   value: string;
+  tone: HighlightTone;
 }) {
   if (!day) {
     return null;
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-border dark:bg-muted/20">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-normal text-slate-500 dark:text-slate-300">
+    <article
+      className={`rounded-xl border p-3.5 ${getHighlightClasses(tone)}`}
+      aria-label={`${label}: ${formatWeekday(day.date)}`}
+    >
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]">
         {icon}
         {label}
       </div>
-      <p className="mt-2 font-semibold text-slate-950 dark:text-slate-50">
-        {formatWeekday(day.date)}
-      </p>
-      <p className="text-xs text-muted-foreground">
-        {formatShortDate(day.date)} · {value}
-      </p>
-    </div>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="font-semibold capitalize text-slate-950 dark:text-slate-50">
+            {formatWeekday(day.date)}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {formatShortDate(day.date)} · {day.weatherLabel}
+          </p>
+        </div>
+        <span className="text-lg font-semibold tabular-nums">{value}</span>
+      </div>
+    </article>
   );
 }
 
@@ -90,123 +106,153 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
   const hasDays = overview.days.length > 0;
 
   return (
-    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-      <CardHeader className="gap-3 border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
-        <div>
-          <CardTitle>Consulta da semana</CardTitle>
-          <CardDescription>
-            {formatCityLabel(overview.city)} · {formatShortDate(overview.startDate)} a{" "}
-            {formatShortDate(overview.endDate)}
-          </CardDescription>
+    <Card className="glass-card overflow-hidden rounded-xl">
+      <CardHeader className="gap-4 border-b border-soft bg-weather-card p-4 sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-sm font-medium text-weather-accent">
+              <Sparkles className="size-4" aria-hidden="true" />
+              Clima por decisão
+            </p>
+            <CardTitle className="mt-1">Consulta da semana</CardTitle>
+            <CardDescription>
+              {formatCityLabel(overview.city)} · {formatShortDate(overview.startDate)} a{" "}
+              {formatShortDate(overview.endDate)}
+            </CardDescription>
+          </div>
+          <Badge
+            variant="outline"
+            className="h-8 w-fit border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent"
+          >
+            <CalendarDays className="size-4" aria-hidden="true" />
+            {overview.days.length} dias
+          </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-5 p-4 sm:p-5">
         {hasDays ? (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              <Highlight
-                label="Melhor dia"
-                icon={<ThumbsUp className="size-3.5 text-emerald-700" aria-hidden="true" />}
-                day={overview.highlights.bestDay}
-                value={`${overview.highlights.bestDay?.comfortScore ?? 0}/100`}
-              />
-              <Highlight
-                label="Pior dia"
-                icon={<ThumbsDown className="size-3.5 text-rose-700" aria-hidden="true" />}
-                day={overview.highlights.worstDay}
-                value={`${overview.highlights.worstDay?.comfortScore ?? 0}/100`}
-              />
-              <Highlight
-                label="Mais chuva"
-                icon={<Droplets className="size-3.5 text-sky-700" aria-hidden="true" />}
-                day={overview.highlights.rainiestDay}
-                value={formatNumber(
-                  overview.highlights.rainiestDay?.precipitationProbabilityMax ?? null,
-                  "%",
-                )}
-              />
-              <Highlight
-                label="Mais quente"
-                icon={<Flame className="size-3.5 text-orange-700" aria-hidden="true" />}
-                day={overview.highlights.hottestDay}
-                value={formatNumber(
-                  overview.highlights.hottestDay?.temperatureMax ?? null,
-                  "°C",
-                )}
-              />
-              <Highlight
-                label="Mais frio"
-                icon={<Snowflake className="size-3.5 text-cyan-700" aria-hidden="true" />}
-                day={overview.highlights.coldestDay}
-                value={formatNumber(
-                  overview.highlights.coldestDay?.temperatureMin ?? null,
-                  "°C",
-                )}
-              />
-            </div>
+            <section aria-label="Destaques da semana">
+              <div className="grid gap-3 md:grid-cols-3">
+                <Highlight
+                  label="Melhor dia"
+                  icon={<ThumbsUp className="size-3.5" aria-hidden="true" />}
+                  day={overview.highlights.bestDay}
+                  value={`${overview.highlights.bestDay?.comfortScore ?? 0}/100`}
+                  tone="success"
+                />
+                <Highlight
+                  label="Pior dia"
+                  icon={<ThumbsDown className="size-3.5" aria-hidden="true" />}
+                  day={overview.highlights.worstDay}
+                  value={`${overview.highlights.worstDay?.comfortScore ?? 0}/100`}
+                  tone="danger"
+                />
+                <Highlight
+                  label="Maior chance de chuva"
+                  icon={<Droplets className="size-3.5" aria-hidden="true" />}
+                  day={overview.highlights.rainiestDay}
+                  value={formatNumber(
+                    overview.highlights.rainiestDay?.precipitationProbabilityMax ?? null,
+                    "%",
+                  )}
+                  tone="warning"
+                />
+              </div>
+            </section>
 
-            <div className="grid gap-3">
-              {overview.days.map((day) => {
-                const WeatherIcon = getWeatherIcon(day.weatherCode);
+            <section className="space-y-3" aria-label="Previsão dos próximos 7 dias">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-slate-950 dark:text-slate-50">
+                    Próximos 7 dias
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Deslize para explorar a previsão completa.
+                  </p>
+                </div>
+                <span className="hidden text-xs text-muted-foreground sm:block">
+                  {overview.days.length} previsões
+                </span>
+              </div>
 
-                return (
-                  <article
-                    key={day.date}
-                    className="rounded-lg border border-slate-200 bg-white p-4 dark:border-border dark:bg-muted/20"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <WeatherIcon className="size-5 text-sky-700" aria-hidden="true" />
+              <div className="overflow-x-auto pb-2">
+                <div className="flex min-w-max gap-3" role="list">
+                  {overview.days.map((day) => {
+                    const WeatherIcon = getWeatherIcon(day.weatherCode);
+
+                    return (
+                      <article
+                        key={day.date}
+                        role="listitem"
+                        className="group flex w-64 shrink-0 flex-col rounded-xl border border-soft bg-weather-card/70 p-4 shadow-weather-soft transition-transform motion-safe:hover:-translate-y-1 motion-reduce:transition-none dark:bg-weather-card/45"
+                      >
+                        <div className="flex items-start justify-between gap-3">
                           <div>
-                            <h3 className="font-semibold capitalize text-slate-950 dark:text-slate-50">
+                            <p className="font-semibold capitalize text-slate-950 dark:text-slate-50">
                               {formatWeekday(day.date)}
-                            </h3>
-                            <p className="text-xs text-muted-foreground">
-                              {formatShortDate(day.date)} · {day.weatherLabel}
+                            </p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              {formatShortDate(day.date)}
                             </p>
                           </div>
+                          <div className="grid size-10 place-items-center rounded-lg border border-weather-accent/30 bg-weather-accent/10 text-weather-accent">
+                            <WeatherIcon className="size-5" aria-hidden="true" />
+                          </div>
                         </div>
-                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                          {day.summary}
-                        </p>
-                      </div>
-                      <Badge className="h-8 bg-sky-700 px-3 text-white hover:bg-sky-700">
-                        {day.comfortScore}/100
-                      </Badge>
-                    </div>
 
-                    <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-5">
-                      <span className="inline-flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2">
-                        <Thermometer className="size-4 text-rose-700" aria-hidden="true" />
-                        {formatNumber(day.temperatureMin, "°C")} /{" "}
-                        {formatNumber(day.temperatureMax, "°C")}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2">
-                        <Droplets className="size-4 text-sky-700" aria-hidden="true" />
-                        {formatNumber(day.precipitationProbabilityMax, "%")}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2">
-                        <CloudRain className="size-4 text-cyan-700" aria-hidden="true" />
-                        {formatDecimal(day.precipitationSum, " mm")}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2">
-                        <Wind className="size-4 text-teal-700" aria-hidden="true" />
-                        {formatNumber(day.windSpeedMax, " km/h")}
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2">
-                        <CalendarDays className="size-4 text-amber-700" aria-hidden="true" />
-                        UV {formatNumber(day.uvIndexMax, "")}
-                      </span>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                        <div className="mt-5">
+                          <p className="text-sm text-muted-foreground">{day.weatherLabel}</p>
+                          <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
+                            {formatNumber(day.temperatureMin, "°C")} <span className="text-base font-medium text-muted-foreground">/</span>{" "}
+                            {formatNumber(day.temperatureMax, "°C")}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">Mínima / máxima</p>
+                        </div>
+
+                        <div className="mt-5 grid grid-cols-2 gap-2 border-y border-soft py-3 text-xs">
+                          <span className="flex items-center gap-1.5 text-muted-foreground">
+                            <Droplets className="size-3.5 text-sky-500" aria-hidden="true" />
+                            {formatNumber(day.precipitationProbabilityMax, "%")}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-muted-foreground">
+                            <CloudRain className="size-3.5 text-cyan-500" aria-hidden="true" />
+                            {formatNumber(day.precipitationSum, " mm")}
+                          </span>
+                        </div>
+
+                        <p className="mt-4 text-sm leading-6 text-muted-foreground">{day.summary}</p>
+
+                        <div className="mt-auto pt-5">
+                          <div className="flex items-center justify-between gap-3 text-xs">
+                            <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
+                              <Thermometer className="size-3.5 text-rose-400" aria-hidden="true" />
+                              Conforto
+                            </span>
+                            <span className="font-semibold tabular-nums text-slate-950 dark:text-slate-50">
+                              {day.comfortScore}/100
+                            </span>
+                          </div>
+                          <div
+                            className="mt-2 h-1.5 overflow-hidden rounded-full bg-weather-muted"
+                            aria-label={`Conforto: ${day.comfortScore} de 100`}
+                          >
+                            <div
+                              className="h-full rounded-full bg-weather-accent transition-[width] duration-500 motion-reduce:transition-none"
+                              style={{ width: `${Math.max(0, Math.min(day.comfortScore, 100))}%` }}
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
           </>
         ) : (
-          <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          <div className="rounded-xl border border-soft bg-weather-card/70 p-4 text-sm text-muted-foreground dark:bg-weather-card/45">
             Sem dados diários para montar a previsão da semana.
           </div>
         )}
