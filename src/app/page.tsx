@@ -676,7 +676,7 @@ export default function Home() {
 
         <section className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(300px,0.76fr)_minmax(0,1.24fr)]">
           <aside className="flex min-h-0 flex-col gap-3">
-          <Card className="glass-card overflow-hidden rounded-xl lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+          <Card className="glass-card overflow-hidden rounded-xl lg:min-h-0 lg:flex-1">
             <CardHeader className="border-b border-soft bg-weather-card">
               <CardTitle>Painel de controle</CardTitle>
               <CardDescription>
@@ -689,8 +689,9 @@ export default function Home() {
                       : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-3 scrollbar-subtle">
-              <form className="flex flex-col gap-6 lg:gap-4" onSubmit={handleSubmit}>
+            <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+              <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit}>
+                <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 lg:pr-3 scrollbar-subtle">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -977,45 +978,60 @@ export default function Home() {
                   </label>
                 ) : null}
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="glow-primary order-4 h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
-                  disabled={!canSearch || recommendationMutation.isPending}
-                >
-                  {recommendationMutation.isPending ? (
-                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Search className="size-4" aria-hidden="true" />
-                  )}
-                  {recommendationMutation.isPending
-                    ? "Calculando..."
-                    : searchMode === "dia"
-                      ? "Consultar dia"
-                      : searchMode === "clima_semana"
-                        ? "Consultar semana"
-                      : searchMode === "atividades"
-                        ? "Ver o que fazer"
-                        : searchMode === "semana"
-                          ? "Comparar semana"
-                          : "Encontrar janela"}
-                </Button>
+                </div>
+                <div className="shrink-0 border-t border-soft bg-weather-card/70 p-4 sm:p-5">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="glow-primary h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
+                    disabled={!canSearch || recommendationMutation.isPending}
+                  >
+                    {recommendationMutation.isPending ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Search className="size-4" aria-hidden="true" />
+                    )}
+                    {recommendationMutation.isPending
+                      ? "Calculando..."
+                      : searchMode === "dia"
+                        ? "Consultar dia"
+                        : searchMode === "clima_semana"
+                          ? "Consultar semana"
+                        : searchMode === "atividades"
+                          ? "Ver o que fazer"
+                          : searchMode === "semana"
+                            ? "Comparar semana"
+                            : "Encontrar janela"}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
 
-          <Card className="glass-card shrink-0 overflow-hidden rounded-xl">
-            <CardHeader className="border-b border-soft bg-weather-card">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle>Buscas recentes</CardTitle>
-                  <CardDescription>Apenas neste navegador</CardDescription>
-                </div>
+          <details className="glass-card shrink-0 overflow-hidden rounded-xl">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-weather-card px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
+              <span>
+                <span className="block font-medium text-slate-950 dark:text-slate-50">
+                  Buscas recentes
+                </span>
+                <span className="block text-xs text-muted-foreground">
+                  {searchHistory.length > 0
+                    ? `${searchHistory.length} salva${searchHistory.length === 1 ? "" : "s"} neste navegador`
+                    : "Nenhuma busca salva"}
+                </span>
+              </span>
+              <History className="size-4 text-weather-accent" aria-hidden="true" />
+            </summary>
+            <div className="border-t border-soft p-4 sm:p-5">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-xs text-muted-foreground">
+                  Selecione uma busca para repetir a consulta.
+                </p>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 rounded-md"
+                  className="h-8 shrink-0 rounded-md"
                   disabled={searchHistory.length === 0}
                   onClick={handleClearHistory}
                 >
@@ -1023,8 +1039,7 @@ export default function Home() {
                   Limpar
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent className="max-h-44 overflow-y-auto p-4 sm:p-5 scrollbar-subtle">
+              <div className="max-h-36 overflow-y-auto pr-1 scrollbar-subtle">
               {searchHistory.length > 0 ? (
                 <div className="grid gap-2">
                   {searchHistory.map((entry) => {
@@ -1062,8 +1077,9 @@ export default function Home() {
                   Nenhuma busca recente.
                 </div>
               )}
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </details>
           </aside>
 
           <section

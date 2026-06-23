@@ -59,9 +59,30 @@ test("cockpit desktop mantem paineis na viewport", async ({ page }) => {
 
   const controlPanel = page.getByText("Painel de controle", { exact: true });
   const resultPanel = page.getByLabel(/Resultado/);
+  const submitButton = page.getByRole("button", {
+    name: "Encontrar janela",
+  });
 
   await expect(controlPanel).toBeVisible();
   await expect(resultPanel).toBeVisible();
+  await expect(page.getByLabel("Cidade")).toBeVisible();
+  await expect(submitButton).toBeVisible();
+  await expect(page.locator("details")).not.toHaveAttribute("open", "");
+
+  const availableFrom = page.locator("#available-from");
+  const date = page.locator("#date");
+  const activity = page
+    .getByRole("radiogroup", { name: "Atividade" })
+    .getByRole("radio")
+    .first();
+
+  await availableFrom.scrollIntoViewIfNeeded();
+  await expect(availableFrom).toBeVisible();
+  await date.scrollIntoViewIfNeeded();
+  await expect(date).toBeVisible();
+  await activity.scrollIntoViewIfNeeded();
+  await expect(activity).toBeVisible();
+  await expect(submitButton).toBeVisible();
 
   const layout = await page.evaluate(() => {
     const control = document
