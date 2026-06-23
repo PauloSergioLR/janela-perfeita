@@ -77,8 +77,10 @@ export function ActivitySelector({
             key={activity.id}
             type="button"
             className={cn(
-              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition hover:-translate-y-0.5 hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45",
-              selected ? visual.selectedClassName : "",
+              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45",
+              selected
+                ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
+                : "",
             )}
             role="radio"
             aria-checked={selected}
@@ -88,8 +90,8 @@ export function ActivitySelector({
             <span className="flex items-start gap-3">
               <span
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-colors group-hover:bg-weather-card",
-                  selected && "bg-background/25",
+                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card",
+                  selected && "bg-background/25 motion-safe:scale-105",
                 )}
               >
                 <Icon
@@ -106,7 +108,7 @@ export function ActivitySelector({
             </span>
             {selected ? (
               <Check
-                className="absolute top-3 right-3 size-3.5 text-current"
+                className="motion-selection-check absolute top-3 right-3 size-3.5 text-current"
                 aria-hidden="true"
               />
             ) : null}

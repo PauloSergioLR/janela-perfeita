@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getScoreRingBand,
   getScoreRingStrokeOffset,
@@ -26,12 +29,19 @@ function getToneClassName(tone: ReturnType<typeof getScoreRingBand>["tone"]): st
 }
 
 export function ScoreRing({ score, className }: ScoreRingProps) {
+  const [isFilled, setIsFilled] = useState(false);
   const normalizedScore = normalizeScore(score);
   const band = getScoreRingBand(normalizedScore);
   const strokeDashoffset = getScoreRingStrokeOffset(
     normalizedScore,
     RING_CIRCUMFERENCE,
   );
+
+  useEffect(() => {
+    const animationFrame = window.requestAnimationFrame(() => setIsFilled(true));
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, []);
 
   return (
     <div
@@ -63,8 +73,11 @@ export function ScoreRing({ score, className }: ScoreRingProps) {
           strokeWidth="9"
           strokeLinecap="round"
           strokeDasharray={RING_CIRCUMFERENCE}
-          strokeDashoffset={strokeDashoffset}
-          className={cn("stroke-current", getToneClassName(band.tone))}
+          strokeDashoffset={isFilled ? strokeDashoffset : RING_CIRCUMFERENCE}
+          className={cn(
+            "stroke-current transition-[stroke-dashoffset] duration-700 ease-out motion-reduce:transition-none",
+            getToneClassName(band.tone),
+          )}
         />
       </svg>
       <div className="absolute grid place-items-center text-center">

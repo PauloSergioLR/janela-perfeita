@@ -72,7 +72,7 @@ export function ReasonChips({ rules }: ReasonChipsProps) {
                     key={`${rule.factor}-${rule.reason}`}
                     variant="outline"
                     className={cn(
-                      "min-h-8 max-w-full justify-start gap-2 whitespace-normal px-3 py-1 text-left text-sm leading-5",
+                      "motion-chip-enter min-h-8 max-w-full justify-start gap-2 whitespace-normal px-3 py-1 text-left text-sm leading-5",
                       style.badgeClassName,
                     )}
                   >
