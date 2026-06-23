@@ -49,6 +49,6 @@ test("busca de cidade exibe estado sem resultado real", async ({ page }) => {
   await page.getByLabel("Cidade").fill("cidadeinexistentejanela");
 
   await expect(
-    page.getByText("Nenhuma cidade encontrada. Tente ajustar o nome."),
+    page.getByRole("heading", { name: "Nenhuma cidade encontrada" }),
   ).toBeVisible();
 });

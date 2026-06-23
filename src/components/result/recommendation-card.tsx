@@ -228,16 +228,24 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 </div>
               </div>
             ) : (
-              <div className="border-b border-warning/45 pb-4 text-sm leading-6 text-warning">
-                <div className="flex items-center gap-2 font-medium">
-                  <AlertTriangle className="size-4" aria-hidden="true" />
-                  Sem janela ideal
+              <div className="relative overflow-hidden rounded-xl border border-warning/45 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--warning)_14%,transparent),transparent_64%)] p-4 text-sm leading-6 text-warning">
+                <div
+                  aria-hidden="true"
+                  className="absolute -right-10 -bottom-14 size-32 rounded-full bg-warning/15 blur-3xl"
+                />
+                <div className="relative">
+                  <div className="flex items-center gap-2 font-medium">
+                    <span className="flex size-7 items-center justify-center rounded-lg border border-warning/45 bg-warning/12">
+                      <AlertTriangle className="size-3.5" aria-hidden="true" />
+                    </span>
+                    Sem janela ideal hoje
+                  </div>
+                  <p className="mt-3">
+                    Nenhuma janela atingiu o mínimo de{" "}
+                    {recommendation.activity.minRecommendedScore}/100. O melhor
+                    horário isolado ainda aparece para comparação.
+                  </p>
                 </div>
-                <p className="mt-2">
-                Nenhuma janela atingiu o mínimo de{" "}
-                {recommendation.activity.minRecommendedScore}/100. O melhor
-                horário isolado ainda aparece para comparação.
-                </p>
               </div>
             )}
           </div>
