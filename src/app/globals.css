@@ -292,6 +292,20 @@
     background: color-mix(in oklab, var(--weather-muted) 44%, transparent);
     color: var(--muted-foreground);
   }
+
+  .scrollbar-subtle {
+    scrollbar-color: color-mix(in oklab, var(--weather-border-strong) 70%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-subtle::-webkit-scrollbar {
+    width: 0.4rem;
+  }
+
+  .scrollbar-subtle::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--weather-border-strong) 70%, transparent);
+  }
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {

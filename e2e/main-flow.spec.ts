@@ -52,3 +52,33 @@ test("busca de cidade exibe estado sem resultado real", async ({ page }) => {
     page.getByRole("heading", { name: "Nenhuma cidade encontrada" }),
   ).toBeVisible();
 });
+
+test("cockpit desktop mantem paineis na viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await openHome(page);
+
+  const controlPanel = page.getByText("Painel de controle", { exact: true });
+  const resultPanel = page.getByLabel(/Resultado/);
+
+  await expect(controlPanel).toBeVisible();
+  await expect(resultPanel).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const control = document
+      .querySelector("aside")
+      ?.getBoundingClientRect();
+    const result = document
+      .querySelector('[aria-label^="Resultado"]')
+      ?.getBoundingClientRect();
+
+    return {
+      pageHeight: document.documentElement.scrollHeight,
+      viewportHeight: window.innerHeight,
+      controlRight: control?.right ?? 0,
+      resultLeft: result?.left ?? 0,
+    };
+  });
+
+  expect(layout.pageHeight).toBeLessThanOrEqual(layout.viewportHeight);
+  expect(layout.resultLeft).toBeGreaterThan(layout.controlRight);
+});

@@ -19,10 +19,12 @@ describe("layout Weather Decision Cockpit", () => {
 
   it("separa seletor de modo, painel lateral e area de resultado", () => {
     expect(page).toContain("<ModeSelector");
-    expect(page).toContain("xl:sticky xl:top-6");
+    expect(page).toContain("lg:h-dvh lg:overflow-hidden");
+    expect(page).toContain("lg:min-h-0 lg:flex-1");
+    expect(page).toContain("lg:overflow-y-auto");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain(
-      "xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)]",
+      "lg:grid-cols-[minmax(300px,0.76fr)_minmax(0,1.24fr)]",
     );
   });
 

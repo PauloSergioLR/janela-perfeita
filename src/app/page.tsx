@@ -590,13 +590,13 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:h-dvh lg:overflow-hidden lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 lg:h-full lg:min-h-0">
+        <header className="glass-panel grid shrink-0 gap-3 rounded-xl p-3 sm:p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
               <CloudSun
-                className="size-6 text-weather-accent"
+                className="size-5 text-weather-accent"
                 aria-hidden="true"
               />
             </div>
@@ -604,10 +604,10 @@ export default function Home() {
               <p className="text-sm font-medium text-weather-accent">
                 Clima por decisão
               </p>
-              <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-50 sm:text-3xl">
+              <h1 className="text-xl font-semibold text-slate-950 dark:text-slate-50 sm:text-2xl">
                 Janela Perfeita
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <p className="hidden max-w-2xl text-sm leading-5 text-slate-600 sm:block dark:text-slate-300">
                 Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
@@ -643,7 +643,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2">
+          <div className="hidden grid-cols-3 gap-2 border-t border-soft pt-3 text-center xl:col-span-2 xl:grid">
             <div className="rounded-md bg-background/45 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 {activities.length}
@@ -674,9 +674,9 @@ export default function Home() {
           }}
         />
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start">
-          <aside className="flex flex-col gap-4 xl:sticky xl:top-6">
-          <Card className="glass-card overflow-hidden rounded-xl">
+        <section className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(300px,0.76fr)_minmax(0,1.24fr)]">
+          <aside className="flex min-h-0 flex-col gap-3">
+          <Card className="glass-card overflow-hidden rounded-xl lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
             <CardHeader className="border-b border-soft bg-weather-card">
               <CardTitle>Painel de controle</CardTitle>
               <CardDescription>
@@ -689,8 +689,8 @@ export default function Home() {
                       : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5">
-              <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <CardContent className="p-4 sm:p-5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-3 scrollbar-subtle">
+              <form className="flex flex-col gap-6 lg:gap-4" onSubmit={handleSubmit}>
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -1004,7 +1004,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card overflow-hidden rounded-xl">
+          <Card className="glass-card shrink-0 overflow-hidden rounded-xl">
             <CardHeader className="border-b border-soft bg-weather-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -1024,7 +1024,7 @@ export default function Home() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5">
+            <CardContent className="max-h-44 overflow-y-auto p-4 sm:p-5 scrollbar-subtle">
               {searchHistory.length > 0 ? (
                 <div className="grid gap-2">
                   {searchHistory.map((entry) => {
@@ -1067,7 +1067,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4"
+            className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1 scrollbar-subtle"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
@@ -1081,7 +1081,7 @@ export default function Home() {
             ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl">
+              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl lg:min-h-0 lg:flex-1">
                 <CardHeader className="border-b border-soft bg-weather-card">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
@@ -1167,31 +1167,31 @@ export default function Home() {
         </section>
 
         <section
-          className="glass-panel rounded-xl p-3 sm:p-4"
+          className="glass-panel shrink-0 rounded-xl p-2.5 sm:p-3"
           aria-label="Resumo da consulta"
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
               <p className="text-xs text-muted-foreground">Modo</p>
               <p className="truncate text-sm font-medium">
                 {selectedModeOption?.label ?? "Janela perfeita"}
               </p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
               <p className="text-xs text-muted-foreground">Cidade</p>
               <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
               <p className="text-xs text-muted-foreground">Período</p>
               <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
               <p className="text-xs text-muted-foreground">Atividade</p>
               <p className="truncate text-sm font-medium">
                 {cockpitActivityLabel}
               </p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
               <p className="text-xs text-muted-foreground">Resultado</p>
               <p className="truncate text-sm font-medium">
                 {cockpitResultLabel}

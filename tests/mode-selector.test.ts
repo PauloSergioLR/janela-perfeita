@@ -16,7 +16,7 @@ describe("ModeSelector", () => {
     expect(source).toContain('role="radiogroup"');
     expect(source).toContain('role="radio"');
     expect(source).toContain("aria-checked={selected}");
-    expect(source).toContain("sm:grid-cols-2 xl:grid-cols-4");
+    expect(source).toContain("sm:grid-cols-2 lg:grid-cols-4");
   });
 
   it("destaca modo ativo com icone e sem mapa", () => {
