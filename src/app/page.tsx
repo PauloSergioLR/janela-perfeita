@@ -2,23 +2,20 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  AlertCircle,
   CalendarDays,
   CalendarSearch,
   CircleHelp,
-  Clock3,
   CloudSun,
   History,
   ListChecks,
   Loader2,
   MapPin,
-  RefreshCw,
   RotateCcw,
   Search,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
@@ -37,6 +34,7 @@ import { ControlPanelSection } from "@/components/search/control-panel-section";
 import { ActivitySelector } from "@/components/search/activity-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PremiumState } from "@/components/ui/premium-state";
 import {
   Card,
   CardContent,
@@ -65,6 +63,7 @@ import {
   SEARCH_DEBOUNCE_MS,
   type SearchDateOption,
 } from "@/lib/ui/search-page";
+import { getResultState } from "@/lib/ui/result-state";
 import { getWeatherStageVariant } from "@/lib/ui/weather-stage";
 import {
   buildSearchHistoryEntry,
@@ -272,6 +271,19 @@ export default function Home() {
   const dailyOverview = recommendationMutation.data?.dailyOverview;
   const weeklyOverview = recommendationMutation.data?.weeklyOverview;
   const forecastStrip = recommendationMutation.data?.forecastStrip;
+  const hasResultContent = Boolean(
+    recommendation ||
+      activityRanking ||
+      weekComparison ||
+      dailyOverview ||
+      weeklyOverview,
+  );
+  const resultState = getResultState({
+    hasContent: hasResultContent,
+    isError: recommendationMutation.isError,
+    isIdle: recommendationMutation.isIdle,
+    isPending: recommendationMutation.isPending,
+  });
   const resultDisclaimer =
     recommendation?.disclaimer ??
     activityRanking?.disclaimer ??
@@ -296,18 +308,9 @@ export default function Home() {
     setSearchHistory(readSearchHistory(window.localStorage));
   }, []);
 
-  useEffect(() => {
-    if (autoLocationRequestedRef.current) {
-      return;
-    }
-
-    if (new URLSearchParams(window.location.search).get("demo") === "true") {
-      return;
-    }
-
+  const requestCurrentLocation = useCallback(() => {
     const requestId = locationRequestIdRef.current + 1;
 
-    autoLocationRequestedRef.current = true;
     locationRequestIdRef.current = requestId;
     setLocationStatus("loading");
     setLocationMessage(CURRENT_LOCATION_WAITING_MESSAGE);
@@ -374,6 +377,19 @@ export default function Home() {
       },
     );
   }, []);
+
+  useEffect(() => {
+    if (autoLocationRequestedRef.current) {
+      return;
+    }
+
+    if (new URLSearchParams(window.location.search).get("demo") === "true") {
+      return;
+    }
+
+    autoLocationRequestedRef.current = true;
+    requestCurrentLocation();
+  }, [requestCurrentLocation]);
 
   function resetRecommendationState() {
     if (!recommendationMutation.isIdle) {
@@ -481,6 +497,10 @@ export default function Home() {
 
   function handleRecommendationRetry() {
     submitCurrentSearch();
+  }
+
+  function handleLocationRetry() {
+    requestCurrentLocation();
   }
 
   function handleHistorySelect(entry: SearchHistoryEntry) {
@@ -703,52 +723,43 @@ export default function Home() {
                         className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
                       >
                         {cityQueryResult.isFetching ? (
-                          <div className="space-y-2 px-3 py-2 text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                            Buscando cidades...
-                            </div>
-                            <div className="grid gap-1">
-                              <span className="h-2 rounded-full bg-muted" />
-                              <span className="h-2 w-2/3 rounded-full bg-muted" />
-                            </div>
-                          </div>
+                          <PremiumState
+                            compact
+                            variant="loading"
+                            eyebrow="Busca de cidades"
+                            title="Procurando destinos"
+                            description="Consultando cidades que combinam com sua busca."
+                          />
                         ) : null}
 
                         {cityQueryResult.isError ? (
-                          <div className="space-y-2 px-3 py-2 text-destructive">
-                            <div className="flex items-center gap-2">
-                              <AlertCircle className="size-4" aria-hidden="true" />
-                              {(cityQueryResult.error as Error).message}
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-8"
-                              onClick={() => void cityQueryResult.refetch()}
-                            >
-                              <RefreshCw className="size-3" aria-hidden="true" />
-                              Tentar novamente
-                            </Button>
-                          </div>
+                          <PremiumState
+                            compact
+                            variant="error"
+                            eyebrow="Busca indisponível"
+                            title="Não foi possível encontrar cidades"
+                            description={(cityQueryResult.error as Error).message}
+                            action={{
+                              label: "Tentar novamente",
+                              onClick: () => void cityQueryResult.refetch(),
+                            }}
+                          />
                         ) : null}
 
                         {!cityQueryResult.isFetching &&
                         !cityQueryResult.isError &&
                         cityQueryResult.data?.length === 0 ? (
-                          <div className="space-y-2 px-3 py-2 text-muted-foreground">
-                            <p>Nenhuma cidade encontrada. Tente ajustar o nome.</p>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-8"
-                              onClick={() => handleCityQueryChange("")}
-                            >
-                              Limpar busca
-                            </Button>
-                          </div>
+                          <PremiumState
+                            compact
+                            variant="empty"
+                            eyebrow="Sem resultados"
+                            title="Nenhuma cidade encontrada"
+                            description="Ajuste o nome da cidade ou tente outra grafia."
+                            action={{
+                              label: "Limpar busca",
+                              onClick: () => handleCityQueryChange(""),
+                            }}
+                          />
                         ) : null}
 
                         {cityQueryResult.data?.map((city) => (
@@ -776,31 +787,57 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
-                  <div className="flex items-start gap-3 rounded-lg border border-sky-100 bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-950 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100">
-                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-white/80 dark:bg-sky-950">
-                      {isDetectingLocation ? (
-                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <MapPin className="size-3.5" aria-hidden="true" />
-                      )}
-                    </span>
-                    <span
-                      role={locationStatus === "error" ? "alert" : "status"}
-                      className={cn(
-                        "min-w-0",
-                        locationStatus === "error"
-                          ? "text-destructive dark:text-red-300"
-                          : "",
-                      )}
-                    >
-                      <span className="block">
-                        {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                      </span>
-                      <span className="block text-sky-800/80 dark:text-sky-200/80">
-                        {CURRENT_LOCATION_ATTRIBUTION}
-                      </span>
-                    </span>
-                  </div>
+                  {isDetectingLocation ? (
+                    <PremiumState
+                      compact
+                      variant="loading"
+                      eyebrow="Localização atual"
+                      title="Detectando sua cidade"
+                      description={locationMessage || CURRENT_LOCATION_WAITING_MESSAGE}
+                    />
+                  ) : locationStatus === "error" ? (
+                    <PremiumState
+                      compact
+                      variant="error"
+                      eyebrow="Localização atual"
+                      title="Localização indisponível"
+                      description={
+                        <>
+                          <span className="block">
+                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
+                          </span>
+                          <span className="block text-sky-800/80 dark:text-sky-200/80">
+                            {CURRENT_LOCATION_ATTRIBUTION}
+                          </span>
+                        </>
+                      }
+                      action={{
+                        label: "Tentar novamente",
+                        onClick: handleLocationRetry,
+                      }}
+                    />
+                  ) : (
+                    <PremiumState
+                      compact
+                      variant="initial"
+                      eyebrow="Localização atual"
+                      title={
+                        locationStatus === "success"
+                          ? "Cidade detectada"
+                          : "Use sua localização se quiser"
+                      }
+                      description={
+                        <>
+                          <span className="block">
+                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
+                          </span>
+                          <span className="block text-sky-800/80 dark:text-sky-200/80">
+                            {CURRENT_LOCATION_ATTRIBUTION}
+                          </span>
+                        </>
+                      }
+                    />
+                  )}
                 </div>
                 </ControlPanelSection>
 
@@ -1033,15 +1070,15 @@ export default function Home() {
             className="flex min-w-0 flex-col gap-4"
             aria-label="Resultado da decisão"
           >
-            {recommendationMutation.isSuccess && recommendation ? (
+            {resultState === "content" && recommendation ? (
               <RecommendationCard recommendation={recommendation} />
-            ) : recommendationMutation.isSuccess && activityRanking ? (
+            ) : resultState === "content" && activityRanking ? (
               <ActivityRankingCard ranking={activityRanking} />
-            ) : recommendationMutation.isSuccess && weekComparison ? (
+            ) : resultState === "content" && weekComparison ? (
               <WeekComparisonCard comparison={weekComparison} />
-            ) : recommendationMutation.isSuccess && dailyOverview ? (
+            ) : resultState === "content" && dailyOverview ? (
               <DailyOverviewCard overview={dailyOverview} />
-            ) : recommendationMutation.isSuccess && weeklyOverview ? (
+            ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
               <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl">
@@ -1063,74 +1100,61 @@ export default function Home() {
                       : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-5" aria-live="polite">
-                  {recommendationMutation.isIdle ? (
-                    <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
-                      <div className="flex items-start gap-3">
-                        <Clock3 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                        <span>
-                          Nenhuma busca executada. Preencha os campos para
-                          receber uma recomendação.
-                        </span>
-                      </div>
-                      <div className="grid gap-2 text-xs sm:grid-cols-3">
-                        <span className="rounded-md bg-background px-3 py-2">
-                          1. Cidade
-                        </span>
-                        {modeUsesActivity(searchMode) ? (
-                          <span className="rounded-md bg-background px-3 py-2">
-                            2. Atividade
-                          </span>
-                        ) : null}
-                        {usesDate ? (
-                          <span className="rounded-md bg-background px-3 py-2">
-                            {modeUsesActivity(searchMode) ? "3. Data" : "2. Data"}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
+                <CardContent className="p-4 sm:p-5">
+                  {resultState === "initial" ? (
+                    <PremiumState
+                      variant="initial"
+                      eyebrow="Cockpit pronto"
+                      title="Monte sua próxima decisão"
+                      description="Escolha cidade, atividade e data. A previsão horária transforma o clima em uma janela prática para você."
+                    />
                   ) : null}
 
-                  {recommendationMutation.isPending ? (
-                    <div className="space-y-4 rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100">
-                      <div className="flex items-start gap-3">
-                        <Loader2 className="mt-0.5 size-4 shrink-0 animate-spin" aria-hidden="true" />
-                        <span>Calculando notas e melhores janelas...</span>
-                      </div>
-                      <div className="grid gap-2">
-                        <span className="h-3 rounded-full bg-sky-100 dark:bg-sky-900/70" />
-                        <span className="h-3 w-4/5 rounded-full bg-sky-100 dark:bg-sky-900/70" />
-                        <span className="h-3 w-3/5 rounded-full bg-sky-100 dark:bg-sky-900/70" />
-                      </div>
-                    </div>
+                  {resultState === "loading" ? (
+                    <PremiumState
+                      variant="loading"
+                      eyebrow="Analisando previsão"
+                      title="Calculando melhor janela"
+                      description={`Combinando clima, horários e preferências para ${cockpitCityLabel}.`}
+                    />
                   ) : null}
 
-                  {recommendationMutation.isError ? (
-                    <div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                        <span>
-                          {(recommendationMutation.error as Error).message}
-                        </span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-9"
-                        disabled={!canSearch || recommendationMutation.isPending}
-                        onClick={handleRecommendationRetry}
-                      >
-                        <RefreshCw className="size-3" aria-hidden="true" />
-                        Tentar novamente
-                      </Button>
-                    </div>
+                  {resultState === "error" ? (
+                    <PremiumState
+                      variant="error"
+                      eyebrow="Previsão indisponível"
+                      title="Não foi possível concluir a análise"
+                      description={(recommendationMutation.error as Error).message}
+                      action={{
+                        label: "Tentar novamente",
+                        onClick: handleRecommendationRetry,
+                      }}
+                    />
+                  ) : null}
+
+                  {resultState === "empty" ? (
+                    <PremiumState
+                      variant="empty"
+                      eyebrow="Sem dados para exibir"
+                      title="Esta consulta não trouxe previsão"
+                      description={
+                        searchMode === "clima_semana"
+                          ? "Não há dados suficientes para montar a visão da semana agora. Atualize a previsão em instantes."
+                          : searchMode === "dia"
+                            ? "Não há dados suficientes para este dia. Tente outra data ou atualize a previsão."
+                            : "Não recebemos dados para calcular uma recomendação. Tente novamente em instantes."
+                      }
+                      action={{
+                        label: "Atualizar previsão",
+                        onClick: handleRecommendationRetry,
+                      }}
+                    />
                   ) : null}
                 </CardContent>
               </Card>
             )}
 
-            {recommendationMutation.isSuccess && recommendation ? (
+            {resultState === "content" && recommendation ? (
               <section className="space-y-4">
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
                   <OpportunityTimeline recommendation={recommendation} />
