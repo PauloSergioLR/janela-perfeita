@@ -53,9 +53,9 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition hover:-translate-y-0.5 hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                  "group relative min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
                   selected
-                    ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow"
+                    ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",
                 )}
                 onClick={() => onChange(mode.id)}
@@ -63,8 +63,8 @@ export function ModeSelector({
                 <span className="flex items-start gap-3">
                   <span
                     className={cn(
-                      "flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-colors",
-                      selected && "bg-weather-accent/20",
+                      "flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none",
+                      selected && "bg-weather-accent/20 motion-safe:scale-105",
                     )}
                   >
                     <Icon
@@ -81,7 +81,7 @@ export function ModeSelector({
                 </span>
                 {selected ? (
                   <Check
-                    className="absolute top-3 right-3 size-3.5 text-weather-accent"
+                    className="motion-selection-check absolute top-3 right-3 size-3.5 text-weather-accent"
                     aria-hidden="true"
                   />
                 ) : null}

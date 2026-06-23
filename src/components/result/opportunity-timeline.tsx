@@ -97,9 +97,11 @@ export function OpportunityTimeline({ recommendation }: OpportunityTimelineProps
                       aria-pressed={isSelected}
                       aria-label={`${datum.hourLabel}, score ${datum.score} de 100. ${tone.label}. ${datum.reason}`}
                       className={cn(
-                        "group grid w-[4.75rem] shrink-0 gap-2 rounded-lg border border-transparent p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
+                        "group grid w-[4.75rem] shrink-0 gap-2 rounded-lg border border-transparent p-2 text-left transition-[transform,border-color,background-color,box-shadow,opacity] duration-200 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
                         datum.score < 40 && "opacity-55 hover:opacity-100",
-                        isSelected && "border-weather-accent/55 bg-weather-accent/10",
+                        datum.isBestWindow && "motion-timeline-best ring-1 ring-weather-accent/35",
+                        isSelected &&
+                          "border-weather-accent/55 bg-weather-accent/10 motion-safe:-translate-y-1 shadow-weather-glow",
                       )}
                     >
                       <span className="flex h-36 items-end rounded-md border border-soft bg-muted/35 p-1">
