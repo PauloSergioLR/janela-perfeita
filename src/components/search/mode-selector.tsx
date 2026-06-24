@@ -25,16 +25,16 @@ export function ModeSelector({
 }: ModeSelectorProps) {
   return (
     <section
-      className="glass-card shrink-0 rounded-xl p-2.5 sm:p-3"
+      className="glass-card shrink-0 rounded-xl p-2 sm:p-2.5"
       aria-labelledby="modo-label"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(160px,0.22fr)_minmax(0,1fr)] lg:items-center">
-        <div className="space-y-1">
+      <div className="grid gap-2 lg:grid-cols-[minmax(140px,auto)_minmax(0,1fr)] lg:items-center">
+        <div className="space-y-0.5">
           <p id="modo-label" className="text-sm font-medium text-foreground">
             Modo
           </p>
-          <p className="text-xs leading-5 text-muted-foreground lg:leading-4">
-            Cidade, data, atividade e previsão no mesmo painel.
+          <p className="hidden text-xs leading-tight text-muted-foreground lg:block">
+            Tipo de consulta climática.
           </p>
         </div>
         <div
@@ -53,35 +53,35 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none lg:min-h-14 lg:p-2",
+                  "group relative min-h-16 rounded-lg border border-soft bg-background/45 p-2.5 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none lg:min-h-12",
                   selected
                     ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",
                 )}
                 onClick={() => onChange(mode.id)}
               >
-                <span className="flex items-start gap-3 lg:items-center lg:gap-2">
+                <span className="flex items-start gap-2 lg:items-center">
                   <span
                     className={cn(
-                      "flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none lg:size-8",
+                      "flex size-8 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none lg:size-7",
                       selected && "bg-weather-accent/20 motion-safe:scale-105",
                     )}
                   >
                     <Icon
-                      className="size-4 text-weather-accent"
+                      className="size-3.5 text-weather-accent"
                       aria-hidden="true"
                     />
                   </span>
                   <span className="min-w-0">
-                    <span className="block font-medium">{mode.label}</span>
-                    <span className="block text-xs leading-5 text-muted-foreground lg:hidden">
+                    <span className="block text-sm font-medium leading-tight">{mode.label}</span>
+                    <span className="block text-xs leading-tight text-muted-foreground lg:hidden">
                       {mode.description}
                     </span>
                   </span>
                 </span>
                 {selected ? (
                   <Check
-                    className="motion-selection-check absolute top-3 right-3 size-3.5 text-weather-accent"
+                    className="motion-selection-check absolute top-2 right-2 size-3 text-weather-accent"
                     aria-hidden="true"
                   />
                 ) : null}

@@ -24,7 +24,7 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("lg:overflow-y-auto");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain(
-      "lg:grid-cols-[minmax(300px,0.76fr)_minmax(0,1.24fr)]",
+      "lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]",
     );
   });
 

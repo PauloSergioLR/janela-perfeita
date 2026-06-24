@@ -10,7 +10,6 @@ import {
   ListChecks,
   Loader2,
   MapPin,
-  RotateCcw,
   Search,
   Trash2,
 } from "lucide-react";
@@ -591,76 +590,54 @@ export default function Home() {
     <>
       <WeatherStage variant={weatherStageVariant} />
       <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:h-dvh lg:overflow-hidden lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 lg:h-full lg:min-h-0">
-        <header className="glass-panel grid shrink-0 gap-3 rounded-xl p-3 sm:p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
-              <CloudSun
-                className="size-5 text-weather-accent"
-                aria-hidden="true"
-              />
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 lg:h-full lg:min-h-0">
+        <header className="glass-panel shrink-0 rounded-xl p-3 sm:p-4">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+                <CloudSun
+                  className="size-5 text-weather-accent"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-weather-accent">
+                  Clima por decisão
+                </p>
+                <h1 className="text-lg font-semibold text-slate-950 dark:text-slate-50 sm:text-xl">
+                  Janela Perfeita
+                </h1>
+              </div>
             </div>
-            <div className="min-w-0 space-y-1">
-              <p className="text-sm font-medium text-weather-accent">
-                Clima por decisão
-              </p>
-              <h1 className="text-xl font-semibold text-slate-950 dark:text-slate-50 sm:text-2xl">
-                Janela Perfeita
-              </h1>
-              <p className="hidden max-w-2xl text-sm leading-5 text-slate-600 sm:block dark:text-slate-300">
-                Previsão horária para decidir o melhor momento de cada atividade.
-              </p>
-            </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-            <Badge
-              variant="outline"
-              className="h-7 border-weather-accent/50 bg-weather-card px-3 text-weather-accent"
-            >
-              Previsão por hora
-            </Badge>
-            <Badge
-              variant="outline"
-              className="h-7 border-success/45 bg-success/10 px-3 text-success"
-            >
-              Open-Meteo
-            </Badge>
-            {demoMode ? (
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="h-7 border-warning/45 bg-warning/10 px-3 text-warning"
+                className="h-6 border-weather-accent/50 bg-weather-card px-2.5 text-xs text-weather-accent"
               >
-                Modo demo
+                Previsão por hora
               </Badge>
-            ) : null}
-            <Link
-              href="/como-funciona"
-              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <CircleHelp className="size-3.5" aria-hidden="true" />
-              Como funciona
-            </Link>
-          </div>
-
-          <div className="hidden grid-cols-3 gap-2 border-t border-soft pt-3 text-center xl:col-span-2 xl:grid">
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                {activities.length}
-              </p>
-              <p className="text-xs text-muted-foreground">atividades</p>
-            </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                7
-              </p>
-              <p className="text-xs text-muted-foreground">dias</p>
-            </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                0-100
-              </p>
-              <p className="text-xs text-muted-foreground">score</p>
+              <Badge
+                variant="outline"
+                className="h-6 border-success/45 bg-success/10 px-2.5 text-xs text-success"
+              >
+                Open-Meteo
+              </Badge>
+              {demoMode ? (
+                <Badge
+                  variant="outline"
+                  className="h-6 border-warning/45 bg-warning/10 px-2.5 text-xs text-warning"
+                >
+                  Demo
+                </Badge>
+              ) : null}
+              <Link
+                href="/como-funciona"
+                className="inline-flex h-7 items-center gap-1.5 rounded-md border border-soft bg-weather-card px-2.5 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <CircleHelp className="size-3" aria-hidden="true" />
+                Como funciona
+              </Link>
             </div>
           </div>
         </header>
@@ -674,12 +651,12 @@ export default function Home() {
           }}
         />
 
-        <section className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(300px,0.76fr)_minmax(0,1.24fr)]">
-          <aside className="flex min-h-0 flex-col gap-3">
-          <Card className="glass-card overflow-hidden rounded-xl lg:min-h-0 lg:flex-1">
-            <CardHeader className="border-b border-soft bg-weather-card">
-              <CardTitle>Painel de controle</CardTitle>
-              <CardDescription>
+        <section className="grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:overflow-hidden">
+          <aside className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto lg:pr-1 scrollbar-subtle">
+          <Card className="glass-card shrink-0 overflow-hidden rounded-xl">
+            <CardHeader className="border-b border-soft bg-weather-card px-4 py-3">
+              <CardTitle className="text-base">Painel de controle</CardTitle>
+              <CardDescription className="text-xs">
                 {searchMode === "clima_semana"
                   ? "Cidade define a consulta dos próximos 7 dias."
                   : searchMode === "dia"
@@ -689,14 +666,13 @@ export default function Home() {
                       : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col p-0">
-              <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit}>
-                <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 lg:pr-3 scrollbar-subtle">
+            <CardContent className="p-0">
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-4 p-4">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
-                  description="Busque uma cidade ou use a localização atual."
-                  className="order-1"
+                  description="Busque uma cidade."
                 >
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
@@ -846,8 +822,7 @@ export default function Home() {
                   <ControlPanelSection
                     number="3"
                     title="O que você quer fazer?"
-                    description="Escolha uma atividade para receber a melhor janela."
-                    className="order-3"
+                    description="Escolha uma atividade."
                   >
                   <div className="space-y-3">
                     <Label id="atividade-label">Atividade</Label>
@@ -866,20 +841,21 @@ export default function Home() {
                 <ControlPanelSection
                   number="2"
                   title="Quando?"
-                  description="Defina a data e, se quiser, sua disponibilidade."
-                  className="order-2"
+                  description="Defina a data e disponibilidade."
                 >
                 {usesAvailability ? (
-                  <div className="space-y-3 border-t border-soft pt-3">
+                  <div className="space-y-2 border-t border-soft pt-3">
                     <div className="space-y-1">
-                      <Label>Disponibilidade opcional</Label>
-                      <p className="text-xs leading-5 text-muted-foreground">
-                        Limita a busca ao periodo em que voce pode fazer a atividade.
+                      <Label className="text-xs">Disponibilidade opcional</Label>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Limita a busca ao período disponível.
                       </p>
                     </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="available-from">Disponivel de</Label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="available-from" className="text-xs">
+                          Disponível de
+                        </Label>
                         <Input
                           id="available-from"
                           type="time"
@@ -888,11 +864,13 @@ export default function Home() {
                             setAvailableFrom(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md"
+                          className="h-9 rounded-md text-sm"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="available-to">Disponivel ate</Label>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="available-to" className="text-xs">
+                          Disponível até
+                        </Label>
                         <Input
                           id="available-to"
                           type="time"
@@ -901,21 +879,21 @@ export default function Home() {
                             setAvailableTo(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md"
+                          className="h-9 rounded-md text-sm"
                         />
                       </div>
                     </div>
                   </div>
                 ) : null}
 
-                <div className="grid gap-4">
+                <div className="space-y-2">
                   {usesDate ? (
-                    <div className="space-y-2">
-                      <Label htmlFor="date">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="date" className="text-xs">
                         {searchMode === "semana" ? "A partir de" : "Data"}
                       </Label>
                       <div className="relative">
-                        <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
+                        <CalendarDays className="pointer-events-none absolute top-2 left-2.5 size-3.5 text-muted-foreground" aria-hidden="true" />
                         <Input
                           id="date"
                           type="date"
@@ -926,18 +904,18 @@ export default function Home() {
                             setSelectedDate(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md pl-8"
+                          className="h-9 rounded-md pl-8 text-sm"
                         />
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {dateOptions.map((option) => (
+                      <div className="flex flex-wrap gap-1.5">
+                        {dateOptions.slice(0, 4).map((option) => (
                           <button
                             key={option.value}
                             type="button"
                             className={cn(
-                              "h-8 rounded-md border px-3 text-xs font-medium transition hover:border-foreground/30",
+                              "h-7 rounded-md border px-2.5 text-xs font-medium transition hover:border-foreground/30",
                               selectedDate === option.value
-                                ? "border-sky-600 bg-sky-50 text-sky-900"
+                                ? "border-sky-600 bg-sky-50 text-sky-900 dark:border-sky-400 dark:bg-sky-950/60 dark:text-sky-100"
                                 : "border-border bg-background text-muted-foreground",
                             )}
                             aria-pressed={selectedDate === option.value}
@@ -957,7 +935,7 @@ export default function Home() {
                 </ControlPanelSection>
 
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="order-4 flex items-start gap-3 rounded-lg border border-soft bg-background/35 p-3 text-sm">
+                  <label className="flex items-start gap-2.5 rounded-lg border border-soft bg-background/35 p-3 text-xs">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -965,31 +943,31 @@ export default function Home() {
                         setCompareModels(event.target.checked);
                         resetRecommendationState();
                       }}
-                      className="mt-1 size-4"
+                      className="mt-0.5 size-3.5"
                     />
                     <span className="min-w-0">
-                      <span className="block font-medium">
+                      <span className="block font-medium leading-snug">
                         Comparar modelos Open-Meteo
                       </span>
-                      <span className="block text-xs leading-5 text-muted-foreground">
-                        Mostra concordância quando a recomendação for calculada.
+                      <span className="block leading-relaxed text-muted-foreground">
+                        Mostra concordância ao calcular.
                       </span>
                     </span>
                   </label>
                 ) : null}
 
                 </div>
-                <div className="shrink-0 border-t border-soft bg-weather-card/70 p-4 sm:p-5">
+                <div className="shrink-0 border-t border-soft bg-weather-card/70 p-3">
                   <Button
                     type="submit"
-                    size="lg"
-                    className="glow-primary h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
+                    size="default"
+                    className="glow-primary h-10 w-full rounded-md bg-weather-accent text-sm font-medium text-slate-950 hover:bg-weather-accent/90"
                     disabled={!canSearch || recommendationMutation.isPending}
                   >
                     {recommendationMutation.isPending ? (
-                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                      <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
                     ) : (
-                      <Search className="size-4" aria-hidden="true" />
+                      <Search className="size-3.5" aria-hidden="true" />
                     )}
                     {recommendationMutation.isPending
                       ? "Calculando..."
@@ -998,7 +976,7 @@ export default function Home() {
                         : searchMode === "clima_semana"
                           ? "Consultar semana"
                         : searchMode === "atividades"
-                          ? "Ver o que fazer"
+                          ? "Ver ranking"
                           : searchMode === "semana"
                             ? "Comparar semana"
                             : "Encontrar janela"}
@@ -1009,40 +987,40 @@ export default function Home() {
           </Card>
 
           <details className="glass-card shrink-0 overflow-hidden rounded-xl">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-weather-card px-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 bg-weather-card px-3 py-2.5 marker:content-none [&::-webkit-details-marker]:hidden">
               <span>
-                <span className="block font-medium text-slate-950 dark:text-slate-50">
+                <span className="block text-sm font-medium text-slate-950 dark:text-slate-50">
                   Buscas recentes
                 </span>
                 <span className="block text-xs text-muted-foreground">
                   {searchHistory.length > 0
-                    ? `${searchHistory.length} salva${searchHistory.length === 1 ? "" : "s"} neste navegador`
-                    : "Nenhuma busca salva"}
+                    ? `${searchHistory.length} salva${searchHistory.length === 1 ? "" : "s"}`
+                    : "Nenhuma salva"}
                 </span>
               </span>
-              <History className="size-4 text-weather-accent" aria-hidden="true" />
+              <History className="size-3.5 text-weather-accent" aria-hidden="true" />
             </summary>
-            <div className="border-t border-soft p-4 sm:p-5">
-              <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="border-t border-soft p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
                 <p className="text-xs text-muted-foreground">
-                  Selecione uma busca para repetir a consulta.
+                  Repita uma consulta anterior.
                 </p>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 shrink-0 rounded-md"
+                  className="h-7 shrink-0 rounded-md text-xs"
                   disabled={searchHistory.length === 0}
                   onClick={handleClearHistory}
                 >
-                  <Trash2 className="size-3.5" aria-hidden="true" />
+                  <Trash2 className="size-3" aria-hidden="true" />
                   Limpar
                 </Button>
               </div>
-              <div className="max-h-36 overflow-y-auto pr-1 scrollbar-subtle">
+              <div className="max-h-52 overflow-y-auto pr-1 scrollbar-subtle">
               {searchHistory.length > 0 ? (
-                <div className="grid gap-2">
-                  {searchHistory.map((entry) => {
+                <div className="grid gap-1.5">
+                  {searchHistory.slice(0, 6).map((entry) => {
                     const mode = SEARCH_MODE_OPTIONS.find(
                       (option) => option.id === entry.mode,
                     );
@@ -1051,29 +1029,26 @@ export default function Home() {
                       <button
                         key={`${entry.id}-${entry.createdAt}`}
                         type="button"
-                        className="grid gap-2 rounded-lg border border-border bg-background p-3 text-left transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                        className="grid gap-1.5 rounded-lg border border-border bg-background p-2.5 text-left text-xs transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none"
                         onClick={() => handleHistorySelect(entry)}
                       >
                         <span className="min-w-0">
-                          <span className="flex items-center gap-2 font-medium text-slate-950 dark:text-slate-50">
-                            <History className="size-4 text-sky-700" aria-hidden="true" />
-                            {getSearchHistoryLabel(entry)}
+                          <span className="flex items-center gap-1.5 font-medium text-slate-950 dark:text-slate-50">
+                            <History className="size-3 text-sky-700" aria-hidden="true" />
+                            <span className="truncate">{getSearchHistoryLabel(entry)}</span>
                           </span>
-                          <span className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                          <span className="mt-0.5 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
                             <span>{mode?.label ?? "Busca"}</span>
+                            <span>•</span>
                             <span>{entry.date}</span>
                           </span>
-                        </span>
-                        <span className="inline-flex h-8 items-center gap-1 rounded-md border border-border px-2 text-xs text-muted-foreground">
-                          <RotateCcw className="size-3" aria-hidden="true" />
-                          Repetir
                         </span>
                       </button>
                     );
                   })}
                 </div>
               ) : (
-                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                   Nenhuma busca recente.
                 </div>
               )}
@@ -1083,11 +1058,18 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1 scrollbar-subtle"
+            className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:overflow-y-auto lg:pr-1 scrollbar-subtle"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
-              <RecommendationCard recommendation={recommendation} />
+              <>
+                <RecommendationCard recommendation={recommendation} />
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
+                  <OpportunityTimeline recommendation={recommendation} />
+                  <ScoreBreakdown recommendation={recommendation} />
+                </div>
+                {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
+              </>
             ) : resultState === "content" && activityRanking ? (
               <ActivityRankingCard ranking={activityRanking} />
             ) : resultState === "content" && weekComparison ? (
@@ -1097,10 +1079,10 @@ export default function Home() {
             ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl lg:min-h-0 lg:flex-1">
-                <CardHeader className="border-b border-soft bg-weather-card">
-                  <CardTitle>Status</CardTitle>
-                  <CardDescription>
+              <Card className="glass-card min-h-[24rem] overflow-hidden rounded-xl lg:flex-1">
+                <CardHeader className="border-b border-soft bg-weather-card px-4 py-3">
+                  <CardTitle className="text-base">Status</CardTitle>
+                  <CardDescription className="text-xs">
                     {searchMode === "atividades"
                       ? selectedDate
                         ? `Ranking em ${selectedDate}`
@@ -1116,7 +1098,7 @@ export default function Home() {
                       : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-5">
+                <CardContent className="p-4">
                   {resultState === "initial" ? (
                     <PremiumState
                       variant="initial"
@@ -1169,45 +1151,35 @@ export default function Home() {
                 </CardContent>
               </Card>
             )}
-
-            {resultState === "content" && recommendation ? (
-              <section className="space-y-4">
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-                  <OpportunityTimeline recommendation={recommendation} />
-                  <ScoreBreakdown recommendation={recommendation} />
-                </div>
-                {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
-              </section>
-            ) : null}
           </section>
         </section>
 
         <section
-          className="glass-panel shrink-0 rounded-xl p-2.5 sm:p-3"
+          className="glass-panel shrink-0 rounded-xl p-2 sm:p-2.5"
           aria-label="Resumo da consulta"
         >
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
+          <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-lg border border-soft bg-background/45 px-2.5 py-1.5">
               <p className="text-xs text-muted-foreground">Modo</p>
               <p className="truncate text-sm font-medium">
                 {selectedModeOption?.label ?? "Janela perfeita"}
               </p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
+            <div className="rounded-lg border border-soft bg-background/45 px-2.5 py-1.5">
               <p className="text-xs text-muted-foreground">Cidade</p>
               <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
+            <div className="rounded-lg border border-soft bg-background/45 px-2.5 py-1.5">
               <p className="text-xs text-muted-foreground">Período</p>
               <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
+            <div className="rounded-lg border border-soft bg-background/45 px-2.5 py-1.5">
               <p className="text-xs text-muted-foreground">Atividade</p>
               <p className="truncate text-sm font-medium">
                 {cockpitActivityLabel}
               </p>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-1.5">
+            <div className="rounded-lg border border-soft bg-background/45 px-2.5 py-1.5">
               <p className="text-xs text-muted-foreground">Resultado</p>
               <p className="truncate text-sm font-medium">
                 {cockpitResultLabel}
