@@ -34,7 +34,7 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
 
   return (
     <section
-      className="glass-panel space-y-4 rounded-xl p-4 sm:p-5"
+      className="glass-panel space-y-2 rounded-xl p-3"
       aria-label="Previsão dos próximos dias"
     >
       <div className="flex items-center gap-2">
@@ -49,8 +49,8 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto pb-2">
-        <div className="flex min-w-max gap-3">
+      <div className="overflow-x-auto pb-1 lg:overflow-visible">
+        <div className="flex min-w-max gap-2 lg:grid lg:min-w-0 lg:grid-cols-7">
           {overview.days.map((day) => {
             const WeatherIcon = getWeatherIcon(day.weatherCode);
             const classification = getForecastClassification(day);
@@ -58,42 +58,42 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
             return (
               <article
                 key={day.date}
-                className="flex w-44 shrink-0 flex-col gap-3 rounded-lg border border-soft bg-weather-card/75 p-3"
+                className="flex w-36 shrink-0 flex-col gap-1.5 rounded-lg border border-soft bg-weather-card/75 p-2.5 lg:w-auto"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold capitalize text-slate-950 dark:text-slate-50">
+                    <p className="text-xs font-semibold capitalize text-slate-950 dark:text-slate-50">
                       {formatForecastDayLabel(day.date, todayDate)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[10px] text-muted-foreground">
                       {formatForecastDate(day.date)}
                     </p>
                   </div>
                   <WeatherIcon
-                    className="size-5 shrink-0 text-weather-accent"
+                    className="size-4 shrink-0 text-weather-accent"
                     aria-hidden="true"
                   />
                 </div>
 
-                <p className="text-xl font-semibold text-slate-950 dark:text-slate-50">
+                <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                   {formatTemperatureRange(day.temperatureMin, day.temperatureMax)}
                 </p>
 
                 <span
                   className={cn(
-                    "inline-flex w-fit rounded-md border px-2 py-1 text-xs font-medium",
+                    "inline-flex w-fit rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
                     classificationClasses[classification.tone],
                   )}
                 >
                   {classification.label}
                 </span>
 
-                <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">
+                <p className="line-clamp-1 text-[10px] leading-4 text-muted-foreground">
                   {getForecastShortSummary(day.summary, day.weatherLabel)}
                 </p>
 
-                <p className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <TemperatureIcon className="size-3.5 text-weather-accent" aria-hidden="true" />
+                <p className="mt-auto flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <TemperatureIcon className="size-3 text-weather-accent" aria-hidden="true" />
                   {day.weatherLabel}
                 </p>
               </article>

@@ -498,10 +498,6 @@ export default function Home() {
     submitCurrentSearch();
   }
 
-  function handleLocationRetry() {
-    requestCurrentLocation();
-  }
-
   function handleHistorySelect(entry: SearchHistoryEntry) {
     const historyDateIsAvailable = dateOptions.some(
       (option) => option.value === entry.date,
@@ -589,9 +585,9 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:h-dvh lg:overflow-hidden lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 lg:h-full lg:min-h-0">
-        <header className="glass-panel shrink-0 rounded-xl p-3 sm:p-4">
+      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:h-dvh lg:overflow-hidden lg:px-5 lg:py-4">
+      <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-3 lg:h-full lg:min-h-0">
+        <header className="glass-panel shrink-0 rounded-xl p-3">
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
@@ -642,19 +638,10 @@ export default function Home() {
           </div>
         </header>
 
-        <ModeSelector
-          options={SEARCH_MODE_OPTIONS}
-          value={searchMode}
-          onChange={(mode) => {
-            setSearchMode(mode);
-            resetRecommendationState();
-          }}
-        />
-
-        <section className="grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:overflow-hidden">
-          <aside className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto lg:pr-1 scrollbar-subtle">
+        <section className="grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)]">
+          <aside className="flex min-w-0 flex-col gap-3">
           <Card className="glass-card shrink-0 overflow-hidden rounded-xl">
-            <CardHeader className="border-b border-soft bg-weather-card px-4 py-3">
+            <CardHeader className="border-b border-soft bg-weather-card px-3 py-2.5">
               <CardTitle className="text-base">Painel de controle</CardTitle>
               <CardDescription className="text-xs">
                 {searchMode === "clima_semana"
@@ -668,7 +655,7 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-0">
               <form onSubmit={handleSubmit}>
-                <div className="space-y-4 p-4">
+                <div className="space-y-3 p-3">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -687,7 +674,7 @@ export default function Home() {
                         handleCityQueryChange(event.target.value)
                       }
                       placeholder="Ex.: Criciúma"
-                      className="h-11 rounded-md pl-8"
+                      className="h-10 rounded-md pl-8 text-sm"
                       autoComplete="off"
                       role="combobox"
                       aria-expanded={cityQueryEnabled}
@@ -764,57 +751,33 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
-                  {isDetectingLocation ? (
-                    <PremiumState
-                      compact
-                      variant="loading"
-                      eyebrow="Localização atual"
-                      title="Detectando sua cidade"
-                      description={locationMessage || CURRENT_LOCATION_WAITING_MESSAGE}
-                    />
-                  ) : locationStatus === "error" ? (
-                    <PremiumState
-                      compact
-                      variant="error"
-                      eyebrow="Localização atual"
-                      title="Localização indisponível"
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                      action={{
-                        label: "Tentar novamente",
-                        onClick: handleLocationRetry,
-                      }}
-                    />
-                  ) : (
-                    <PremiumState
-                      compact
-                      variant="initial"
-                      eyebrow="Localização atual"
-                      title={
-                        locationStatus === "success"
-                          ? "Cidade detectada"
-                          : "Use sua localização se quiser"
-                      }
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                    />
-                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-9 w-full justify-center rounded-md text-xs"
+                    onClick={requestCurrentLocation}
+                    disabled={isDetectingLocation}
+                  >
+                    {isDetectingLocation ? (
+                      <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <MapPin className="size-3.5" aria-hidden="true" />
+                    )}
+                    {isDetectingLocation
+                      ? "Detectando localização..."
+                      : "Usar localização atual"}
+                  </Button>
+                  <p
+                    className={cn(
+                      "text-[11px] leading-4 text-muted-foreground",
+                      locationStatus === "error" && "text-danger",
+                      locationStatus === "success" && "text-success",
+                    )}
+                    aria-live="polite"
+                  >
+                    {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
+                    <span className="sr-only"> {CURRENT_LOCATION_ATTRIBUTION}</span>
+                  </p>
                 </div>
                 </ControlPanelSection>
 
@@ -824,11 +787,12 @@ export default function Home() {
                     title="O que você quer fazer?"
                     description="Escolha uma atividade."
                   >
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <Label id="atividade-label">Atividade</Label>
                     <ActivitySelector
                       activities={activities}
                       value={selectedActivityId}
+                      compact
                       onChange={(activityId) => {
                         setSelectedActivityId(activityId);
                         resetRecommendationState();
@@ -844,7 +808,7 @@ export default function Home() {
                   description="Defina a data e disponibilidade."
                 >
                 {usesAvailability ? (
-                  <div className="space-y-2 border-t border-soft pt-3">
+                  <div className="space-y-2 border-t border-soft pt-2">
                     <div className="space-y-1">
                       <Label className="text-xs">Disponibilidade opcional</Label>
                       <p className="text-xs leading-relaxed text-muted-foreground">
@@ -935,7 +899,7 @@ export default function Home() {
                 </ControlPanelSection>
 
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="flex items-start gap-2.5 rounded-lg border border-soft bg-background/35 p-3 text-xs">
+                  <label className="flex items-center gap-2 rounded-lg border border-soft bg-background/35 px-2.5 py-2 text-xs">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -957,7 +921,7 @@ export default function Home() {
                 ) : null}
 
                 </div>
-                <div className="shrink-0 border-t border-soft bg-weather-card/70 p-3">
+                <div className="shrink-0 border-t border-soft bg-weather-card/70 p-2.5">
                   <Button
                     type="submit"
                     size="default"
@@ -986,7 +950,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <details className="glass-card shrink-0 overflow-hidden rounded-xl">
+          <details className="glass-card relative shrink-0 overflow-hidden rounded-xl">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 bg-weather-card px-3 py-2.5 marker:content-none [&::-webkit-details-marker]:hidden">
               <span>
                 <span className="block text-sm font-medium text-slate-950 dark:text-slate-50">
@@ -1000,7 +964,7 @@ export default function Home() {
               </span>
               <History className="size-3.5 text-weather-accent" aria-hidden="true" />
             </summary>
-            <div className="border-t border-soft p-3">
+            <div className="border-t border-soft bg-weather-card p-3 lg:absolute lg:bottom-full lg:left-0 lg:right-0 lg:z-30 lg:mb-2 lg:rounded-xl lg:border">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <p className="text-xs text-muted-foreground">
                   Repita uma consulta anterior.
@@ -1017,7 +981,6 @@ export default function Home() {
                   Limpar
                 </Button>
               </div>
-              <div className="max-h-52 overflow-y-auto pr-1 scrollbar-subtle">
               {searchHistory.length > 0 ? (
                 <div className="grid gap-1.5">
                   {searchHistory.slice(0, 6).map((entry) => {
@@ -1052,23 +1015,37 @@ export default function Home() {
                   Nenhuma busca recente.
                 </div>
               )}
-              </div>
             </div>
           </details>
           </aside>
 
+          <div className="flex min-w-0 flex-col gap-3 lg:min-h-0">
+            <ModeSelector
+              options={SEARCH_MODE_OPTIONS}
+              value={searchMode}
+              onChange={(mode) => {
+                setSearchMode(mode);
+                resetRecommendationState();
+              }}
+            />
+
           <section
-            className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:overflow-y-auto lg:pr-1 scrollbar-subtle"
+            className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:flex-1"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
               <>
                 <RecommendationCard recommendation={recommendation} />
-                <div className="grid gap-3 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-                  <OpportunityTimeline recommendation={recommendation} />
-                  <ScoreBreakdown recommendation={recommendation} />
-                </div>
+                <OpportunityTimeline recommendation={recommendation} />
                 {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
+                <details className="glass-card relative rounded-xl">
+                  <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-muted-foreground transition hover:text-foreground">
+                    Ver critérios da pontuação
+                  </summary>
+                  <div className="border-t border-soft p-3 lg:absolute lg:bottom-full lg:right-0 lg:z-40 lg:w-[min(34rem,calc(100vw-3rem))] lg:rounded-xl lg:border lg:bg-popover lg:shadow-weather-card">
+                    <ScoreBreakdown recommendation={recommendation} />
+                  </div>
+                </details>
               </>
             ) : resultState === "content" && activityRanking ? (
               <ActivityRankingCard ranking={activityRanking} />
@@ -1152,10 +1129,9 @@ export default function Home() {
               </Card>
             )}
           </section>
-        </section>
 
         <section
-          className="glass-panel shrink-0 rounded-xl p-2 sm:p-2.5"
+          className="glass-panel shrink-0 rounded-xl p-2 sm:p-2.5 lg:hidden"
           aria-label="Resumo da consulta"
         >
           <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-5">
@@ -1189,6 +1165,8 @@ export default function Home() {
         </section>
 
         <AttributionFooter disclaimer={resultDisclaimer} />
+          </div>
+        </section>
       </div>
       </main>
     </>

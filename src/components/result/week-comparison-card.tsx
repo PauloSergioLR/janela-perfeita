@@ -45,17 +45,17 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
   const shareText = buildWeekComparisonShareText(comparison);
 
   return (
-    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-      <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+    <Card className="glass-card overflow-hidden rounded-xl">
+      <CardHeader className="gap-2 border-b border-soft bg-weather-card p-3">
         <CardTitle>Melhor dia da semana</CardTitle>
         <CardDescription>
           {comparison.activity.name} em {formatCityLabel(comparison.city)}
         </CardDescription>
         <ShareResultButton title="Janela Perfeita" text={shareText} />
       </CardHeader>
-      <CardContent className="space-y-4 p-4 sm:p-5">
+      <CardContent className="space-y-3 p-3">
         {bestRecommendation ? (
-          <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sky-950 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-50">
+          <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sky-950 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-50">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal">
               <Trophy className="size-4" aria-hidden="true" />
               Melhor opção
@@ -70,7 +70,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
           </div>
         ) : null}
 
-        <ol className="space-y-3" aria-label="Comparação de dias da semana">
+        <ol className="grid gap-2 md:grid-cols-2 xl:grid-cols-4" aria-label="Comparação de dias da semana">
           {comparison.days.map((item) => {
             const recommendation = item.recommendation;
             const confidence = recommendation.bestWindow?.confidence.level;
@@ -79,7 +79,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
               <li
                 key={recommendation.date}
                 className={cn(
-                  "rounded-lg border p-3",
+                  "rounded-lg border p-2.5",
                   item.isRecommended
                     ? "border-sky-200 bg-sky-50/60 dark:border-sky-900/50 dark:bg-sky-950/20"
                     : "border-border bg-muted/30",
@@ -119,7 +119,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
                   </div>
                   <DayBadge item={item} />
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 line-clamp-2 text-xs leading-4 text-muted-foreground">
                   {getRecommendationRankingReason(recommendation)}
                 </p>
               </li>

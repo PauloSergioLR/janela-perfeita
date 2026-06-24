@@ -64,7 +64,9 @@ describe("WeatherStatsPanel", () => {
     expect(source).toContain("getWeatherMetricIcon");
     expect(source).toContain("getWeatherIcon");
     expect(source).toContain("grid-cols-2");
-    expect(source).toContain("sm:grid-cols-3 lg:grid-cols-5");
+    expect(source).toContain("sm:grid-cols-3");
+    expect(source).toContain("lg:grid-cols-5");
+    expect(source).toContain("compact?: boolean");
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
   });

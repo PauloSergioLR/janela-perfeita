@@ -107,8 +107,8 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
 
   return (
     <Card className="glass-card overflow-hidden rounded-xl">
-      <CardHeader className="gap-4 border-b border-soft bg-weather-card p-4 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <CardHeader className="gap-3 border-b border-soft bg-weather-card p-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm font-medium text-weather-accent">
               <Sparkles className="size-4" aria-hidden="true" />
@@ -130,11 +130,11 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-4 sm:p-5">
+      <CardContent className="space-y-3 p-3">
         {hasDays ? (
           <>
             <section aria-label="Destaques da semana">
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-2 md:grid-cols-3">
                 <Highlight
                   label="Melhor dia"
                   icon={<ThumbsUp className="size-3.5" aria-hidden="true" />}
@@ -177,8 +177,8 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
                 </span>
               </div>
 
-              <div className="overflow-x-auto pb-2">
-                <div className="flex min-w-max gap-3" role="list">
+              <div className="overflow-x-auto pb-1 lg:overflow-visible">
+                <div className="flex min-w-max gap-2 lg:grid lg:min-w-0 lg:grid-cols-7" role="list">
                   {overview.days.map((day) => {
                     const WeatherIcon = getWeatherIcon(day.weatherCode);
 
@@ -186,7 +186,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
                       <article
                         key={day.date}
                         role="listitem"
-                        className="group flex w-64 shrink-0 flex-col rounded-xl border border-soft bg-weather-card/70 p-4 shadow-weather-soft transition-transform motion-safe:hover:-translate-y-1 motion-reduce:transition-none dark:bg-weather-card/45"
+                        className="group flex w-36 shrink-0 flex-col rounded-lg border border-soft bg-weather-card/70 p-2.5 shadow-weather-soft transition-transform motion-safe:hover:-translate-y-1 motion-reduce:transition-none dark:bg-weather-card/45 lg:w-auto"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -197,21 +197,21 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
                               {formatShortDate(day.date)}
                             </p>
                           </div>
-                          <div className="grid size-10 place-items-center rounded-lg border border-weather-accent/30 bg-weather-accent/10 text-weather-accent">
-                            <WeatherIcon className="size-5" aria-hidden="true" />
+                          <div className="grid size-8 place-items-center rounded-lg border border-weather-accent/30 bg-weather-accent/10 text-weather-accent">
+                            <WeatherIcon className="size-4" aria-hidden="true" />
                           </div>
                         </div>
 
-                        <div className="mt-5">
-                          <p className="text-sm text-muted-foreground">{day.weatherLabel}</p>
-                          <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
+                        <div className="mt-2">
+                          <p className="text-xs text-muted-foreground">{day.weatherLabel}</p>
+                          <p className="mt-1 text-lg font-semibold tracking-tight text-slate-950 dark:text-slate-50">
                             {formatNumber(day.temperatureMin, "°C")} <span className="text-base font-medium text-muted-foreground">/</span>{" "}
                             {formatNumber(day.temperatureMax, "°C")}
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground">Mínima / máxima</p>
                         </div>
 
-                        <div className="mt-5 grid grid-cols-2 gap-2 border-y border-soft py-3 text-xs">
+                        <div className="mt-2 grid grid-cols-2 gap-1 border-y border-soft py-2 text-[10px]">
                           <span className="flex items-center gap-1.5 text-muted-foreground">
                             <Droplets className="size-3.5 text-sky-500" aria-hidden="true" />
                             {formatNumber(day.precipitationProbabilityMax, "%")}
@@ -222,9 +222,9 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
                           </span>
                         </div>
 
-                        <p className="mt-4 text-sm leading-6 text-muted-foreground">{day.summary}</p>
+                        <p className="mt-2 line-clamp-2 text-xs leading-4 text-muted-foreground">{day.summary}</p>
 
-                        <div className="mt-auto pt-5">
+                        <div className="mt-auto pt-2">
                           <div className="flex items-center justify-between gap-3 text-xs">
                             <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
                               <Thermometer className="size-3.5 text-rose-400" aria-hidden="true" />

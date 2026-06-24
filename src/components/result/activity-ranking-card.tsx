@@ -49,15 +49,15 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
     : null;
 
   return (
-    <Card className="overflow-hidden rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
-      <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-border dark:bg-muted/30">
+    <Card className="glass-card overflow-hidden rounded-xl">
+      <CardHeader className="gap-2 border-b border-soft bg-weather-card p-3">
         <CardTitle>Ranking de atividades</CardTitle>
         <CardDescription>
           {formatCityLabel(ranking.city)} · {formatRecommendationDate(ranking.date)}
         </CardDescription>
         <ShareResultButton title="Janela Perfeita" text={shareText} />
       </CardHeader>
-      <CardContent className="space-y-4 p-4 sm:p-5">
+      <CardContent className="space-y-3 p-3">
         {availabilityNotice ? (
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
             {availabilityNotice}
@@ -65,7 +65,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
         ) : null}
 
         {bestRecommendation ? (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-50">
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-50">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal">
               <Trophy className="size-4" aria-hidden="true" />
               Mais recomendada
@@ -80,7 +80,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
           </div>
         ) : null}
 
-        <ol className="space-y-3" aria-label="Ranking de atividades recomendadas">
+        <ol className="grid gap-2 md:grid-cols-2 xl:grid-cols-4" aria-label="Ranking de atividades recomendadas">
           {ranking.items.map((item) => {
             const recommendation = item.recommendation;
             const confidence = recommendation.bestWindow?.confidence.level;
@@ -89,7 +89,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
               <li
                 key={recommendation.activity.id}
                 className={cn(
-                  "rounded-lg border p-3",
+                  "rounded-lg border p-2.5",
                   item.isRecommended
                     ? "border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20"
                     : "border-border bg-muted/30",
@@ -123,7 +123,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
                   </div>
                   <RecommendationBadge item={item} />
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 line-clamp-2 text-xs leading-4 text-muted-foreground">
                   {getRecommendationRankingReason(recommendation)}
                 </p>
               </li>

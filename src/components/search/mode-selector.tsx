@@ -28,8 +28,8 @@ export function ModeSelector({
       className="glass-card shrink-0 rounded-xl p-2 sm:p-2.5"
       aria-labelledby="modo-label"
     >
-      <div className="grid gap-2 lg:grid-cols-[minmax(140px,auto)_minmax(0,1fr)] lg:items-center">
-        <div className="space-y-0.5">
+      <div className="grid gap-2">
+        <div className="sr-only">
           <p id="modo-label" className="text-sm font-medium text-foreground">
             Modo
           </p>
@@ -53,7 +53,7 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-16 rounded-lg border border-soft bg-background/45 p-2.5 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none lg:min-h-12",
+                  "group relative min-h-14 rounded-lg border border-soft bg-background/45 p-2.5 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none",
                   selected
                     ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",

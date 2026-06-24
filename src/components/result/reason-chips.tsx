@@ -14,6 +14,7 @@ import type { RuleResult } from "@/types";
 
 interface ReasonChipsProps {
   rules: RuleResult[];
+  compact?: boolean;
 }
 
 interface ReasonStyle {
@@ -40,11 +41,41 @@ const reasonStyles: Record<ReasonKind, ReasonStyle> = {
   },
 };
 
-export function ReasonChips({ rules }: ReasonChipsProps) {
+export function ReasonChips({ rules, compact = false }: ReasonChipsProps) {
   const groups = getReasonGroups(rules);
 
   if (groups.length === 0) {
     return null;
+  }
+
+  if (compact) {
+    return (
+      <section className="space-y-2" aria-label="Motivos da recomendação">
+        <h3 className="text-xs font-medium text-slate-950 dark:text-slate-50">
+          Por que esta é uma boa janela?
+        </h3>
+        <div className="flex flex-wrap gap-1.5">
+          {groups.flatMap((group) => {
+            const style = reasonStyles[group.kind];
+            const Icon = style.icon;
+
+            return group.rules.map((rule) => (
+              <Badge
+                key={`${rule.factor}-${rule.reason}`}
+                variant="outline"
+                className={cn(
+                  "min-h-7 max-w-full gap-1.5 whitespace-normal px-2 py-0.5 text-left text-xs leading-4",
+                  style.badgeClassName,
+                )}
+              >
+                <Icon className="size-3 shrink-0" aria-hidden="true" />
+                <span>{rule.reason}</span>
+              </Badge>
+            ));
+          })}
+        </div>
+      </section>
+    );
   }
 
   return (

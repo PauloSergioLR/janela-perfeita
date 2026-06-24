@@ -125,18 +125,14 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         : "text-danger";
 
   return (
-    <Card className="glass-card overflow-hidden rounded-xl">
-      <CardHeader className="gap-3 border-b border-soft bg-weather-card">
+    <Card className="glass-card relative rounded-xl">
+      <CardHeader className="gap-1.5 border-b border-soft bg-weather-card p-2.5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-weather-accent">
-              Decisão principal
-            </p>
-            <CardTitle className="mt-1">Recomendação</CardTitle>
-            <CardDescription>
-              {recommendation.activity.name} ·{" "}
-              {formatRecommendationLocation(recommendation)} ·{" "}
-              {formatRecommendationDate(recommendation.date)}
+            <p className="text-xs font-medium text-weather-accent">Melhor janela para</p>
+            <CardTitle className="mt-0.5 text-xl">{recommendation.activity.name}</CardTitle>
+            <CardDescription className="text-xs">
+              {formatRecommendationLocation(recommendation)} · {formatRecommendationDate(recommendation.date)}
             </CardDescription>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
@@ -162,32 +158,32 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-4 sm:p-5">
-        <div className="grid gap-5 lg:grid-cols-[minmax(180px,0.48fr)_minmax(0,1fr)]">
-          <div className="grid min-h-52 place-items-center rounded-lg border border-soft bg-weather-card/65 p-4">
+      <CardContent className="space-y-2.5 p-2.5">
+        <div className="grid gap-3 xl:grid-cols-[minmax(144px,0.38fr)_minmax(0,1fr)_minmax(280px,0.82fr)]">
+          <div className="grid min-h-0 place-items-center rounded-lg border border-soft bg-weather-card/65 p-2">
             <div className="grid place-items-center gap-2">
-              <ScoreRing score={displayScore} />
-              <span className="text-xs text-muted-foreground">
+              <ScoreRing score={displayScore} className="w-28 sm:w-32" />
+              <span className="text-[10px] text-muted-foreground">
                 Mínimo {recommendation.activity.minRecommendedScore}/100
               </span>
             </div>
           </div>
 
-          <div className="grid gap-3">
-            <div className="border-y border-soft py-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
+          <div className="grid gap-2">
+            <div className="rounded-lg border border-soft bg-background/25 p-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-300">
                 <Timer className="size-4 text-weather-accent" aria-hidden="true" />
                 Janela recomendada
               </div>
-              <p className="mt-2 text-4xl font-semibold text-slate-950 dark:text-slate-50">
+              <p className="mt-1.5 text-3xl font-semibold text-slate-950 dark:text-slate-50">
                 {decisionWindow}
               </p>
               {bestWindow ? (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Duração: {formatDurationHours(bestWindow.durationHours)}
                 </p>
               ) : null}
-              <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+              <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
                 <div className="flex items-center gap-2">
                   <CalendarDays className="size-4 text-cyan-700" aria-hidden="true" />
                   {formatRecommendationDate(recommendation.date)}
@@ -200,8 +196,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
 
             {bestWindow ? (
-              <div className="border-b border-soft pb-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
+              <div className="rounded-lg border border-soft bg-weather-card/45 p-2.5">
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-950 dark:text-slate-50">
                   {ConfidenceIcon ? (
                     <ConfidenceIcon
                       className={cn("size-4", confidenceIconClassName)}
@@ -210,7 +206,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                   ) : null}
                   Confiança da previsão
                 </div>
-                <div className="mt-2 flex flex-wrap items-start gap-2">
+                <div className="mt-1.5 flex flex-wrap items-start gap-2">
                   <Badge
                     variant="outline"
                     className={cn(
@@ -222,13 +218,13 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                       bestWindow.confidence.level,
                     )}
                   </Badge>
-                  <p className="min-w-0 flex-1 text-sm leading-6 text-muted-foreground">
+                  <p className="min-w-0 flex-1 text-xs leading-4 text-muted-foreground">
                     {bestWindow.confidence.reason}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="relative overflow-hidden rounded-xl border border-warning/45 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--warning)_14%,transparent),transparent_64%)] p-4 text-sm leading-6 text-warning">
+              <div className="relative overflow-hidden rounded-xl border border-warning/45 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--warning)_14%,transparent),transparent_64%)] p-3 text-xs leading-5 text-warning">
                 <div
                   aria-hidden="true"
                   className="absolute -right-10 -bottom-14 size-32 rounded-full bg-warning/15 blur-3xl"
@@ -240,7 +236,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                     </span>
                     Sem janela ideal hoje
                   </div>
-                  <p className="mt-3">
+                  <p className="mt-2">
                     Nenhuma janela atingiu o mínimo de{" "}
                     {recommendation.activity.minRecommendedScore}/100. O melhor
                     horário isolado ainda aparece para comparação.
@@ -249,21 +245,26 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               </div>
             )}
           </div>
+          <WeatherStatsPanel
+            compact
+            weather={resultScore?.weather ?? null}
+            sunrise={recommendation.sunrise}
+            sunset={recommendation.sunset}
+          />
         </div>
 
+        <ReasonChips compact rules={reasonRules} />
+
+        <details className="group relative">
+          <summary className="w-fit cursor-pointer rounded-md border border-soft bg-weather-card px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground">
+            Ver detalhes da análise
+          </summary>
+          <div className="mt-2 space-y-3 lg:absolute lg:top-full lg:right-0 lg:z-40 lg:w-[min(42rem,calc(100vw-3rem))] lg:rounded-xl lg:border lg:border-soft lg:bg-popover lg:p-3 lg:shadow-weather-card">
         {timeFilterNotice ? (
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
             {timeFilterNotice}
           </div>
         ) : null}
-
-        <ReasonChips rules={reasonRules} />
-
-        <WeatherStatsPanel
-          weather={resultScore?.weather ?? null}
-          sunrise={recommendation.sunrise}
-          sunset={recommendation.sunset}
-        />
 
         {modelAgreement ? (
           <div
@@ -354,6 +355,8 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
           </div>
         ) : null}
+          </div>
+        </details>
       </CardContent>
     </Card>
   );
