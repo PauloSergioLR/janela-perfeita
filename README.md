@@ -1,31 +1,62 @@
 # Janela Perfeita
 
-Janela Perfeita e um web app que transforma previsao meteorologica horaria em
-recomendacoes praticas de melhores janelas para atividades ao ar livre.
+Janela Perfeita é um **Weather Decision Cockpit** que transforma previsão
+meteorológica horária em recomendações práticas de melhores janelas para
+atividades ao ar livre.
 
-O produto nao tenta ser apenas mais um app de clima. A previsao e a entrada; a
-entrega e uma decisao: a aplicacao combina regras de dominio, pesos por
-atividade, contexto solar, confianca da previsao e agrupamento de horas
-consecutivas para responder uma pergunta mais util: "quando vale a pena fazer
+O produto não tenta ser apenas mais um app de clima. A previsão é a entrada; a
+entrega é uma decisão: a aplicação combina regras de domínio, pesos por
+atividade, contexto solar, confiança da previsão e agrupamento de horas
+consecutivas para responder uma pergunta mais útil: "quando vale a pena fazer
 esta atividade?".
+
+## Redesign Visual
+
+O projeto passou por um redesign completo focado em **cockpit climático**:
+interface escura premium inspirada em painéis de decisão, com glassmorphism
+discreto, gradientes climáticos e organização visual em viewport única no
+desktop. Toda a interface foi projetada para entregar informação climática de
+forma clara, compacta e visual, sem páginas longas ou scroll desnecessário.
+
+**Não usa mapas.** O foco visual está em score rings, cards climáticos,
+timelines horárias e painéis de estatísticas meteorológicas. A navegação
+acontece por modos, abas e troca de conteúdo contextual dentro da própria tela.
 
 ## Demo
 
-- Local: `http://localhost:3000`, apos `npm run dev`.
-- Producao: https://janela-perfeita.vercel.app
+- Local: `http://localhost:3000`, após `npm run dev`.
+- Produção: https://janela-perfeita.vercel.app
 
 ![Tela inicial do Janela Perfeita](docs/screenshot-home.png)
 
+_Screenshot representa o visual atual do cockpit climático. Interface escura
+premium com score rings, cards de resultado, timeline horária e painéis de
+estatísticas meteorológicas. Sem mapas._
+
 ## O que o app faz hoje
 
+### Funcionalidades Principais
+
+- **Cockpit de viewport única:** interface desktop compacta sem página longa,
+  com painel de controle lateral, área de resultado protagonista e faixa
+  inferior contextual.
+- **Visual premium climático:** tema escuro, glassmorphism discreto, gradientes
+  climáticos, score rings grandes, cards de resultado e timeline horária visual.
+- **Sem mapas:** toda navegação e visualização acontece por modos, cards, abas
+  e painéis internos. Nenhuma integração com MapLibre, MapTiler ou Google Maps.
+- **APIs gratuitas:** usa somente Open-Meteo (gratuita e sem chave obrigatória)
+  como fonte principal. MET Norway é opcional e também gratuita. WeatherAPI.com
+  fica como alternativa futura opcional, sem ser obrigatória.
 - Busca cidade por nome, sem exigir GPS.
-- Pode sugerir a cidade pela localizacao atual quando o navegador pedir
-  permissao ao abrir o site.
-- Recomenda datas de hoje ate hoje+6.
-- Organiza o fluxo em quatro modos: Janela perfeita, O que fazer hoje?,
-  Consulta do dia e Consulta da semana.
+- Pode sugerir a cidade pela localização atual quando o navegador pedir
+  permissão ao abrir o site.
+- Recomenda datas de hoje até hoje+6.
+- Organiza o fluxo em quatro modos: **Janela perfeita**, **O que fazer hoje?**,
+  **Consulta do dia** e **Consulta da semana**.
 - Permite consultar o clima completo de um dia sem escolher atividade.
-- Permite consultar um resumo visual dos proximos 7 dias sem escolher atividade.
+- Permite consultar um resumo visual dos próximos 7 dias sem escolher atividade.
+### Atividades Suportadas
+
 - Suporta sete atividades:
   - correr
   - caminhar
@@ -34,24 +65,36 @@ esta atividade?".
   - observar estrelas
   - lavar carro
   - lavar roupa
+
+### Cálculo e Visualização
+
 - Calcula score de 0 a 100 por hora.
-- Mostra melhor janela do dia, alternativas e timeline.
-- Explica os principais motivos da recomendacao.
-- Informa quando nao ha janela boa.
-- Calcula confianca da previsao dentro da janela recomendada.
-- Considera probabilidade de chuva, chuva, pancadas, weather code, sensacao
-  termica, rajadas, visibilidade, duracao de sol e camadas de nuvens.
+- **Score ring grande e protagonista** no resultado principal.
+- Mostra melhor janela do dia, alternativas e **timeline horária visual**.
+- **Cards climáticos** com gradientes e ícones contextuais.
+- **Painéis de estatísticas meteorológicas** compactos.
+- Explica os principais motivos da recomendação com **reason chips**.
+- Informa quando não há janela boa.
+- Calcula confiança da previsão dentro da janela recomendada.
+- Considera probabilidade de chuva, chuva, pancadas, weather code, sensação
+  térmica, rajadas, visibilidade, duração de sol e camadas de nuvens.
+
+### Modos Adicionais
+
 - Oferece modo inverso para responder "o que fazer hoje?".
 - Compara melhores dias da semana para uma atividade.
 - Compara modelos da Open-Meteo quando solicitado.
 - Pode consultar MET Norway como segunda fonte gratuita quando
   `MET_NORWAY_USER_AGENT` existe.
+
+### Recursos de Usabilidade
+
 - Permite compartilhar resultados e repetir buscas recentes salvas no navegador.
-- Inclui uma pagina tecnica de backtesting com fixture historica local.
+- Inclui uma página técnica de backtesting com fixture histórica local.
 - Inclui `/como-funciona` para explicar score, pesos, janelas e limitações.
 - Permite modo demo isolado via `?demo=true`.
-- Usa Open-Meteo com atribuicao e disclaimer.
-- Nao armazena localizacao, IP, historico ou dados pessoais em servidor.
+- Usa Open-Meteo com atribuição e disclaimer.
+- Não armazena localização, IP, histórico ou dados pessoais em servidor.
 
 ## Arquitetura
 
@@ -130,30 +173,46 @@ O score usa dados horarios normalizados:
 Todas as atividades mantem pesos somando 100. Scores e fatores sao limitados de
 0 a 100.
 
-## Funcionalidades tecnicas
+## Funcionalidades técnicas
 
-- **Confianca da previsao:** mostra se a janela e estavel ou se ha variacao
+### Interface e Navegação
+
+- **Cockpit de viewport única:** no desktop, toda interface cabe em uma tela sem
+  página longa, com painel lateral, área de resultado e faixa inferior contextual.
+- **Score rings grandes:** visualização protagonista do score 0-100 com gradiente
+  e banda de qualidade.
+- **Timeline horária visual:** linha do tempo com barras de score, ícones de
+  clima e detalhes por hora.
+- **Cards climáticos premium:** glassmorphism, gradientes climáticos e ícones
+  contextuais.
+- **Reason chips:** motivos da recomendação em chips coloridos por categoria.
+- **Sem mapas:** navegação por modos, abas e painéis internos. Zero integração
+  com bibliotecas de mapa.
+
+### Previsão e Análise
+
+- **Confiança da previsão:** mostra se a janela é estável ou se há variação
   relevante de chuva, vento, temperatura e nuvens.
-- **Consulta do dia:** mostra resumo diario com temperatura, sensacao termica,
-  chuva, vento, rajadas, UV, nascer/por do sol, weather code e timeline horaria.
-- **Consulta da semana:** mostra cards diarios com icone do clima, minima,
-  maxima, chuva, vento, UV, resumo curto e destaques da semana; exige somente
+- **Consulta do dia:** mostra resumo diário com temperatura, sensação térmica,
+  chuva, vento, rajadas, UV, nascer/pôr do sol, weather code e timeline horária.
+- **Consulta da semana:** mostra cards diários com ícone do clima, mínima,
+  máxima, chuva, vento, UV, resumo curto e destaques da semana; exige somente
   cidade na interface.
-- **Localizacao atual:** usa a Geolocation API do navegador, resolve o nome da
-  cidade por Nominatim/OpenStreetMap e nao salva coordenadas no historico local.
+- **Localização atual:** usa a Geolocation API do navegador, resolve o nome da
+  cidade por Nominatim/OpenStreetMap e não salva coordenadas no histórico local.
 - **Modo inverso:** ranqueia as sete atividades para a mesma cidade e data.
-- **Comparacao semanal:** compara os proximos dias para encontrar o melhor dia
+- **Comparação semanal:** compara os próximos dias para encontrar o melhor dia
   de uma atividade.
-- **Comparacao de modelos:** opcionalmente consulta modelos Open-Meteo extras e
-  mostra divergencia, sem fazer media cega.
+- **Comparação de modelos:** opcionalmente consulta modelos Open-Meteo extras e
+  mostra divergência, sem fazer média cega.
 - **Provider MET Norway:** segunda fonte gratuita opcional da v1.1 para
-  comparacao e alerta de divergencia quando `MET_NORWAY_USER_AGENT` existe,
-  com score, nivel de concordancia e motivos de divergencia.
+  comparação e alerta de divergência quando `MET_NORWAY_USER_AGENT` existe,
+  com score, nível de concordância e motivos de divergência.
   WeatherAPI.com fica apenas como alternativa opcional futura.
-- **Historico local:** salva somente as ultimas buscas no `localStorage`.
-- **Compartilhamento:** gera texto compartilhavel do resultado.
+- **Histórico local:** salva somente as últimas buscas no `localStorage`.
+- **Compartilhamento:** gera texto compartilhável do resultado.
 - **Modo demo:** usa fixture local apenas com `?demo=true`.
-- **Backtesting:** pagina tecnica valida a metodologia com amostra local.
+- **Backtesting:** página técnica valida a metodologia com amostra local.
 
 ## Stack
 
@@ -440,11 +499,20 @@ Janela Perfeita:
 
 ## Roadmap
 
-- Melhorar a amostra do backtesting com dados historicos reais e reprodutiveis.
-- Criar mais cenarios E2E para modos semana, inverso, demo e compartilhamento.
-- Evoluir acessibilidade e tema visual sem mudar a regra de negocio.
-- Comparar Open-Meteo e MET Norway com avisos mais detalhados de divergencia.
-- Manter novas fontes meteorologicas somente como comparacao explicita.
+### Concluído
+
+- ✅ Redesign visual completo: cockpit climático com tema escuro premium.
+- ✅ Interface de viewport única no desktop sem página longa.
+- ✅ Score rings grandes, timeline visual e cards climáticos.
+- ✅ Eliminação total de mapas em favor de painéis e navegação contextual.
+
+### Próximos Passos
+
+- Melhorar a amostra do backtesting com dados históricos reais e reprodutíveis.
+- Criar mais cenários E2E para modos semana, inverso, demo e compartilhamento.
+- Comparar Open-Meteo e MET Norway com avisos mais detalhados de divergência.
+- Manter novas fontes meteorológicas somente como comparação explícita.
+- Evoluir micro-animações e responsividade com `prefers-reduced-motion`.
 
 ## Fluxo de desenvolvimento
 
