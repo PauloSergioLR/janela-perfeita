@@ -9,25 +9,22 @@ function readHomePage() {
 describe("layout Weather Decision Cockpit", () => {
   const page = readHomePage();
 
-  it("usa a base visual climatica no layout principal", () => {
-    expect(page).toContain("<WeatherStage variant={weatherStageVariant} />");
-    expect(page).toContain("weatherStageVariant");
+  it("usa a base visual climatica no shell desktop", () => {
+    expect(page).toContain('<WeatherStage variant="night" />');
     expect(page).toContain("glass-panel");
     expect(page).toContain("glass-card");
     expect(page).toContain("bg-weather-card");
   });
 
-  it("separa seletor de modo, painel lateral e area de resultado", () => {
-    expect(page).toContain("<ModeSelector");
-    expect(page).toContain("xl:sticky xl:top-6");
-    expect(page).toContain('aria-label="Resultado da decisão"');
-    expect(page).toContain(
-      "xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)]",
-    );
+  it("separa ModeBar, painel lateral e painel principal placeholders", () => {
+    expect(page).toContain('aria-label="ModeBar"');
+    expect(page).toContain('aria-label="LeftPanel placeholder"');
+    expect(page).toContain('aria-label="MainPanel placeholder"');
+    expect(page).toContain("lg:grid-cols-[340px_minmax(0,1fr)]");
   });
 
-  it("mantem faixa inferior de resumo sem adicionar mapa", () => {
-    expect(page).toContain('aria-label="Resumo da consulta"');
+  it("mantem faixa inferior de previsao sem adicionar mapa", () => {
+    expect(page).toContain('aria-label="BottomForecastStrip placeholder"');
     expect(page).not.toContain("MapLibre");
     expect(page).not.toContain("maptiler");
     expect(page).not.toContain("google.maps");
@@ -35,8 +32,8 @@ describe("layout Weather Decision Cockpit", () => {
 
   it("apresenta marca, subtitulo e acao discreta no header", () => {
     expect(page).toContain("CircleHelp");
-    expect(page).toContain("Clima por decisão");
-    expect(page).toContain("Previsão por hora");
+    expect(page).toContain("Clima por decisao");
+    expect(page).toContain("Previsao por hora");
     expect(page).toContain("glow-primary");
   });
 });
