@@ -1,20 +1,59 @@
+"use client";
+
+import { useState } from "react";
 import {
+  CalendarDays,
   CircleHelp,
   CloudSun,
   Compass,
   Gauge,
-  Layers,
+  LocateFixed,
   PanelLeft,
+  Radar,
   Sparkles,
+  SunMedium,
 } from "lucide-react";
 import Link from "next/link";
 import { WeatherStage } from "@/components/weather/weather-stage";
 
 const decisionModes = [
-  "Janela perfeita",
-  "O que fazer hoje?",
-  "Consulta do dia",
-  "Consulta da semana",
+  {
+    id: "janela-perfeita",
+    label: "Janela perfeita",
+    eyebrow: "Melhor horario",
+    title: "Resultado futuro",
+    description:
+      "Score protagonista, janela recomendada e sinais climaticos no MainPanel.",
+    metric: "86",
+    icon: Sparkles,
+  },
+  {
+    id: "fazer-hoje",
+    label: "O que fazer hoje?",
+    eyebrow: "Ranking rapido",
+    title: "Atividades do dia",
+    description: "Comparativo compacto para escolher atividade sem abrir nova secao.",
+    metric: "4",
+    icon: SunMedium,
+  },
+  {
+    id: "consulta-dia",
+    label: "Consulta do dia",
+    eyebrow: "Dia especifico",
+    title: "Agenda climatica",
+    description: "Leitura hora a hora com pontos de atencao dentro do painel principal.",
+    metric: "12h",
+    icon: CalendarDays,
+  },
+  {
+    id: "consulta-semana",
+    label: "Consulta da semana",
+    eyebrow: "7 dias",
+    title: "Panorama semanal",
+    description: "Tendencia, melhores dias e riscos resumidos no mesmo MainPanel.",
+    metric: "7d",
+    icon: Radar,
+  },
 ];
 
 const controlSteps = ["Local", "Atividade", "Periodo"];
@@ -37,6 +76,11 @@ function PlaceholderLine({ className = "" }: { className?: string }) {
 }
 
 export default function Home() {
+  const [activeModeId, setActiveModeId] = useState(decisionModes[0].id);
+  const activeMode =
+    decisionModes.find((mode) => mode.id === activeModeId) ?? decisionModes[0];
+  const ActiveModeIcon = activeMode.icon;
+
   return (
     <>
       <WeatherStage variant="night" />
@@ -60,7 +104,8 @@ export default function Home() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="hidden h-8 items-center rounded-md border border-success/35 bg-success/10 px-3 text-xs font-medium text-success md:inline-flex">
+              <span className="hidden h-8 items-center gap-2 rounded-md border border-success/35 bg-success/10 px-3 text-xs font-medium text-success lg:inline-flex">
+                <LocateFixed className="size-3.5" aria-hidden="true" />
                 Open-Meteo
               </span>
               <span className="hidden h-8 items-center rounded-md border border-weather-accent/40 bg-weather-card px-3 text-xs font-medium text-weather-accent sm:inline-flex">
@@ -80,20 +125,27 @@ export default function Home() {
             className="glass-panel flex min-h-0 items-center gap-2 rounded-xl p-2"
             aria-label="ModeBar"
           >
-            {decisionModes.map((mode, index) => (
-              <button
-                key={mode}
-                type="button"
-                className={`flex h-full min-w-0 flex-1 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition ${
-                  index === 0
-                    ? "border-weather-accent/60 bg-weather-accent/18 text-weather-accent shadow-weather-glow"
-                    : "border-white/10 bg-white/7 text-slate-300 hover:border-white/25 hover:bg-white/10"
-                }`}
-              >
-                <Layers className="size-4 shrink-0" aria-hidden="true" />
-                <span className="truncate">{mode}</span>
-              </button>
-            ))}
+            {decisionModes.map((mode) => {
+              const Icon = mode.icon;
+              const isActive = mode.id === activeMode.id;
+
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setActiveModeId(mode.id)}
+                  className={`flex h-full min-w-0 flex-1 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition ${
+                    isActive
+                      ? "border-weather-accent/60 bg-weather-accent/18 text-weather-accent shadow-weather-glow"
+                      : "border-white/10 bg-white/7 text-slate-300 hover:border-white/25 hover:bg-white/10"
+                  }`}
+                >
+                  <Icon className="size-4 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{mode.label}</span>
+                </button>
+              );
+            })}
           </nav>
 
           <section className="grid min-h-0 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
@@ -108,7 +160,10 @@ export default function Home() {
                   </p>
                   <h2 className="text-lg font-semibold">Controle futuro</h2>
                 </div>
-                <PanelLeft className="size-5 text-weather-accent" aria-hidden="true" />
+                <PanelLeft
+                  className="size-5 text-weather-accent"
+                  aria-hidden="true"
+                />
               </div>
               <div className="grid flex-1 content-between gap-3">
                 {controlSteps.map((step, index) => (
@@ -139,25 +194,38 @@ export default function Home() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
-                    MainPanel placeholder
+                    {activeMode.eyebrow}
                   </p>
-                  <h2 className="text-xl font-semibold">Resultado futuro</h2>
+                  <h2 className="text-xl font-semibold">{activeMode.title}</h2>
                 </div>
                 <div className="flex items-center gap-2 rounded-lg border border-weather-accent/40 bg-weather-accent/12 px-3 py-2 text-weather-accent">
-                  <Gauge className="size-5" aria-hidden="true" />
-                  <span className="text-sm font-semibold">Score</span>
+                  <ActiveModeIcon className="size-5" aria-hidden="true" />
+                  <span className="text-sm font-semibold">
+                    {activeMode.metric}
+                  </span>
                 </div>
               </div>
               <div className="grid min-h-0 items-center gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                 <div className="mx-auto flex aspect-square max-h-[250px] w-full max-w-[250px] items-center justify-center rounded-full border border-weather-accent/40 bg-weather-accent/10 shadow-weather-glow">
                   <div className="text-center">
-                    <p className="text-6xl font-semibold leading-none">86</p>
+                    <p className="text-6xl font-semibold leading-none">
+                      {activeMode.metric}
+                    </p>
                     <p className="mt-2 text-sm text-slate-300">protagonista</p>
                   </div>
                 </div>
                 <div className="grid gap-3">
                   <div className="rounded-lg border border-white/10 bg-white/7 p-4">
-                    <PlaceholderLine className="h-3 w-4/5" />
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-100">
+                      <Gauge
+                        className="size-4 text-weather-accent"
+                        aria-hidden="true"
+                      />
+                      Conteudo muda dentro do MainPanel
+                    </div>
+                    <p className="text-sm leading-6 text-slate-300">
+                      {activeMode.description}
+                    </p>
                     <PlaceholderLine className="mt-3 h-2 w-full" />
                     <PlaceholderLine className="mt-2 h-2 w-5/6" />
                   </div>
@@ -174,7 +242,10 @@ export default function Home() {
                   </div>
                   <div className="rounded-lg border border-white/10 bg-white/7 p-3">
                     <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-                      <Compass className="size-4 text-weather-accent" aria-hidden="true" />
+                      <Compass
+                        className="size-4 text-weather-accent"
+                        aria-hidden="true"
+                      />
                       Timeline placeholder
                     </div>
                     <div className="grid grid-cols-8 gap-2">
@@ -197,7 +268,10 @@ export default function Home() {
             aria-label="BottomForecastStrip placeholder"
           >
             <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/7 px-4">
-              <Sparkles className="size-5 text-weather-accent" aria-hidden="true" />
+              <Sparkles
+                className="size-5 text-weather-accent"
+                aria-hidden="true"
+              />
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
                   BottomStrip

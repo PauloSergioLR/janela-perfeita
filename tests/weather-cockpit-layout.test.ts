@@ -39,4 +39,14 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("Previsao por hora");
     expect(page).toContain("glow-primary");
   });
+
+  it("implementa ModeBar ativa sem criar secoes fora do MainPanel", () => {
+    expect(page).toContain("useState");
+    expect(page).toContain("aria-pressed={isActive}");
+    expect(page).toContain("Janela perfeita");
+    expect(page).toContain("O que fazer hoje?");
+    expect(page).toContain("Consulta do dia");
+    expect(page).toContain("Consulta da semana");
+    expect(page).toContain("Conteudo muda dentro do MainPanel");
+  });
 });
