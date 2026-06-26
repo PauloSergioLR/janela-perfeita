@@ -2,12 +2,15 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-function readHomePage() {
-  return readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
+function readCockpitPreviewPage() {
+  return readFileSync(
+    join(process.cwd(), "src/app/cockpit-preview/page.tsx"),
+    "utf8",
+  );
 }
 
 describe("layout Weather Decision Cockpit", () => {
-  const page = readHomePage();
+  const page = readCockpitPreviewPage();
 
   it("usa a base visual climatica no shell desktop", () => {
     expect(page).toContain('<WeatherStage variant="night" />');
