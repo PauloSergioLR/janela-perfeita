@@ -11,12 +11,15 @@ import {
   Dumbbell,
   Footprints,
   Gauge,
+  History,
   LocateFixed,
   MapPin,
   Radar,
+  RotateCcw,
   Search,
   Sparkles,
   SunMedium,
+  Trash2,
   Waves,
 } from "lucide-react";
 import Link from "next/link";
@@ -97,6 +100,34 @@ const activityCards = [
   },
 ];
 
+interface CockpitRecentSearch {
+  id: string;
+  city: string;
+  date: string;
+  activityId: string;
+  activityLabel: string;
+  modeLabel: string;
+}
+
+const cockpitRecentSearches: CockpitRecentSearch[] = [
+  {
+    id: "sao-paulo-caminhada",
+    city: "Sao Paulo, SP",
+    date: "2026-06-26",
+    activityId: "caminhada",
+    activityLabel: "Caminhada",
+    modeLabel: "Janela perfeita",
+  },
+  {
+    id: "santos-bike",
+    city: "Santos, SP",
+    date: "2026-06-27",
+    activityId: "bike",
+    activityLabel: "Bike",
+    modeLabel: "O que fazer hoje?",
+  },
+];
+
 function PlaceholderLine({ className = "" }: { className?: string }) {
   return (
     <span
@@ -107,34 +138,116 @@ function PlaceholderLine({ className = "" }: { className?: string }) {
 }
 
 function LeftControlPanel() {
+  const [cityValue, setCityValue] = useState("Sao Paulo, SP");
+  const [dateValue, setDateValue] = useState("2026-06-26");
   const [selectedActivityId, setSelectedActivityId] = useState(
     activityCards[0].id,
   );
+  const [recentSearches, setRecentSearches] = useState(cockpitRecentSearches);
+  const [recentPanelOpen, setRecentPanelOpen] = useState(false);
+
+  function handleRecentSearchSelect(search: CockpitRecentSearch) {
+    setCityValue(search.city);
+    setDateValue(search.date);
+    setSelectedActivityId(search.activityId);
+    setRecentPanelOpen(false);
+  }
 
   return (
     <aside
-      className="glass-card flex min-h-0 flex-col rounded-xl p-3"
+      className="glass-card relative flex min-h-0 flex-col rounded-xl p-2.5"
       aria-label="LeftControlPanel"
     >
-      <div className="mb-2 flex shrink-0 items-center justify-between gap-3">
+      <div className="mb-1.5 flex shrink-0 items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
             Painel de controle
           </p>
           <h2 className="truncate text-lg font-semibold">Sua consulta</h2>
         </div>
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/12">
-          <Search className="size-4 text-weather-accent" aria-hidden="true" />
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            aria-expanded={recentPanelOpen}
+            aria-controls="cockpit-recent-searches"
+            onClick={() => setRecentPanelOpen((isOpen) => !isOpen)}
+            className="inline-flex h-8 items-center gap-2 rounded-md border border-white/12 bg-slate-950/28 px-2.5 text-xs font-semibold text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+          >
+            <History className="size-3.5" aria-hidden="true" />
+            Recentes
+            <span className="rounded-full bg-weather-accent/18 px-1.5 py-0.5 text-[10px] leading-none text-weather-accent">
+              {recentSearches.length}
+            </span>
+          </button>
+          <span className="flex size-9 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/12">
+            <Search className="size-4 text-weather-accent" aria-hidden="true" />
+          </span>
+        </div>
       </div>
 
+      {recentPanelOpen ? (
+        <section
+          id="cockpit-recent-searches"
+          aria-label="Buscas recentes"
+          className="absolute top-[4.25rem] right-3 left-3 z-20 rounded-lg border border-weather-accent/35 bg-slate-950/95 p-3 shadow-weather-glow backdrop-blur-md"
+        >
+          <div className="mb-2 flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold">Buscas recentes</h3>
+              <p className="text-[11px] text-slate-400">
+                Atalhos deste cockpit
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={recentSearches.length === 0}
+              onClick={() => setRecentSearches([])}
+              className="inline-flex h-7 items-center gap-1.5 rounded-md border border-white/12 px-2 text-[11px] font-semibold text-slate-300 transition hover:border-danger/45 hover:text-danger disabled:cursor-not-allowed disabled:opacity-45 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <Trash2 className="size-3" aria-hidden="true" />
+              Limpar
+            </button>
+          </div>
+
+          {recentSearches.length > 0 ? (
+            <div className="grid gap-2">
+              {recentSearches.map((search) => (
+                <button
+                  key={search.id}
+                  type="button"
+                  onClick={() => handleRecentSearchSelect(search)}
+                  className="grid min-h-12 gap-1 rounded-md border border-white/10 bg-white/7 p-2 text-left transition hover:border-weather-accent/45 hover:bg-weather-accent/10 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+                >
+                  <span className="flex min-w-0 items-center justify-between gap-2">
+                    <span className="truncate text-xs font-semibold text-slate-100">
+                      {search.city}
+                    </span>
+                    <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-weather-accent">
+                      <RotateCcw className="size-3" aria-hidden="true" />
+                      Repetir
+                    </span>
+                  </span>
+                  <span className="truncate text-[11px] text-slate-400">
+                    {search.modeLabel} - {search.activityLabel} - {search.date}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-md border border-white/10 bg-white/7 p-3 text-xs text-slate-400">
+              Nenhuma busca recente.
+            </p>
+          )}
+        </section>
+      ) : null}
+
       <form
-        className="flex h-full min-h-0 flex-col gap-2"
+        className="flex h-full min-h-0 flex-col gap-1.5"
         onSubmit={(event) => event.preventDefault()}
       >
-        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2">
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-[11px] font-semibold text-weather-accent">
               1
             </span>
             <h3 className="flex items-center gap-1.5 text-sm font-semibold">
@@ -146,22 +259,23 @@ function LeftControlPanel() {
             Cidade
             <input
               type="text"
-              defaultValue="São Paulo, SP"
-              className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2.5 text-sm text-slate-50 outline-none transition placeholder:text-slate-500 focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+              value={cityValue}
+              onChange={(event) => setCityValue(event.target.value)}
+              className="h-7 rounded-md border border-white/12 bg-slate-950/35 px-2.5 text-sm text-slate-50 outline-none transition placeholder:text-slate-500 focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
             />
           </label>
           <button
             type="button"
-            className="mt-2 inline-flex h-8 w-full items-center justify-center gap-2 rounded-md border border-weather-accent/35 bg-weather-accent/10 text-xs font-semibold text-weather-accent transition hover:bg-weather-accent/16 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            className="mt-1.5 inline-flex h-7 w-full items-center justify-center gap-2 rounded-md border border-weather-accent/35 bg-weather-accent/10 text-xs font-semibold text-weather-accent transition hover:bg-weather-accent/16 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
           >
             <LocateFixed className="size-3.5" aria-hidden="true" />
             Usar localização atual
           </button>
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2">
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-[11px] font-semibold text-weather-accent">
               2
             </span>
             <h3 className="text-sm font-semibold">Quando?</h3>
@@ -175,12 +289,13 @@ function LeftControlPanel() {
               />
               <input
                 type="date"
-                defaultValue="2026-06-26"
-                className="h-8 w-full rounded-md border border-white/12 bg-slate-950/35 px-2.5 pl-8 text-sm text-slate-50 outline-none transition focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+                value={dateValue}
+                onChange={(event) => setDateValue(event.target.value)}
+                className="h-7 w-full rounded-md border border-white/12 bg-slate-950/35 px-2.5 pl-8 text-sm text-slate-50 outline-none transition focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
               />
             </span>
           </label>
-          <details className="group mt-2 rounded-md border border-white/10 bg-slate-950/20 p-2">
+          <details className="group mt-1.5 rounded-md border border-white/10 bg-slate-950/20 p-1.5">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold text-slate-200">
               <span>Disponibilidade opcional</span>
               <Clock3 className="size-3.5 text-weather-accent" aria-hidden="true" />
@@ -191,7 +306,7 @@ function LeftControlPanel() {
                 <input
                   type="time"
                   defaultValue="08:00"
-                  className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+                  className="h-7 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
                 />
               </label>
               <label className="grid gap-1 text-xs font-medium text-slate-300">
@@ -199,21 +314,21 @@ function LeftControlPanel() {
                 <input
                   type="time"
                   defaultValue="18:00"
-                  className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+                  className="h-7 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
                 />
               </label>
             </div>
           </details>
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2">
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-[11px] font-semibold text-weather-accent">
               3
             </span>
             <h3 className="text-sm font-semibold">O que você quer fazer?</h3>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-4 gap-1.5">
             {activityCards.map((activity) => {
               const Icon = activity.icon;
               const isSelected = activity.id === selectedActivityId;
@@ -224,17 +339,17 @@ function LeftControlPanel() {
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => setSelectedActivityId(activity.id)}
-                  className={`grid min-h-12 gap-1 rounded-md border p-2 text-left transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
+                  className={`grid h-11 min-w-0 place-items-center gap-0.5 rounded-md border p-1.5 text-center transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
                     isSelected
                       ? "border-weather-accent/65 bg-weather-accent/16 text-weather-accent"
                       : "border-white/10 bg-slate-950/22 text-slate-200 hover:border-white/25"
                   }`}
                 >
-                  <span className="flex items-center gap-1.5 text-xs font-semibold">
-                    <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span className="flex min-w-0 flex-col items-center gap-0.5 text-[11px] font-semibold leading-tight">
+                    <Icon className="size-3 shrink-0" aria-hidden="true" />
                     <span className="truncate">{activity.label}</span>
                   </span>
-                  <span className="text-[11px] leading-none text-slate-400">
+                  <span className="text-[10px] leading-none text-slate-400">
                     {activity.detail}
                   </span>
                 </button>
@@ -245,7 +360,7 @@ function LeftControlPanel() {
 
         <button
           type="submit"
-          className="glow-primary mt-auto flex h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-weather-accent px-3 text-sm font-semibold text-slate-950 transition hover:bg-weather-accent/90 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:outline-none"
+          className="glow-primary mt-auto flex h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-weather-accent px-3 text-sm font-semibold text-slate-950 transition hover:bg-weather-accent/90 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:outline-none"
         >
           <Search className="size-4" aria-hidden="true" />
           Encontrar janela

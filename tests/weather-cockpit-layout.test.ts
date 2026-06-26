@@ -34,9 +34,23 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("Disponibilidade opcional");
     expect(page).toContain("O que você quer fazer?");
     expect(page).toContain("Encontrar janela");
-    expect(page).toContain("mt-auto flex h-11 shrink-0");
+    expect(page).toContain("mt-auto flex h-10 shrink-0");
     expect(page).not.toContain('aria-label="LeftPanel placeholder"');
     expect(page).not.toContain("CTA placeholder");
+  });
+
+  it("mantem buscas recentes em painel compacto no cockpit-preview", () => {
+    expect(page).toContain("CockpitRecentSearch");
+    expect(page).toContain('aria-controls="cockpit-recent-searches"');
+    expect(page).toContain('aria-label="Buscas recentes"');
+    expect(page).toContain("handleRecentSearchSelect");
+    expect(page).toContain("setCityValue(search.city)");
+    expect(page).toContain("setDateValue(search.date)");
+    expect(page).toContain("setRecentSearches([])");
+    expect(page).toContain("Recentes");
+    expect(page).toContain("Repetir");
+    expect(page).toContain("Limpar");
+    expect(page).not.toContain("overflow-hidden");
   });
 
   it("mantem faixa inferior de previsao sem adicionar mapa", () => {
