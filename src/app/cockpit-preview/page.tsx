@@ -2,16 +2,22 @@
 
 import { useState } from "react";
 import {
+  Bike,
   CalendarDays,
   CircleHelp,
+  Clock3,
   CloudSun,
   Compass,
+  Dumbbell,
+  Footprints,
   Gauge,
   LocateFixed,
-  PanelLeft,
+  MapPin,
   Radar,
+  Search,
   Sparkles,
   SunMedium,
+  Waves,
 } from "lucide-react";
 import Link from "next/link";
 import { WeatherStage } from "@/components/weather/weather-stage";
@@ -56,8 +62,6 @@ const decisionModes = [
   },
 ];
 
-const controlSteps = ["Local", "Atividade", "Periodo"];
-
 const climateBlocks = [
   { time: "06h", label: "Ceu limpo", value: "18C" },
   { time: "09h", label: "Brisa leve", value: "21C" },
@@ -66,12 +70,188 @@ const climateBlocks = [
   { time: "18h", label: "Vento baixo", value: "20C" },
 ];
 
+const activityCards = [
+  {
+    id: "caminhada",
+    label: "Caminhada",
+    detail: "leve",
+    icon: Footprints,
+  },
+  {
+    id: "bike",
+    label: "Bike",
+    detail: "vento",
+    icon: Bike,
+  },
+  {
+    id: "treino",
+    label: "Treino",
+    detail: "externo",
+    icon: Dumbbell,
+  },
+  {
+    id: "praia",
+    label: "Praia",
+    detail: "sol",
+    icon: Waves,
+  },
+];
+
 function PlaceholderLine({ className = "" }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
       className={`block rounded-full bg-white/12 ${className}`}
     />
+  );
+}
+
+function LeftControlPanel() {
+  const [selectedActivityId, setSelectedActivityId] = useState(
+    activityCards[0].id,
+  );
+
+  return (
+    <aside
+      className="glass-card flex min-h-0 flex-col rounded-xl p-3"
+      aria-label="LeftControlPanel"
+    >
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+            Painel de controle
+          </p>
+          <h2 className="truncate text-lg font-semibold">Sua consulta</h2>
+        </div>
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/12">
+          <Search className="size-4 text-weather-accent" aria-hidden="true" />
+        </span>
+      </div>
+
+      <form
+        className="flex h-full min-h-0 flex-col gap-2"
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+              1
+            </span>
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+              <MapPin className="size-3.5 text-weather-accent" aria-hidden="true" />
+              Onde?
+            </h3>
+          </div>
+          <label className="grid gap-1 text-xs font-medium text-slate-300">
+            Cidade
+            <input
+              type="text"
+              defaultValue="São Paulo, SP"
+              className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2.5 text-sm text-slate-50 outline-none transition placeholder:text-slate-500 focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+            />
+          </label>
+          <button
+            type="button"
+            className="mt-2 inline-flex h-8 w-full items-center justify-center gap-2 rounded-md border border-weather-accent/35 bg-weather-accent/10 text-xs font-semibold text-weather-accent transition hover:bg-weather-accent/16 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+          >
+            <LocateFixed className="size-3.5" aria-hidden="true" />
+            Usar localização atual
+          </button>
+        </section>
+
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+              2
+            </span>
+            <h3 className="text-sm font-semibold">Quando?</h3>
+          </div>
+          <label className="grid gap-1 text-xs font-medium text-slate-300">
+            Data
+            <span className="relative">
+              <CalendarDays
+                className="pointer-events-none absolute top-2 left-2.5 size-3.5 text-slate-400"
+                aria-hidden="true"
+              />
+              <input
+                type="date"
+                defaultValue="2026-06-26"
+                className="h-8 w-full rounded-md border border-white/12 bg-slate-950/35 px-2.5 pl-8 text-sm text-slate-50 outline-none transition focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+              />
+            </span>
+          </label>
+          <details className="group mt-2 rounded-md border border-white/10 bg-slate-950/20 p-2">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold text-slate-200">
+              <span>Disponibilidade opcional</span>
+              <Clock3 className="size-3.5 text-weather-accent" aria-hidden="true" />
+            </summary>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <label className="grid gap-1 text-xs font-medium text-slate-300">
+                De
+                <input
+                  type="time"
+                  defaultValue="08:00"
+                  className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+                />
+              </label>
+              <label className="grid gap-1 text-xs font-medium text-slate-300">
+                Até
+                <input
+                  type="time"
+                  defaultValue="18:00"
+                  className="h-8 rounded-md border border-white/12 bg-slate-950/35 px-2 text-sm text-slate-50 outline-none focus:border-weather-accent focus:ring-2 focus:ring-weather-accent/25"
+                />
+              </label>
+            </div>
+          </details>
+        </section>
+
+        <section className="rounded-lg border border-white/10 bg-white/7 p-2.5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-weather-accent/18 text-xs font-semibold text-weather-accent">
+              3
+            </span>
+            <h3 className="text-sm font-semibold">O que você quer fazer?</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {activityCards.map((activity) => {
+              const Icon = activity.icon;
+              const isSelected = activity.id === selectedActivityId;
+
+              return (
+                <button
+                  key={activity.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => setSelectedActivityId(activity.id)}
+                  className={`grid min-h-12 gap-1 rounded-md border p-2 text-left transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
+                    isSelected
+                      ? "border-weather-accent/65 bg-weather-accent/16 text-weather-accent"
+                      : "border-white/10 bg-slate-950/22 text-slate-200 hover:border-white/25"
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5 text-xs font-semibold">
+                    <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                    <span className="truncate">{activity.label}</span>
+                  </span>
+                  <span className="text-[11px] leading-none text-slate-400">
+                    {activity.detail}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <button
+          type="submit"
+          className="glow-primary mt-auto flex h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-weather-accent px-3 text-sm font-semibold text-slate-950 transition hover:bg-weather-accent/90 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:outline-none"
+        >
+          <Search className="size-4" aria-hidden="true" />
+          Encontrar janela
+        </button>
+      </form>
+    </aside>
   );
 }
 
@@ -84,8 +264,8 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant="night" />
-      <main className="relative z-10 min-h-screen px-4 py-4 text-slate-50 lg:h-screen lg:overflow-clip">
-        <div className="mx-auto grid h-full w-full max-w-[1400px] gap-3 lg:grid-rows-[4.5rem_4rem_minmax(0,1fr)_8.25rem_1.75rem]">
+      <main className="relative z-10 min-h-screen px-4 py-3 text-slate-50 lg:h-screen">
+        <div className="mx-auto grid h-full w-full max-w-[1400px] gap-2 lg:grid-rows-[3.5rem_3.25rem_minmax(0,1fr)_5.75rem_1.25rem]">
           <header className="glass-panel flex min-h-0 items-center justify-between gap-5 rounded-xl px-5 py-3">
             <div className="flex min-w-0 items-center gap-3">
               <div className="glow-primary flex size-11 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
@@ -149,43 +329,7 @@ export default function Home() {
           </nav>
 
           <section className="grid min-h-0 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
-            <aside
-              className="glass-card flex min-h-0 flex-col rounded-xl p-4"
-              aria-label="LeftPanel placeholder"
-            >
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
-                    LeftPanel placeholder
-                  </p>
-                  <h2 className="text-lg font-semibold">Controle futuro</h2>
-                </div>
-                <PanelLeft
-                  className="size-5 text-weather-accent"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="grid flex-1 content-between gap-3">
-                {controlSteps.map((step, index) => (
-                  <div
-                    key={step}
-                    className="rounded-lg border border-white/10 bg-white/7 p-3"
-                  >
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-                      <span className="flex size-6 items-center justify-center rounded-md bg-weather-accent/18 text-xs text-weather-accent">
-                        {index + 1}
-                      </span>
-                      {step}
-                    </div>
-                    <PlaceholderLine className="h-2 w-5/6" />
-                    <PlaceholderLine className="mt-2 h-2 w-2/3" />
-                  </div>
-                ))}
-              </div>
-              <div className="glow-primary mt-4 flex h-11 items-center justify-center rounded-md bg-weather-accent text-sm font-semibold text-slate-950">
-                CTA placeholder
-              </div>
-            </aside>
+            <LeftControlPanel />
 
             <section
               className="glass-card grid min-h-0 rounded-xl p-4 lg:grid-rows-[auto_minmax(0,1fr)]"
