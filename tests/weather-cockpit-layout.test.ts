@@ -19,11 +19,24 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("bg-weather-card");
   });
 
-  it("separa ModeBar, painel lateral e painel principal placeholders", () => {
+  it("separa ModeBar, painel lateral real e painel principal placeholder", () => {
     expect(page).toContain('aria-label="ModeBar"');
-    expect(page).toContain('aria-label="LeftPanel placeholder"');
+    expect(page).toContain("function LeftControlPanel");
+    expect(page).toContain('aria-label="LeftControlPanel"');
     expect(page).toContain('aria-label="MainPanel placeholder"');
     expect(page).toContain("lg:grid-cols-[340px_minmax(0,1fr)]");
+  });
+
+  it("implementa painel lateral completo sem cortes planejados", () => {
+    expect(page).toContain("Cidade");
+    expect(page).toContain("Usar localização atual");
+    expect(page).toContain("Data");
+    expect(page).toContain("Disponibilidade opcional");
+    expect(page).toContain("O que você quer fazer?");
+    expect(page).toContain("Encontrar janela");
+    expect(page).toContain("mt-auto flex h-11 shrink-0");
+    expect(page).not.toContain('aria-label="LeftPanel placeholder"');
+    expect(page).not.toContain("CTA placeholder");
   });
 
   it("mantem faixa inferior de previsao sem adicionar mapa", () => {
