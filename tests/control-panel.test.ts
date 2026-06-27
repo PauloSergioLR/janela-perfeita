@@ -8,22 +8,22 @@ function readFile(path: string) {
 
 describe("painel lateral de controle", () => {
   const page = readFile("src/app/page.tsx");
-  const section = readFile("src/components/search/control-panel-section.tsx");
 
-  it("organiza a busca em Onde, Quando e atividade", () => {
-    expect(page).toContain('number="1"');
-    expect(page).toContain('title="Onde?"');
-    expect(page).toContain('number="2"');
-    expect(page).toContain('title="Quando?"');
-    expect(page).toContain('number="3"');
-    expect(page).toContain('title="O que você quer fazer?"');
+  it("organiza a busca real em blocos compactos", () => {
+    expect(page).toContain("Onde?");
+    expect(page).toContain('Label htmlFor="city"');
+    expect(page).toContain("Atividade");
+    expect(page).toContain('role="radiogroup"');
+    expect(page).toContain('role="radio"');
+    expect(page).toContain("Quando?");
+    expect(page).toContain('id="date"');
   });
 
   it("mantem painel glass com acao principal destacada", () => {
     expect(page).toContain("glass-card");
-    expect(page).toContain("glow-primary order-4");
-    expect(section).toContain("border-t border-soft");
-    expect(section).not.toContain("MapLibre");
-    expect(section).not.toContain("maptiler");
+    expect(page).toContain("glow-primary mt-auto h-10");
+    expect(page).toContain("Buscas recentes");
+    expect(page).not.toContain("MapLibre");
+    expect(page).not.toContain("maptiler");
   });
 });

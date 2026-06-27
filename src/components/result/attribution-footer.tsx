@@ -1,15 +1,28 @@
 import { ExternalLink } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AttributionFooterProps {
+  className?: string;
+  compact?: boolean;
   disclaimer?: string;
 }
 
 const DEFAULT_DISCLAIMER =
   "Recomendação estimada com base em previsão meteorológica; confirme as condições locais antes de sair.";
 
-export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
+export function AttributionFooter({
+  className,
+  compact = false,
+  disclaimer,
+}: AttributionFooterProps) {
   return (
-    <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
+    <footer
+      className={cn(
+        "flex flex-col gap-2 border-t border-border text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between",
+        compact ? "pt-2 text-xs leading-5" : "pt-5",
+        className,
+      )}
+    >
       <p>
         Dados meteorológicos por{" "}
         <a

@@ -4,12 +4,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   CalendarDays,
   CalendarSearch,
+  CheckCircle2,
   CircleHelp,
   CloudSun,
+  Clock3,
   History,
   ListChecks,
   Loader2,
   MapPin,
+  RefreshCw,
   RotateCcw,
   Search,
   Trash2,
@@ -18,11 +21,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
+import { BottomForecastStrip } from "@/components/result/bottom-forecast-strip";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
-import { ForecastStrip } from "@/components/result/forecast-strip";
-import { RecommendationCard } from "@/components/result/recommendation-card";
-import { ScoreBreakdown } from "@/components/result/score-breakdown";
-import { OpportunityTimeline } from "@/components/result/opportunity-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
 import { WeatherStage } from "@/components/weather/weather-stage";
@@ -30,8 +30,6 @@ import {
   ModeSelector,
   type ModeSelectorOption,
 } from "@/components/search/mode-selector";
-import { ControlPanelSection } from "@/components/search/control-panel-section";
-import { ActivitySelector } from "@/components/search/activity-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PremiumState } from "@/components/ui/premium-state";
@@ -65,6 +63,16 @@ import {
 } from "@/lib/ui/search-page";
 import { getResultState } from "@/lib/ui/result-state";
 import { getWeatherStageVariant } from "@/lib/ui/weather-stage";
+import { getActivityIcon, getWeatherMetricIcon } from "@/lib/ui/icon-system";
+import {
+  buildTimelineData,
+  formatDecisionWindow,
+  formatForecastConfidenceLevel,
+  formatRecommendationDate,
+  formatRecommendationLocation,
+  getPeakHourScore,
+} from "@/lib/ui/recommendation-result";
+import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import {
   buildSearchHistoryEntry,
   clearSearchHistory,
@@ -75,6 +83,7 @@ import {
   saveSearchHistoryEntry,
   type SearchHistoryDraft,
 } from "@/lib/ui/search-history";
+import { getWeatherStats } from "@/lib/ui/weather-stats";
 import { cn } from "@/lib/utils";
 import type {
   ActivityId,
@@ -217,6 +226,262 @@ async function requestRecommendation(input: {
   });
 
   return readApiResponse<RecommendationResponse>(response);
+}
+
+function getCompactScoreClassName(tone: ScoreRingTone): string {
+  if (tone === "success") {
+    return "border-success/55 bg-success/10 text-success";
+  }
+
+  if (tone === "accent") {
+    return "border-weather-accent/55 bg-weather-accent/10 text-weather-accent";
+  }
+
+  if (tone === "warning") {
+    return "border-warning/55 bg-warning/10 text-warning";
+  }
+
+  if (tone === "caution") {
+    return "border-amber-400/55 bg-amber-400/10 text-amber-300";
+  }
+
+  return "border-danger/55 bg-danger/10 text-danger";
+}
+
+function CockpitRecommendationPanel({
+  recommendation,
+}: {
+  recommendation: Recommendation;
+}) {
+  const bestWindow = recommendation.bestWindow;
+  const resultScore =
+    bestWindow !== null
+      ? getPeakHourScore(bestWindow.scores)
+      : getPeakHourScore(recommendation.scores);
+  const displayScore = Math.round(
+    bestWindow?.avgScore ?? resultScore?.score ?? 0,
+  );
+  const scoreBand = getScoreRingBand(displayScore);
+  const timelineData = useMemo(
+    () =>
+      buildTimelineData(
+        recommendation.scores,
+        recommendation.activity.minRecommendedScore,
+        bestWindow,
+      ),
+    [bestWindow, recommendation],
+  );
+  const defaultSelectedTime =
+    timelineData.find((datum) => datum.isBestWindow)?.time ??
+    timelineData[0]?.time ??
+    null;
+  const [selectedTime, setSelectedTime] = useState(defaultSelectedTime);
+  const selectedDatum =
+    timelineData.find((datum) => datum.time === selectedTime) ??
+    timelineData[0] ??
+    null;
+  const reasonRules = (resultScore?.breakdown ?? []).slice(0, 4);
+  const weatherStats = getWeatherStats({
+    weather: resultScore?.weather ?? null,
+    sunrise: recommendation.sunrise,
+    sunset: recommendation.sunset,
+  }).slice(0, 5);
+
+  useEffect(() => {
+    setSelectedTime(defaultSelectedTime);
+  }, [defaultSelectedTime]);
+
+  return (
+    <section className="grid h-full min-h-0 gap-3 lg:grid-rows-[minmax(0,1fr)_7.25rem]">
+      <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(220px,0.42fr)_minmax(0,1fr)]">
+        <article className="grid min-h-0 content-center rounded-lg border border-weather-accent/40 bg-weather-accent/10 p-4 shadow-weather-glow">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+            Decisão principal
+          </p>
+          <h2 className="mt-1 text-xl font-semibold">Recomendação</h2>
+          <div
+            className={cn(
+              "mt-4 grid aspect-square w-32 place-items-center rounded-full border-8 text-center sm:w-36",
+              getCompactScoreClassName(scoreBand.tone),
+            )}
+            role="img"
+            aria-label={`Score ${displayScore} de 100: ${scoreBand.label}`}
+          >
+            <div>
+              <p className="text-xs font-medium">Score</p>
+              <p className="text-4xl font-semibold leading-none">
+                {displayScore}
+                <span className="text-sm">/100</span>
+              </p>
+              <p className="mt-1 text-xs font-semibold">{scoreBand.label}</p>
+            </div>
+          </div>
+          <div className="mt-4 border-t border-weather-accent/25 pt-3">
+            <p className="text-sm font-medium text-muted-foreground">
+              Janela recomendada
+            </p>
+            <p className="mt-1 text-2xl font-semibold leading-tight">
+              {formatDecisionWindow(bestWindow)}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {recommendation.activity.name} ·{" "}
+              {formatRecommendationLocation(recommendation)} ·{" "}
+              {formatRecommendationDate(recommendation.date)}
+            </p>
+            {bestWindow ? (
+              <Badge
+                variant="outline"
+                className="mt-3 h-7 border-success/45 bg-success/10 px-3 text-success"
+              >
+                <CheckCircle2 className="size-3" aria-hidden="true" />
+                Confiança{" "}
+                {formatForecastConfidenceLevel(
+                  bestWindow.confidence.level,
+                ).toLowerCase()}
+              </Badge>
+            ) : null}
+          </div>
+        </article>
+
+        <div className="grid min-h-0 gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <section
+            className="min-h-0 rounded-lg border border-soft bg-background/45 p-3"
+            aria-label="Motivos da recomendação"
+          >
+            <h3 className="text-sm font-medium">Motivos da recomendação</h3>
+            <div className="mt-3 grid gap-2">
+              {reasonRules.length > 0 ? (
+                reasonRules.map((rule) => (
+                  <div
+                    key={`${rule.factor}-${rule.reason}`}
+                    className="rounded-md border border-soft bg-weather-card/70 px-3 py-2"
+                  >
+                    <p className="text-xs font-semibold">{rule.label}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {rule.reason}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-md border border-soft bg-weather-card/70 p-3 text-xs text-muted-foreground">
+                  Sem detalhamento para esta janela.
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section
+            className="min-h-0 rounded-lg border border-soft bg-background/45 p-3"
+            aria-label="Estatísticas climáticas"
+          >
+            <h3 className="text-sm font-medium">Estatísticas climáticas</h3>
+            <dl className="mt-3 grid grid-cols-2 gap-2 xl:grid-cols-3">
+              {weatherStats.map((stat) => {
+                const Icon = getWeatherMetricIcon(stat.id);
+
+                return (
+                  <div
+                    key={stat.id}
+                    className="rounded-md border border-soft bg-weather-card/70 p-2"
+                  >
+                    <dt className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <Icon
+                        className="size-3 text-weather-accent"
+                        aria-hidden="true"
+                      />
+                      {stat.label}
+                    </dt>
+                    <dd className="mt-1 text-base font-semibold">{stat.value}</dd>
+                    {stat.detail ? (
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {stat.detail}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
+        </div>
+      </div>
+
+      <section
+        className="grid min-h-0 gap-3 rounded-lg border border-soft bg-background/45 p-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,0.42fr)]"
+        aria-label="Timeline de oportunidade"
+      >
+        <div className="min-w-0">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-medium">Timeline de scores</h3>
+            <Badge
+              variant="outline"
+              className="h-7 border-weather-accent/45 bg-weather-accent/10 px-3 text-weather-accent"
+            >
+              Mínimo {recommendation.activity.minRecommendedScore}/100
+            </Badge>
+          </div>
+          <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {timelineData.map((datum) => {
+              const isSelected = datum.time === selectedDatum?.time;
+              const isStrong = datum.isBestWindow || datum.isRecommended;
+
+              return (
+                <button
+                  key={datum.time}
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`${datum.hourLabel}, score ${datum.score} de 100. ${datum.reason}`}
+                  onClick={() => setSelectedTime(datum.time)}
+                  className={cn(
+                    "grid h-16 w-16 shrink-0 content-end rounded-md border p-1.5 text-left transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                    isSelected
+                      ? "border-weather-accent/65 bg-weather-accent/16 shadow-weather-glow"
+                      : "border-soft bg-weather-card/70 hover:border-weather-accent/45",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "rounded-sm",
+                      isStrong ? "bg-weather-accent" : "bg-muted-foreground/45",
+                    )}
+                    style={{
+                      height: `${Math.max(12, Math.min(48, datum.score / 2))}px`,
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span className="mt-1 flex items-center justify-between gap-1 text-[11px]">
+                    <span>{datum.hourLabel}</span>
+                    <span className="font-semibold">{datum.score}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedDatum ? (
+          <div
+            className="min-w-0 rounded-md border border-soft bg-weather-card/70 p-2"
+            aria-live="polite"
+            aria-label={`Detalhes de ${selectedDatum.hourLabel}`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold">{selectedDatum.hourLabel}</p>
+              <Badge variant="outline" className="h-7 px-2">
+                {selectedDatum.score}/100
+              </Badge>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {selectedDatum.reason}
+            </p>
+            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+              {selectedDatum.rainRisk ? <span>{selectedDatum.rainRisk}</span> : null}
+              {selectedDatum.wind ? <span>{selectedDatum.wind}</span> : null}
+            </div>
+          </div>
+        ) : null}
+      </section>
+    </section>
+  );
 }
 
 export default function Home() {
@@ -590,24 +855,27 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+      <main
+        className="relative z-10 min-h-screen px-3 py-2 text-foreground sm:px-4 lg:h-dvh lg:overflow-hidden lg:px-4"
+        aria-label="Cockpit principal"
+      >
+      <div className="mx-auto grid w-full max-w-[1540px] gap-2 lg:h-[calc(100dvh-1rem)] lg:grid-rows-[auto_auto_minmax(0,1fr)_7rem_auto]">
+        <header className="glass-panel flex min-h-0 flex-col gap-2 rounded-xl p-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="glow-primary flex size-9 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
               <CloudSun
-                className="size-6 text-weather-accent"
+                className="size-4 text-weather-accent"
                 aria-hidden="true"
               />
             </div>
-            <div className="min-w-0 space-y-1">
-              <p className="text-sm font-medium text-weather-accent">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
                 Clima por decisão
               </p>
-              <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-50 sm:text-3xl">
+              <h1 className="text-lg font-semibold text-slate-950 dark:text-slate-50 sm:text-xl">
                 Janela Perfeita
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <p className="hidden max-w-2xl text-xs leading-5 text-slate-600 dark:text-slate-300 2xl:block">
                 Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
@@ -636,33 +904,13 @@ export default function Home() {
             ) : null}
             <Link
               href="/como-funciona"
-              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-7 items-center gap-2 rounded-md border border-soft bg-weather-card px-2.5 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <CircleHelp className="size-3.5" aria-hidden="true" />
               Como funciona
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2">
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                {activities.length}
-              </p>
-              <p className="text-xs text-muted-foreground">atividades</p>
-            </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                7
-              </p>
-              <p className="text-xs text-muted-foreground">dias</p>
-            </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
-                0-100
-              </p>
-              <p className="text-xs text-muted-foreground">score</p>
-            </div>
-          </div>
         </header>
 
         <ModeSelector
@@ -674,12 +922,12 @@ export default function Home() {
           }}
         />
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start">
-          <aside className="flex flex-col gap-4 xl:sticky xl:top-6">
-          <Card className="glass-card overflow-hidden rounded-xl">
-            <CardHeader className="border-b border-soft bg-weather-card">
+        <section className="grid min-h-0 gap-2 xl:grid-cols-[minmax(360px,0.64fr)_minmax(0,1.36fr)]">
+          <aside className="min-h-0 min-w-0">
+          <Card className="glass-card h-full min-h-0 overflow-visible rounded-xl py-2">
+            <CardHeader className="border-b border-soft bg-weather-card px-3 pb-2">
               <CardTitle>Painel de controle</CardTitle>
-              <CardDescription>
+              <CardDescription className="hidden lg:block">
                 {searchMode === "clima_semana"
                   ? "Cidade define a consulta dos próximos 7 dias."
                   : searchMode === "dia"
@@ -689,16 +937,17 @@ export default function Home() {
                       : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5">
-              <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                <ControlPanelSection
-                  number="1"
-                  title="Onde?"
-                  description="Busque uma cidade ou use a localização atual."
-                  className="order-1"
-                >
-                <div className="space-y-2">
-                  <Label htmlFor="city">Cidade</Label>
+            <CardContent className="flex min-h-0 flex-1 flex-col px-3 pt-3">
+              <form className="flex min-h-0 flex-1 flex-col gap-2.5" onSubmit={handleSubmit}>
+                <section className="rounded-lg border border-soft bg-background/35 p-2">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-[11px] font-semibold text-weather-accent">
+                      1
+                    </span>
+                    <h2 className="text-sm font-semibold">Onde?</h2>
+                  </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="city" className="text-xs">Cidade</Label>
                   <div className="relative">
                     <div className="pointer-events-none absolute top-2 left-2.5 text-muted-foreground">
                       <MapPin className="size-4" aria-hidden="true" />
@@ -710,7 +959,7 @@ export default function Home() {
                         handleCityQueryChange(event.target.value)
                       }
                       placeholder="Ex.: Criciúma"
-                      className="h-11 rounded-md pl-8"
+                      className="h-9 rounded-md pl-8"
                       autoComplete="off"
                       role="combobox"
                       aria-expanded={cityQueryEnabled}
@@ -720,7 +969,7 @@ export default function Home() {
                       <div
                         id="city-suggestions"
                         role="listbox"
-                        className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
+                        className="absolute z-30 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
                       >
                         {cityQueryResult.isFetching ? (
                           <PremiumState
@@ -787,98 +1036,92 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
-                  {isDetectingLocation ? (
-                    <PremiumState
-                      compact
-                      variant="loading"
-                      eyebrow="Localização atual"
-                      title="Detectando sua cidade"
-                      description={locationMessage || CURRENT_LOCATION_WAITING_MESSAGE}
-                    />
-                  ) : locationStatus === "error" ? (
-                    <PremiumState
-                      compact
-                      variant="error"
-                      eyebrow="Localização atual"
-                      title="Localização indisponível"
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                      action={{
-                        label: "Tentar novamente",
-                        onClick: handleLocationRetry,
-                      }}
-                    />
-                  ) : (
-                    <PremiumState
-                      compact
-                      variant="initial"
-                      eyebrow="Localização atual"
-                      title={
-                        locationStatus === "success"
-                          ? "Cidade detectada"
-                          : "Use sua localização se quiser"
-                      }
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                    />
-                  )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      className="inline-flex h-7 items-center gap-1.5 rounded-md border border-soft px-2 text-xs text-muted-foreground transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-wait disabled:opacity-65"
+                      disabled={isDetectingLocation}
+                      onClick={handleLocationRetry}
+                    >
+                      <RefreshCw className="size-3" aria-hidden="true" />
+                      {isDetectingLocation
+                        ? "Detectando..."
+                        : "Usar localização atual"}
+                    </button>
+                    <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                      {isDetectingLocation
+                        ? locationMessage || CURRENT_LOCATION_WAITING_MESSAGE
+                        : locationStatus === "error"
+                          ? locationMessage || CURRENT_LOCATION_PRIVACY_NOTE
+                          : locationStatus === "success"
+                            ? locationMessage
+                            : CURRENT_LOCATION_ATTRIBUTION}
+                    </p>
+                  </div>
                 </div>
-                </ControlPanelSection>
+                </section>
 
                 {modeUsesActivity(searchMode) ? (
-                  <ControlPanelSection
-                    number="3"
-                    title="O que você quer fazer?"
-                    description="Escolha uma atividade para receber a melhor janela."
-                    className="order-3"
-                  >
-                  <div className="space-y-3">
-                    <Label id="atividade-label">Atividade</Label>
-                    <ActivitySelector
-                      activities={activities}
-                      value={selectedActivityId}
-                      onChange={(activityId) => {
-                        setSelectedActivityId(activityId);
-                        resetRecommendationState();
-                      }}
-                    />
-                  </div>
-                  </ControlPanelSection>
+                  <section className="rounded-lg border border-soft bg-background/35 p-2">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-[11px] font-semibold text-weather-accent">
+                        2
+                      </span>
+                      <h2 id="atividade-label" className="text-sm font-semibold">
+                        Atividade
+                      </h2>
+                    </div>
+                    <div
+                      className="grid grid-cols-2 gap-1.5 sm:grid-cols-3"
+                      role="radiogroup"
+                      aria-labelledby="atividade-label"
+                    >
+                      {activities.map((activity) => {
+                        const ActivityIcon = getActivityIcon(activity.id);
+                        const selected = selectedActivityId === activity.id;
+
+                        return (
+                          <button
+                            key={activity.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={selected}
+                            className={cn(
+                              "grid h-9 min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-1.5 rounded-md border px-2 text-left text-xs transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                              selected
+                                ? "border-weather-accent/65 bg-weather-accent/14 text-weather-accent"
+                                : "border-soft bg-weather-card/55 hover:border-weather-accent/45",
+                            )}
+                            onClick={() => {
+                              setSelectedActivityId(activity.id);
+                              resetRecommendationState();
+                            }}
+                          >
+                            <ActivityIcon className="size-3.5" aria-hidden="true" />
+                            <span className="truncate">{activity.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
                 ) : null}
 
-                <ControlPanelSection
-                  number="2"
-                  title="Quando?"
-                  description="Defina a data e, se quiser, sua disponibilidade."
-                  className="order-2"
-                >
+                <section className="rounded-lg border border-soft bg-background/35 p-2">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-[11px] font-semibold text-weather-accent">
+                      3
+                    </span>
+                    <h2 className="text-sm font-semibold">Quando?</h2>
+                  </div>
                 {usesAvailability ? (
-                  <div className="space-y-3 border-t border-soft pt-3">
-                    <div className="space-y-1">
-                      <Label>Disponibilidade opcional</Label>
-                      <p className="text-xs leading-5 text-muted-foreground">
-                        Limita a busca ao periodo em que voce pode fazer a atividade.
-                      </p>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
+                  <details className="mb-2 rounded-md border border-soft bg-weather-card/45 p-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium">
+                      Disponibilidade opcional
+                      <Clock3 className="size-3.5 text-weather-accent" aria-hidden="true" />
+                    </summary>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <Label htmlFor="available-from">Disponivel de</Label>
+                        <Label htmlFor="available-from" className="text-xs">Disponivel de</Label>
                         <Input
                           id="available-from"
                           type="time"
@@ -887,11 +1130,11 @@ export default function Home() {
                             setAvailableFrom(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md"
+                          className="h-8 rounded-md"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="available-to">Disponivel ate</Label>
+                        <Label htmlFor="available-to" className="text-xs">Disponivel ate</Label>
                         <Input
                           id="available-to"
                           type="time"
@@ -900,21 +1143,21 @@ export default function Home() {
                             setAvailableTo(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md"
+                          className="h-8 rounded-md"
                         />
                       </div>
                     </div>
-                  </div>
+                  </details>
                 ) : null}
 
-                <div className="grid gap-4">
+                <div className="grid gap-2">
                   {usesDate ? (
-                    <div className="space-y-2">
-                      <Label htmlFor="date">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="date" className="text-xs">
                         {searchMode === "semana" ? "A partir de" : "Data"}
                       </Label>
                       <div className="relative">
-                        <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
+                        <CalendarDays className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
                         <Input
                           id="date"
                           type="date"
@@ -925,16 +1168,16 @@ export default function Home() {
                             setSelectedDate(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md pl-8"
+                          className="h-9 rounded-md pl-8"
                         />
                       </div>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {dateOptions.map((option) => (
                           <button
                             key={option.value}
                             type="button"
                             className={cn(
-                              "h-8 rounded-md border px-3 text-xs font-medium transition hover:border-foreground/30",
+                              "h-7 rounded-md border px-2 text-xs font-medium transition hover:border-foreground/30",
                               selectedDate === option.value
                                 ? "border-sky-600 bg-sky-50 text-sky-900"
                                 : "border-border bg-background text-muted-foreground",
@@ -953,10 +1196,10 @@ export default function Home() {
                   ) : null}
 
                 </div>
-                </ControlPanelSection>
+                </section>
 
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="order-4 flex items-start gap-3 rounded-lg border border-soft bg-background/35 p-3 text-sm">
+                  <label className="flex items-start gap-2 rounded-lg border border-soft bg-background/35 p-2 text-xs">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -970,17 +1213,75 @@ export default function Home() {
                       <span className="block font-medium">
                         Comparar modelos Open-Meteo
                       </span>
-                      <span className="block text-xs leading-5 text-muted-foreground">
+                      <span className="hidden leading-5 text-muted-foreground 2xl:block">
                         Mostra concordância quando a recomendação for calculada.
                       </span>
                     </span>
                   </label>
                 ) : null}
 
+                <details className="rounded-lg border border-soft bg-background/35 p-2">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium">
+                    <span className="inline-flex items-center gap-1.5">
+                      <History className="size-3.5 text-weather-accent" aria-hidden="true" />
+                      Buscas recentes
+                    </span>
+                    <span className="rounded-md border border-soft px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                      {searchHistory.length}
+                    </span>
+                  </summary>
+                  <div className="mt-2 grid gap-1.5">
+                    {searchHistory.length > 0 ? (
+                      searchHistory.slice(0, 3).map((entry) => {
+                        const mode = SEARCH_MODE_OPTIONS.find(
+                          (option) => option.id === entry.mode,
+                        );
+
+                        return (
+                          <button
+                            key={`${entry.id}-${entry.createdAt}`}
+                            type="button"
+                            className="grid gap-1 rounded-md border border-soft bg-weather-card/55 p-2 text-left text-xs transition hover:border-weather-accent/45 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            onClick={() => handleHistorySelect(entry)}
+                          >
+                            <span className="flex min-w-0 items-center gap-1.5 font-medium">
+                              <RotateCcw
+                                className="size-3 text-weather-accent"
+                                aria-hidden="true"
+                              />
+                              <span className="truncate">
+                                {getSearchHistoryLabel(entry)}
+                              </span>
+                            </span>
+                            <span className="truncate text-[11px] text-muted-foreground">
+                              {mode?.label ?? "Busca"} · {entry.date}
+                            </span>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <p className="rounded-md border border-soft bg-weather-card/55 p-2 text-xs text-muted-foreground">
+                        Nenhuma busca recente.
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 justify-self-start rounded-md text-xs"
+                      disabled={searchHistory.length === 0}
+                      onClick={handleClearHistory}
+                    >
+                      <Trash2 className="size-3" aria-hidden="true" />
+                      Limpar
+                    </Button>
+                  </div>
+                </details>
+
                 <Button
                   type="submit"
                   size="lg"
-                  className="glow-primary order-4 h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
+                  className="glow-primary mt-auto h-10 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
                   disabled={!canSearch || recommendationMutation.isPending}
                 >
                   {recommendationMutation.isPending ? (
@@ -1003,75 +1304,14 @@ export default function Home() {
               </form>
             </CardContent>
           </Card>
-
-          <Card className="glass-card overflow-hidden rounded-xl">
-            <CardHeader className="border-b border-soft bg-weather-card">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle>Buscas recentes</CardTitle>
-                  <CardDescription>Apenas neste navegador</CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-8 rounded-md"
-                  disabled={searchHistory.length === 0}
-                  onClick={handleClearHistory}
-                >
-                  <Trash2 className="size-3.5" aria-hidden="true" />
-                  Limpar
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-5">
-              {searchHistory.length > 0 ? (
-                <div className="grid gap-2">
-                  {searchHistory.map((entry) => {
-                    const mode = SEARCH_MODE_OPTIONS.find(
-                      (option) => option.id === entry.mode,
-                    );
-
-                    return (
-                      <button
-                        key={`${entry.id}-${entry.createdAt}`}
-                        type="button"
-                        className="grid gap-2 rounded-lg border border-border bg-background p-3 text-left transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
-                        onClick={() => handleHistorySelect(entry)}
-                      >
-                        <span className="min-w-0">
-                          <span className="flex items-center gap-2 font-medium text-slate-950 dark:text-slate-50">
-                            <History className="size-4 text-sky-700" aria-hidden="true" />
-                            {getSearchHistoryLabel(entry)}
-                          </span>
-                          <span className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            <span>{mode?.label ?? "Busca"}</span>
-                            <span>{entry.date}</span>
-                          </span>
-                        </span>
-                        <span className="inline-flex h-8 items-center gap-1 rounded-md border border-border px-2 text-xs text-muted-foreground">
-                          <RotateCcw className="size-3" aria-hidden="true" />
-                          Repetir
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-                  Nenhuma busca recente.
-                </div>
-              )}
-            </CardContent>
-          </Card>
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4"
+            className="glass-card h-full min-h-0 min-w-0 overflow-y-auto rounded-xl p-2 pr-2.5 [scrollbar-width:thin]"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
-              <RecommendationCard recommendation={recommendation} />
+              <CockpitRecommendationPanel recommendation={recommendation} />
             ) : resultState === "content" && activityRanking ? (
               <ActivityRankingCard ranking={activityRanking} />
             ) : resultState === "content" && weekComparison ? (
@@ -1081,7 +1321,7 @@ export default function Home() {
             ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl">
+              <Card className="h-full min-h-0 overflow-hidden rounded-xl border-0 bg-transparent shadow-none ring-0">
                 <CardHeader className="border-b border-soft bg-weather-card">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
@@ -1153,54 +1393,20 @@ export default function Home() {
                 </CardContent>
               </Card>
             )}
-
-            {resultState === "content" && recommendation ? (
-              <section className="space-y-4">
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-                  <OpportunityTimeline recommendation={recommendation} />
-                  <ScoreBreakdown recommendation={recommendation} />
-                </div>
-                {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
-              </section>
-            ) : null}
           </section>
         </section>
 
-        <section
-          className="glass-panel rounded-xl p-3 sm:p-4"
-          aria-label="Resumo da consulta"
-        >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Modo</p>
-              <p className="truncate text-sm font-medium">
-                {selectedModeOption?.label ?? "Janela perfeita"}
-              </p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Cidade</p>
-              <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Período</p>
-              <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Atividade</p>
-              <p className="truncate text-sm font-medium">
-                {cockpitActivityLabel}
-              </p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Resultado</p>
-              <p className="truncate text-sm font-medium">
-                {cockpitResultLabel}
-              </p>
-            </div>
-          </div>
-        </section>
+        <BottomForecastStrip
+          className="min-h-0"
+          overview={forecastStrip}
+          modeLabel={selectedModeOption?.label ?? "Janela perfeita"}
+          cityLabel={cockpitCityLabel}
+          dateLabel={cockpitDateLabel}
+          activityLabel={cockpitActivityLabel}
+          resultLabel={cockpitResultLabel}
+        />
 
-        <AttributionFooter disclaimer={resultDisclaimer} />
+        <AttributionFooter compact disclaimer={resultDisclaimer} />
       </div>
       </main>
     </>

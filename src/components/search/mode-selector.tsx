@@ -25,15 +25,16 @@ export function ModeSelector({
 }: ModeSelectorProps) {
   return (
     <section
-      className="glass-card rounded-xl p-3 sm:p-4"
+      className="glass-card rounded-xl p-2"
+      aria-label="ModeBar"
       aria-labelledby="modo-label"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center">
-        <div className="space-y-1">
+      <div className="grid gap-2 lg:grid-cols-[minmax(104px,0.12fr)_minmax(0,1fr)] lg:items-center">
+        <div className="space-y-0.5">
           <p id="modo-label" className="text-sm font-medium text-foreground">
             Modo
           </p>
-          <p className="text-xs leading-5 text-muted-foreground">
+          <p className="hidden text-xs leading-5 text-muted-foreground 2xl:block">
             Cidade, data, atividade e previsão no mesmo painel.
           </p>
         </div>
@@ -53,7 +54,7 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
+                  "group relative min-h-12 rounded-lg border border-soft bg-background/45 p-1.5 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none",
                   selected
                     ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",
@@ -63,18 +64,18 @@ export function ModeSelector({
                 <span className="flex items-start gap-3">
                   <span
                     className={cn(
-                      "flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none",
+                      "flex size-8 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none",
                       selected && "bg-weather-accent/20 motion-safe:scale-105",
                     )}
                   >
                     <Icon
-                      className="size-4 text-weather-accent"
+                      className="size-3.5 text-weather-accent"
                       aria-hidden="true"
                     />
                   </span>
                   <span className="min-w-0">
-                    <span className="block font-medium">{mode.label}</span>
-                    <span className="block text-xs leading-5 text-muted-foreground">
+                    <span className="block text-sm font-medium">{mode.label}</span>
+                    <span className="hidden text-xs leading-5 text-muted-foreground xl:block">
                       {mode.description}
                     </span>
                   </span>

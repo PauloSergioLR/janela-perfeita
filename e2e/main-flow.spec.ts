@@ -44,6 +44,36 @@ test("fluxo principal gera recomendação real", async ({ page }) => {
   await expect(page.getByText("Timeline de scores")).toBeVisible();
 });
 
+test("cockpit desktop cabe na viewport sem pagina longa", async ({ page }) => {
+  const viewports = [
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1600, height: 900 },
+    { width: 1920, height: 1080 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await openHome(page);
+
+    await expect(page.getByText("Painel de controle")).toBeVisible();
+    await expect(page.getByLabel("Resultado da decisão")).toBeVisible();
+    await expect(page.getByLabel("Previsão dos próximos dias")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Encontrar janela" }),
+    ).toBeVisible();
+
+    const pageHeight = await page.evaluate(() => ({
+      clientHeight: document.documentElement.clientHeight,
+      scrollHeight: document.documentElement.scrollHeight,
+    }));
+
+    expect(pageHeight.scrollHeight).toBeLessThanOrEqual(
+      pageHeight.clientHeight + 8,
+    );
+  }
+});
+
 test("busca de cidade exibe estado sem resultado real", async ({ page }) => {
   await openHome(page);
   await page.getByLabel("Cidade").fill("cidadeinexistentejanela");
