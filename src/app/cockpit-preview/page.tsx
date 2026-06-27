@@ -18,10 +18,12 @@ import {
   Radar,
   RotateCcw,
   Search,
+  Share2,
   ShieldCheck,
   Sparkles,
   SunMedium,
   Thermometer,
+  Trophy,
   Trash2,
   Waves,
   Wind,
@@ -149,6 +151,69 @@ const perfectWindowTimeline = [
   { time: "13h", score: 54, label: "fraca" },
 ];
 
+const todayRankingCards = [
+  {
+    id: "caminhada",
+    position: 1,
+    label: "Caminhada",
+    score: 91,
+    window: "08h - 10h",
+    summary: "Brisa leve, baixa chuva e luz confortavel.",
+    signal: "ideal agora",
+    icon: Footprints,
+  },
+  {
+    id: "bike",
+    position: 2,
+    label: "Bike",
+    score: 84,
+    window: "07h - 09h",
+    summary: "Vento controlado antes do aquecimento do meio-dia.",
+    signal: "boa janela",
+    icon: Bike,
+  },
+  {
+    id: "praia",
+    position: 3,
+    label: "Praia",
+    score: 78,
+    window: "09h - 11h",
+    summary: "Sol firme com atencao ao indice UV depois das 11h.",
+    signal: "vale cedo",
+    icon: Waves,
+  },
+  {
+    id: "treino",
+    position: 4,
+    label: "Treino",
+    score: 72,
+    window: "17h - 18h",
+    summary: "Temperatura cai no fim da tarde e melhora conforto.",
+    signal: "fim do dia",
+    icon: Dumbbell,
+  },
+  {
+    id: "jardim",
+    position: 5,
+    label: "Jardim",
+    score: 66,
+    window: "06h - 08h",
+    summary: "Solo seco e vento fraco, mas pouca luz no inicio.",
+    signal: "moderada",
+    icon: SunMedium,
+  },
+  {
+    id: "externo",
+    position: 6,
+    label: "Tarefas externas",
+    score: 58,
+    window: "14h - 16h",
+    summary: "Calor e nuvens reduzem conforto para deslocamentos longos.",
+    signal: "com cautela",
+    icon: MapPin,
+  },
+];
+
 interface CockpitRecentSearch {
   id: string;
   city: string;
@@ -183,6 +248,10 @@ interface LeftControlPanelProps {
 
 interface ModePreviewPanelProps {
   activeMode: (typeof decisionModes)[number];
+}
+
+interface TodayRankingViewProps {
+  hasResult: boolean;
 }
 
 interface PerfectWindowViewProps {
@@ -366,6 +435,186 @@ function PerfectWindowView({ hasResult }: PerfectWindowViewProps) {
           })}
         </div>
       </section>
+    </section>
+  );
+}
+
+function TodayRankingView({ hasResult }: TodayRankingViewProps) {
+  const [pageIndex, setPageIndex] = useState(0);
+  const pageSize = 3;
+  const totalPages = Math.ceil(todayRankingCards.length / pageSize);
+  const firstCardIndex = pageIndex * pageSize;
+  const visibleCards = todayRankingCards.slice(
+    firstCardIndex,
+    firstCardIndex + pageSize,
+  );
+  const bestActivity = todayRankingCards[0];
+  const BestIcon = bestActivity.icon;
+
+  return (
+    <section
+      className="grid h-full min-h-0 gap-4 lg:grid-cols-[minmax(0,1fr)_260px]"
+      aria-label="MainPanel O que fazer hoje"
+    >
+      <div className="grid min-h-0 gap-4 lg:grid-rows-[minmax(150px,0.45fr)_minmax(0,1fr)]">
+        <section className="grid min-h-0 gap-4 rounded-lg border border-weather-accent/35 bg-weather-accent/10 p-4 shadow-weather-glow lg:grid-cols-[minmax(0,1fr)_170px] lg:items-center">
+          <div className="min-w-0">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-weather-accent">
+              <Trophy className="size-4" aria-hidden="true" />
+              Mais recomendada
+            </div>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-weather-accent/45 bg-slate-950/28">
+                <BestIcon className="size-5 text-weather-accent" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate text-3xl font-semibold leading-tight">
+                  {bestActivity.label}
+                </h2>
+                <p className="mt-1 text-sm text-slate-300">
+                  {bestActivity.window} · {bestActivity.summary}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg border border-white/10 bg-slate-950/30 p-4 text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+              Score do dia
+            </p>
+            <p className="mt-1 text-5xl font-semibold leading-none text-slate-50">
+              {bestActivity.score}
+            </p>
+            <p className="mt-2 text-xs font-semibold text-success">
+              {bestActivity.signal}
+            </p>
+          </div>
+        </section>
+
+        <section
+          className="grid min-h-0 gap-3 rounded-lg border border-white/10 bg-white/7 p-3"
+          aria-label="Ranking de atividades do dia"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+                Ranking compacto
+              </p>
+              <h3 className="truncate text-sm font-semibold">
+                Pagina {pageIndex + 1} de {totalPages}
+              </h3>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                aria-label="Atividades anteriores"
+                disabled={pageIndex === 0}
+                onClick={() => setPageIndex((index) => Math.max(0, index - 1))}
+                className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+              >
+                <ChevronLeft className="size-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                aria-label="Proximas atividades"
+                disabled={pageIndex === totalPages - 1}
+                onClick={() =>
+                  setPageIndex((index) => Math.min(totalPages - 1, index + 1))
+                }
+                className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+              >
+                <ChevronRight className="size-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <ol className="grid min-h-0 gap-3 md:grid-cols-3">
+            {visibleCards.map((activity) => {
+              const Icon = activity.icon;
+              const isBest = activity.position === 1;
+
+              return (
+                <li
+                  key={activity.id}
+                  className={`grid min-h-[142px] gap-3 rounded-lg border p-3 ${
+                    isBest
+                      ? "border-weather-accent/45 bg-weather-accent/12"
+                      : "border-white/10 bg-slate-950/24"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-white/12 bg-white/8">
+                        <Icon className="size-4 text-weather-accent" aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">
+                          {activity.position}. {activity.label}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {activity.window}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="rounded-md border border-success/35 bg-success/10 px-2 py-1 text-xs font-semibold text-success">
+                      {activity.score}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-5 text-slate-300">
+                    {activity.summary}
+                  </p>
+                  <p className="mt-auto text-[11px] font-semibold uppercase tracking-[0.12em] text-weather-accent">
+                    {activity.signal}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="flex justify-center gap-1.5" aria-label="Paginacao do ranking">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <span
+                key={index}
+                className={`h-1.5 rounded-full transition-all ${
+                  index === pageIndex
+                    ? "w-6 bg-weather-accent"
+                    : "w-2 bg-white/25"
+                }`}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <aside className="grid min-h-0 gap-3 lg:grid-rows-[1fr_auto]">
+        <section className="rounded-lg border border-white/10 bg-slate-950/24 p-4">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+            Resumo curto
+          </p>
+          <div className="mt-4 grid gap-3">
+            {[
+              ["Cidade", "Sao Paulo, SP"],
+              ["Data", "Hoje"],
+              ["Atividades", `${todayRankingCards.length} analisadas`],
+              ["Criterio", hasResult ? "Busca simulada" : "Preview estatico"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-lg border border-white/10 bg-white/7 px-3 py-2"
+              >
+                <p className="text-[11px] text-slate-400">{label}</p>
+                <p className="truncate text-sm font-semibold">{value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+        <button
+          type="button"
+          className="flex h-10 items-center justify-center gap-2 rounded-md border border-weather-accent/45 bg-weather-accent/12 px-3 text-sm font-semibold text-weather-accent transition hover:bg-weather-accent/18 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+        >
+          <Share2 className="size-4" aria-hidden="true" />
+          Compartilhar ranking
+        </button>
+      </aside>
     </section>
   );
 }
@@ -719,6 +968,8 @@ export default function Home() {
             >
               {activeMode.id === "janela-perfeita" ? (
                 <PerfectWindowView hasResult={hasPerfectWindowResult} />
+              ) : activeMode.id === "fazer-hoje" ? (
+                <TodayRankingView hasResult={hasPerfectWindowResult} />
               ) : (
                 <ModePreviewPanel activeMode={activeMode} />
               )}
