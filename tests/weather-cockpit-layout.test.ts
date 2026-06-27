@@ -112,4 +112,21 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("Compartilhar ranking");
     expect(page).toContain('activeMode.id === "fazer-hoje"');
   });
+
+  it("cria view Consulta do dia dentro do MainPanel", () => {
+    expect(page).toContain("function DailyOverviewView");
+    expect(page).toContain('aria-label="MainPanel Consulta do dia"');
+    expect(page).toContain("dailyOverviewMetrics");
+    expect(page).toContain("dailyOverviewTimeline");
+    expect(page).toContain("Parcialmente nublado");
+    expect(page).toContain("Umidade");
+    expect(page).toContain("UV");
+    expect(page).toContain("06:42 / 17:31");
+    expect(page).toContain('aria-label="Cards climaticos da consulta do dia"');
+    expect(page).toContain(
+      'aria-label="Timeline horaria compacta Consulta do dia"',
+    );
+    expect(page).toContain('activeMode.id === "consulta-dia"');
+    expect(page).not.toContain("test.skip");
+  });
 });

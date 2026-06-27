@@ -10,6 +10,7 @@ import {
   Clock3,
   CloudRain,
   CloudSun,
+  Droplets,
   Dumbbell,
   Footprints,
   History,
@@ -21,6 +22,8 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  Sunrise,
+  Sunset,
   SunMedium,
   Thermometer,
   Trophy,
@@ -214,6 +217,54 @@ const todayRankingCards = [
   },
 ];
 
+const dailyOverviewMetrics = [
+  {
+    label: "Min / max",
+    value: "18C / 27C",
+    detail: "sensacao ate 28C",
+    icon: Thermometer,
+  },
+  {
+    label: "Chuva",
+    value: "22%",
+    detail: "1.4 mm no fim do dia",
+    icon: CloudRain,
+  },
+  {
+    label: "Vento",
+    value: "11 km/h",
+    detail: "rajadas 19 km/h",
+    icon: Wind,
+  },
+  {
+    label: "Umidade",
+    value: "63%",
+    detail: "conforto moderado",
+    icon: Droplets,
+  },
+  {
+    label: "UV",
+    value: "7",
+    detail: "alto entre 11h e 14h",
+    icon: SunMedium,
+  },
+  {
+    label: "Sol",
+    value: "06:42 / 17:31",
+    detail: "nascer e por do sol",
+    icon: Sunrise,
+  },
+];
+
+const dailyOverviewTimeline = [
+  { time: "06h", temp: "18C", rain: "4%", wind: "6", label: "amanhecer" },
+  { time: "09h", temp: "22C", rain: "8%", wind: "9", label: "agradavel" },
+  { time: "12h", temp: "27C", rain: "12%", wind: "11", label: "UV alto" },
+  { time: "15h", temp: "26C", rain: "18%", wind: "14", label: "nuvens" },
+  { time: "18h", temp: "22C", rain: "22%", wind: "12", label: "chuva leve" },
+  { time: "21h", temp: "20C", rain: "16%", wind: "8", label: "estavel" },
+];
+
 interface CockpitRecentSearch {
   id: string;
   city: string;
@@ -252,6 +303,11 @@ interface ModePreviewPanelProps {
 
 interface TodayRankingViewProps {
   hasResult: boolean;
+}
+
+interface DailyOverviewViewProps {
+  city: string;
+  date: string;
 }
 
 interface PerfectWindowViewProps {
@@ -619,6 +675,173 @@ function TodayRankingView({ hasResult }: TodayRankingViewProps) {
   );
 }
 
+function DailyOverviewView({ city, date }: DailyOverviewViewProps) {
+  const [selectedHourIndex, setSelectedHourIndex] = useState(2);
+  const selectedHour = dailyOverviewTimeline[selectedHourIndex];
+
+  return (
+    <section
+      className="grid h-full min-h-0 gap-4 lg:grid-rows-[minmax(0,1fr)_auto]"
+      aria-label="MainPanel Consulta do dia"
+    >
+      <div className="grid min-h-0 gap-4 lg:grid-cols-[minmax(0,1fr)_330px]">
+        <section className="grid min-h-0 gap-4 rounded-lg border border-weather-accent/35 bg-weather-accent/10 p-5 shadow-weather-glow lg:grid-cols-[minmax(0,1fr)_190px] lg:items-center">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Consulta do dia
+            </p>
+            <div className="mt-3 flex min-w-0 items-start gap-4">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-weather-accent/45 bg-slate-950/30">
+                <CloudSun className="size-7 text-weather-accent" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate text-3xl font-semibold leading-tight">
+                  {city}
+                </h2>
+                <p className="mt-1 text-sm text-slate-300">{date}</p>
+                <p className="mt-4 text-5xl font-semibold leading-none text-slate-50">
+                  18C / 27C
+                </p>
+                <p className="mt-3 text-sm font-medium text-weather-accent">
+                  Parcialmente nublado, tarde quente e chuva leve no fim do dia.
+                </p>
+              </div>
+            </div>
+          </div>
+          <aside className="grid gap-3 rounded-lg border border-white/10 bg-slate-950/28 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-400">Condicao</span>
+              <span className="rounded-md border border-success/35 bg-success/10 px-2 py-1 text-xs font-semibold text-success">
+                Estavel
+              </span>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+                Hora foco
+              </p>
+              <p className="mt-1 text-3xl font-semibold">{selectedHour.time}</p>
+              <p className="mt-1 text-sm text-slate-300">
+                {selectedHour.temp} - chuva {selectedHour.rain} - vento{" "}
+                {selectedHour.wind} km/h
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/7 px-2 py-1.5">
+                <Sunrise className="size-3.5 text-weather-accent" aria-hidden="true" />
+                06:42
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/7 px-2 py-1.5">
+                <Sunset className="size-3.5 text-weather-accent" aria-hidden="true" />
+                17:31
+              </span>
+            </div>
+          </aside>
+        </section>
+
+        <section
+          className="grid min-h-0 gap-3 rounded-lg border border-white/10 bg-white/7 p-3 sm:grid-cols-2"
+          aria-label="Cards climaticos da consulta do dia"
+        >
+          {dailyOverviewMetrics.map((metric) => {
+            const Icon = metric.icon;
+
+            return (
+              <div
+                key={metric.label}
+                className="grid min-h-[92px] gap-2 rounded-lg border border-white/10 bg-slate-950/24 p-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-slate-400">{metric.label}</p>
+                  <Icon className="size-4 text-weather-accent" aria-hidden="true" />
+                </div>
+                <p className="text-xl font-semibold text-slate-50">
+                  {metric.value}
+                </p>
+                <p className="text-xs leading-4 text-slate-400">
+                  {metric.detail}
+                </p>
+              </div>
+            );
+          })}
+        </section>
+      </div>
+
+      <section
+        className="rounded-lg border border-white/10 bg-white/7 p-3"
+        aria-label="Timeline horaria compacta Consulta do dia"
+      >
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Timeline horaria compacta
+            </p>
+            <h3 className="truncate text-sm font-semibold">
+              {selectedHour.time}: {selectedHour.label}
+            </h3>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Horario anterior da consulta do dia"
+              disabled={selectedHourIndex === 0}
+              onClick={() => setSelectedHourIndex((index) => Math.max(0, index - 1))}
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Proximo horario da consulta do dia"
+              disabled={selectedHourIndex === dailyOverviewTimeline.length - 1}
+              onClick={() =>
+                setSelectedHourIndex((index) =>
+                  Math.min(dailyOverviewTimeline.length - 1, index + 1),
+                )
+              }
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+        <div className="grid min-h-0 grid-cols-6 gap-2">
+          {dailyOverviewTimeline.map((hour, index) => {
+            const isSelected = index === selectedHourIndex;
+
+            return (
+              <button
+                key={hour.time}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedHourIndex(index)}
+                className={`grid min-h-[86px] min-w-0 gap-1 rounded-md border p-2 text-left transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
+                  isSelected
+                    ? "border-weather-accent/60 bg-weather-accent/14 shadow-weather-glow"
+                    : "border-white/10 bg-slate-950/22 hover:border-white/25"
+                }`}
+              >
+                <span className="text-xs font-semibold text-slate-200">
+                  {hour.time}
+                </span>
+                <span className="text-lg font-semibold text-slate-50">
+                  {hour.temp}
+                </span>
+                <span className="truncate text-[11px] text-slate-400">
+                  {hour.label}
+                </span>
+                <span className="mt-auto flex items-center gap-1 text-[11px] text-slate-300">
+                  <CloudRain className="size-3 text-weather-accent" aria-hidden="true" />
+                  {hour.rain}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </section>
+  );
+}
+
 function ModePreviewPanel({ activeMode }: ModePreviewPanelProps) {
   const ActiveModeIcon = activeMode.icon;
 
@@ -970,6 +1193,8 @@ export default function Home() {
                 <PerfectWindowView hasResult={hasPerfectWindowResult} />
               ) : activeMode.id === "fazer-hoje" ? (
                 <TodayRankingView hasResult={hasPerfectWindowResult} />
+              ) : activeMode.id === "consulta-dia" ? (
+                <DailyOverviewView city="Sao Paulo, SP" date="26/06/2026" />
               ) : (
                 <ModePreviewPanel activeMode={activeMode} />
               )}
