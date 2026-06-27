@@ -129,4 +129,19 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain('activeMode.id === "consulta-dia"');
     expect(page).not.toContain("test.skip");
   });
+
+  it("cria view Consulta da semana dentro do MainPanel", () => {
+    expect(page).toContain("function WeeklyOverviewView");
+    expect(page).toContain('aria-label="MainPanel Consulta da semana"');
+    expect(page).toContain("weeklyOverviewDays");
+    expect(page).toContain("Melhor dia");
+    expect(page).toContain("Pior dia");
+    expect(page).toContain("Maior chance de chuva");
+    expect(page).toContain("Tendencia geral");
+    expect(page).toContain('aria-label="Cards dos 7 dias da consulta da semana"');
+    expect(page).toContain('aria-label="Dia anterior da consulta da semana"');
+    expect(page).toContain('aria-label="Proximo dia da consulta da semana"');
+    expect(page).toContain('activeMode.id === "consulta-semana"');
+    expect(page).not.toContain("test.skip");
+  });
 });
