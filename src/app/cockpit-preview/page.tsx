@@ -265,6 +265,86 @@ const dailyOverviewTimeline = [
   { time: "21h", temp: "20C", rain: "16%", wind: "8", label: "estavel" },
 ];
 
+const weeklyOverviewDays = [
+  {
+    day: "Seg",
+    date: "29/06",
+    score: 82,
+    min: "18C",
+    max: "26C",
+    rain: 12,
+    wind: "9 km/h",
+    label: "sol firme",
+    icon: CloudSun,
+  },
+  {
+    day: "Ter",
+    date: "30/06",
+    score: 88,
+    min: "19C",
+    max: "27C",
+    rain: 8,
+    wind: "8 km/h",
+    label: "melhor dia",
+    icon: SunMedium,
+  },
+  {
+    day: "Qua",
+    date: "01/07",
+    score: 74,
+    min: "20C",
+    max: "28C",
+    rain: 18,
+    wind: "12 km/h",
+    label: "mais quente",
+    icon: Thermometer,
+  },
+  {
+    day: "Qui",
+    date: "02/07",
+    score: 69,
+    min: "19C",
+    max: "25C",
+    rain: 34,
+    wind: "16 km/h",
+    label: "nuvens altas",
+    icon: CloudRain,
+  },
+  {
+    day: "Sex",
+    date: "03/07",
+    score: 58,
+    min: "18C",
+    max: "23C",
+    rain: 46,
+    wind: "18 km/h",
+    label: "maior chuva",
+    icon: CloudRain,
+  },
+  {
+    day: "Sab",
+    date: "04/07",
+    score: 71,
+    min: "17C",
+    max: "24C",
+    rain: 24,
+    wind: "13 km/h",
+    label: "recuperacao",
+    icon: Wind,
+  },
+  {
+    day: "Dom",
+    date: "05/07",
+    score: 79,
+    min: "18C",
+    max: "25C",
+    rain: 14,
+    wind: "10 km/h",
+    label: "estavel",
+    icon: ShieldCheck,
+  },
+];
+
 interface CockpitRecentSearch {
   id: string;
   city: string;
@@ -842,6 +922,229 @@ function DailyOverviewView({ city, date }: DailyOverviewViewProps) {
   );
 }
 
+function WeeklyOverviewView() {
+  const [selectedDayIndex, setSelectedDayIndex] = useState(1);
+  const selectedDay = weeklyOverviewDays[selectedDayIndex];
+  const SelectedDayIcon = selectedDay.icon;
+  const bestDay = weeklyOverviewDays.reduce((best, day) =>
+    day.score > best.score ? day : best,
+  );
+  const worstDay = weeklyOverviewDays.reduce((worst, day) =>
+    day.score < worst.score ? day : worst,
+  );
+  const rainiestDay = weeklyOverviewDays.reduce((rainiest, day) =>
+    day.rain > rainiest.rain ? day : rainiest,
+  );
+  const weeklyHighlights = [
+    {
+      label: "Melhor dia",
+      value: `${bestDay.day} ${bestDay.date}`,
+      detail: `Score ${bestDay.score}`,
+      icon: Trophy,
+    },
+    {
+      label: "Pior dia",
+      value: `${worstDay.day} ${worstDay.date}`,
+      detail: `Score ${worstDay.score}`,
+      icon: CloudRain,
+    },
+    {
+      label: "Maior chance de chuva",
+      value: `${rainiestDay.rain}%`,
+      detail: `${rainiestDay.day} ${rainiestDay.date}`,
+      icon: Droplets,
+    },
+  ];
+
+  return (
+    <section
+      className="grid h-full min-h-0 gap-4 lg:grid-rows-[minmax(0,1fr)_auto]"
+      aria-label="MainPanel Consulta da semana"
+    >
+      <div className="grid min-h-0 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <section className="grid min-h-0 gap-4 rounded-lg border border-weather-accent/35 bg-weather-accent/10 p-4 shadow-weather-glow lg:grid-cols-[minmax(0,1fr)_170px] lg:items-center">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Consulta da semana
+            </p>
+            <div className="mt-3 flex min-w-0 items-start gap-4">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-weather-accent/45 bg-slate-950/30">
+                <SelectedDayIcon
+                  className="size-7 text-weather-accent"
+                  aria-hidden="true"
+                />
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate text-3xl font-semibold leading-tight">
+                  {selectedDay.day} {selectedDay.date}
+                </h2>
+                <p className="mt-1 text-sm text-slate-300">
+                  Sao Paulo, SP - proximos 7 dias
+                </p>
+                <p className="mt-4 text-5xl font-semibold leading-none text-slate-50">
+                  {selectedDay.score}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-weather-accent">
+                  {selectedDay.label}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-300">
+                  <span className="rounded-md border border-white/10 bg-white/7 px-2.5 py-1">
+                    {selectedDay.min} / {selectedDay.max}
+                  </span>
+                  <span className="rounded-md border border-white/10 bg-white/7 px-2.5 py-1">
+                    Chuva {selectedDay.rain}%
+                  </span>
+                  <span className="rounded-md border border-white/10 bg-white/7 px-2.5 py-1">
+                    Vento {selectedDay.wind}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside className="rounded-lg border border-white/10 bg-slate-950/28 p-4">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+              Tendencia geral
+            </p>
+            <p className="mt-2 text-3xl font-semibold leading-none text-slate-50">
+              boa
+            </p>
+            <p className="mt-3 text-sm leading-5 text-slate-300">
+              Inicio forte, chuva concentrada na sexta e recuperacao no fim de
+              semana.
+            </p>
+          </aside>
+        </section>
+
+        <aside
+          className="grid min-h-0 gap-2 rounded-lg border border-white/10 bg-white/7 p-3"
+          aria-label="Resumo semanal"
+        >
+          {weeklyHighlights.map((highlight) => {
+            const Icon = highlight.icon;
+
+            return (
+              <div
+                key={highlight.label}
+                className="grid min-h-[70px] gap-1 rounded-lg border border-white/10 bg-slate-950/24 p-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-xs text-slate-400">
+                    {highlight.label}
+                  </p>
+                  <Icon className="size-4 text-weather-accent" aria-hidden="true" />
+                </div>
+                <p className="truncate text-xl font-semibold text-slate-50">
+                  {highlight.value}
+                </p>
+                <p className="truncate text-xs text-slate-400">
+                  {highlight.detail}
+                </p>
+              </div>
+            );
+          })}
+        </aside>
+      </div>
+
+      <section
+        className="rounded-lg border border-white/10 bg-white/7 p-3"
+        aria-label="Cards dos 7 dias da consulta da semana"
+      >
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Linha semanal
+            </p>
+            <h3 className="truncate text-sm font-semibold">
+              Dia ativo: {selectedDay.day} - score {selectedDay.score}/100
+            </h3>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Dia anterior da consulta da semana"
+              disabled={selectedDayIndex === 0}
+              onClick={() => setSelectedDayIndex((index) => Math.max(0, index - 1))}
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Proximo dia da consulta da semana"
+              disabled={selectedDayIndex === weeklyOverviewDays.length - 1}
+              onClick={() =>
+                setSelectedDayIndex((index) =>
+                  Math.min(weeklyOverviewDays.length - 1, index + 1),
+                )
+              }
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid min-h-0 grid-cols-7 gap-2">
+          {weeklyOverviewDays.map((day, index) => {
+            const DayIcon = day.icon;
+            const isSelected = index === selectedDayIndex;
+            const isBest = day.score === bestDay.score;
+            const isWorst = day.score === worstDay.score;
+
+            return (
+              <button
+                key={day.date}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedDayIndex(index)}
+                className={`grid h-28 min-w-0 content-between rounded-md border p-2 text-left transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
+                  isSelected
+                    ? "border-weather-accent/60 bg-weather-accent/14 shadow-weather-glow"
+                    : "border-white/10 bg-slate-950/22 hover:border-white/25"
+                }`}
+              >
+                <span className="flex min-w-0 items-center justify-between gap-1">
+                  <span className="min-w-0">
+                    <span className="block truncate text-xs font-semibold text-slate-100">
+                      {day.day}
+                    </span>
+                    <span className="block truncate text-[10px] text-slate-400">
+                      {day.date}
+                    </span>
+                  </span>
+                  <DayIcon
+                    className="size-4 shrink-0 text-weather-accent"
+                    aria-hidden="true"
+                  />
+                </span>
+                <span className="text-2xl font-semibold leading-none text-slate-50">
+                  {day.score}
+                </span>
+                <span className="truncate text-[11px] text-slate-400">
+                  {day.min}/{day.max}
+                </span>
+                <span className="flex min-w-0 items-center justify-between gap-1 text-[10px] text-slate-300">
+                  <span className="truncate">Chuva {day.rain}%</span>
+                  {isBest ? (
+                    <span className="shrink-0 rounded-sm bg-success/18 px-1 text-success">
+                      melhor
+                    </span>
+                  ) : isWorst ? (
+                    <span className="shrink-0 rounded-sm bg-danger/18 px-1 text-danger">
+                      pior
+                    </span>
+                  ) : null}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </section>
+  );
+}
+
 function ModePreviewPanel({ activeMode }: ModePreviewPanelProps) {
   const ActiveModeIcon = activeMode.icon;
 
@@ -1195,6 +1498,8 @@ export default function Home() {
                 <TodayRankingView hasResult={hasPerfectWindowResult} />
               ) : activeMode.id === "consulta-dia" ? (
                 <DailyOverviewView city="Sao Paulo, SP" date="26/06/2026" />
+              ) : activeMode.id === "consulta-semana" ? (
+                <WeeklyOverviewView />
               ) : (
                 <ModePreviewPanel activeMode={activeMode} />
               )}
