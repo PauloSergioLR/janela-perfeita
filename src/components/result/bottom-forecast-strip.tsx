@@ -144,13 +144,13 @@ export function BottomForecastStrip({
 
   return (
     <section
-      className={cn("glass-panel h-full rounded-xl p-2 sm:p-3", className)}
+      className={cn("glass-panel h-full rounded-xl p-2", className)}
       aria-label="Previsão dos próximos dias"
     >
-      <div className="grid h-full min-h-0 gap-2 lg:grid-cols-[180px_minmax(0,1fr)] lg:items-stretch">
-        <div className="flex min-h-0 min-w-0 items-center gap-2 rounded-lg border border-soft bg-background/45 px-3 py-2">
-          <span className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/12">
-            <CloudSun className="size-5 text-weather-accent" aria-hidden="true" />
+      <div className="grid h-full min-h-0 gap-2 lg:grid-cols-[150px_minmax(0,1fr)] lg:items-stretch">
+        <div className="flex min-h-0 min-w-0 items-center gap-2 rounded-lg border border-soft bg-background/45 px-2 py-1.5">
+          <span className="glow-primary flex size-9 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/12">
+            <CloudSun className="size-4 text-weather-accent" aria-hidden="true" />
           </span>
           <div className="min-w-0">
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
@@ -177,7 +177,7 @@ export function BottomForecastStrip({
                 onClick={() =>
                   setPageIndex((currentPage) => Math.max(0, currentPage - 1))
                 }
-                className="inline-flex size-8 items-center justify-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/55 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="inline-flex size-7 items-center justify-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/55 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <ChevronLeft className="size-4" aria-hidden="true" />
               </button>
@@ -190,7 +190,7 @@ export function BottomForecastStrip({
                     Math.min(totalPages - 1, currentPage + 1),
                   )
                 }
-                className="inline-flex size-8 items-center justify-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/55 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="inline-flex size-7 items-center justify-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/55 hover:text-weather-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <ChevronRight className="size-4" aria-hidden="true" />
               </button>
@@ -204,7 +204,7 @@ export function BottomForecastStrip({
               return (
                 <article
                   key={card.id}
-                  className="flex min-h-0 min-w-0 flex-col rounded-lg border border-soft bg-weather-card/75 p-2"
+                  className="flex min-h-0 min-w-0 flex-col rounded-lg border border-soft bg-weather-card/75 p-1.5"
                 >
                   <div className="mb-1 flex items-start justify-between gap-2">
                     <div className="min-w-0">

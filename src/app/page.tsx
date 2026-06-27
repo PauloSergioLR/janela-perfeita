@@ -856,26 +856,26 @@ export default function Home() {
     <>
       <WeatherStage variant={weatherStageVariant} />
       <main
-        className="relative z-10 min-h-screen px-4 py-3 text-foreground sm:px-6 lg:h-dvh lg:overflow-hidden lg:px-6"
+        className="relative z-10 min-h-screen px-3 py-2 text-foreground sm:px-4 lg:h-dvh lg:overflow-hidden lg:px-4"
         aria-label="Cockpit principal"
       >
-      <div className="mx-auto grid w-full max-w-[1500px] gap-3 lg:h-[calc(100dvh-1.5rem)] lg:grid-rows-[auto_auto_minmax(0,1fr)_8rem_auto]">
-        <header className="glass-panel flex min-h-0 flex-col gap-3 rounded-xl p-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+      <div className="mx-auto grid w-full max-w-[1540px] gap-2 lg:h-[calc(100dvh-1rem)] lg:grid-rows-[auto_auto_minmax(0,1fr)_7rem_auto]">
+        <header className="glass-panel flex min-h-0 flex-col gap-2 rounded-xl p-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="glow-primary flex size-9 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
               <CloudSun
-                className="size-5 text-weather-accent"
+                className="size-4 text-weather-accent"
                 aria-hidden="true"
               />
             </div>
-            <div className="min-w-0 space-y-1">
+            <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
                 Clima por decisão
               </p>
-              <h1 className="text-xl font-semibold text-slate-950 dark:text-slate-50 sm:text-2xl">
+              <h1 className="text-lg font-semibold text-slate-950 dark:text-slate-50 sm:text-xl">
                 Janela Perfeita
               </h1>
-              <p className="hidden max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 md:block">
+              <p className="hidden max-w-2xl text-xs leading-5 text-slate-600 dark:text-slate-300 2xl:block">
                 Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
@@ -904,7 +904,7 @@ export default function Home() {
             ) : null}
             <Link
               href="/como-funciona"
-              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-7 items-center gap-2 rounded-md border border-soft bg-weather-card px-2.5 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <CircleHelp className="size-3.5" aria-hidden="true" />
               Como funciona
@@ -922,10 +922,10 @@ export default function Home() {
           }}
         />
 
-        <section className="grid min-h-0 gap-3 xl:grid-cols-[minmax(320px,0.68fr)_minmax(0,1.32fr)]">
+        <section className="grid min-h-0 gap-2 xl:grid-cols-[minmax(360px,0.64fr)_minmax(0,1.36fr)]">
           <aside className="min-h-0 min-w-0">
-          <Card className="glass-card h-full min-h-0 overflow-visible rounded-xl py-3">
-            <CardHeader className="border-b border-soft bg-weather-card px-3 pb-3">
+          <Card className="glass-card h-full min-h-0 overflow-visible rounded-xl py-2">
+            <CardHeader className="border-b border-soft bg-weather-card px-3 pb-2">
               <CardTitle>Painel de controle</CardTitle>
               <CardDescription className="hidden lg:block">
                 {searchMode === "clima_semana"
@@ -1036,26 +1036,28 @@ export default function Home() {
                       </div>
                     ) : null}
                   </div>
-                  {isDetectingLocation ? (
-                    <p className="text-xs text-muted-foreground">
-                      {locationMessage || CURRENT_LOCATION_WAITING_MESSAGE}
-                    </p>
-                  ) : locationStatus === "error" ? (
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
-                      className="inline-flex h-7 items-center gap-1.5 rounded-md border border-soft px-2 text-xs text-muted-foreground transition hover:border-weather-accent/45 hover:text-weather-accent"
+                      className="inline-flex h-7 items-center gap-1.5 rounded-md border border-soft px-2 text-xs text-muted-foreground transition hover:border-weather-accent/45 hover:text-weather-accent disabled:cursor-wait disabled:opacity-65"
+                      disabled={isDetectingLocation}
                       onClick={handleLocationRetry}
                     >
                       <RefreshCw className="size-3" aria-hidden="true" />
-                      {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
+                      {isDetectingLocation
+                        ? "Detectando..."
+                        : "Usar localização atual"}
                     </button>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      {locationStatus === "success"
-                        ? locationMessage
-                        : CURRENT_LOCATION_ATTRIBUTION}
+                    <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                      {isDetectingLocation
+                        ? locationMessage || CURRENT_LOCATION_WAITING_MESSAGE
+                        : locationStatus === "error"
+                          ? locationMessage || CURRENT_LOCATION_PRIVACY_NOTE
+                          : locationStatus === "success"
+                            ? locationMessage
+                            : CURRENT_LOCATION_ATTRIBUTION}
                     </p>
-                  )}
+                  </div>
                 </div>
                 </section>
 
@@ -1305,7 +1307,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="glass-card min-h-0 min-w-0 rounded-xl p-3"
+            className="glass-card h-full min-h-0 min-w-0 overflow-y-auto rounded-xl p-2 pr-2.5 [scrollbar-width:thin]"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (

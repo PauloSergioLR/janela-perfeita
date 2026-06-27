@@ -11,11 +11,11 @@ describe("cockpit principal", () => {
     const page = readSource("src/app/page.tsx");
 
     expect(page).toContain("lg:h-dvh lg:overflow-hidden");
-    expect(page).toContain("lg:h-[calc(100dvh-1.5rem)]");
+    expect(page).toContain("lg:h-[calc(100dvh-1rem)]");
     expect(page).toContain(
-      "lg:grid-rows-[auto_auto_minmax(0,1fr)_8rem_auto]",
+      "lg:grid-rows-[auto_auto_minmax(0,1fr)_7rem_auto]",
     );
-    expect(page).toContain("grid min-h-0 gap-3");
+    expect(page).toContain("grid min-h-0 gap-2");
     expect(page).toContain("CockpitRecommendationPanel");
     expect(page).not.toContain("RecommendationCard");
     expect(page).not.toContain("ControlPanelSection");
