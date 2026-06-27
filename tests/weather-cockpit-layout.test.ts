@@ -99,4 +99,17 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("hasPerfectWindowResult");
     expect(page).toContain("onSearch");
   });
+
+  it("cria view O que fazer hoje dentro do MainPanel", () => {
+    expect(page).toContain("function TodayRankingView");
+    expect(page).toContain('aria-label="MainPanel O que fazer hoje"');
+    expect(page).toContain("todayRankingCards");
+    expect(page).toContain("Mais recomendada");
+    expect(page).toContain('aria-label="Ranking de atividades do dia"');
+    expect(page).toContain("Ranking compacto");
+    expect(page).toContain("Proximas atividades");
+    expect(page).toContain("Paginacao do ranking");
+    expect(page).toContain("Compartilhar ranking");
+    expect(page).toContain('activeMode.id === "fazer-hoje"');
+  });
 });
