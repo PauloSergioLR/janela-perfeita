@@ -19,12 +19,14 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("bg-weather-card");
   });
 
-  it("separa ModeBar, painel lateral real e painel principal placeholder", () => {
+  it("separa ModeBar, painel lateral real e painel principal definitivo", () => {
     expect(page).toContain('aria-label="ModeBar"');
     expect(page).toContain("function LeftControlPanel");
     expect(page).toContain('aria-label="LeftControlPanel"');
-    expect(page).toContain('aria-label="MainPanel placeholder"');
+    expect(page).toContain('aria-label="MainPanel"');
+    expect(page).toContain("function PerfectWindowView");
     expect(page).toContain("lg:grid-cols-[340px_minmax(0,1fr)]");
+    expect(page).not.toContain('aria-label="MainPanel placeholder"');
   });
 
   it("implementa painel lateral completo sem cortes planejados", () => {
@@ -75,5 +77,26 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("Consulta do dia");
     expect(page).toContain("Consulta da semana");
     expect(page).toContain("Conteudo muda dentro do MainPanel");
+  });
+
+  it("cria view principal de Janela perfeita dentro do MainPanel", () => {
+    expect(page).toContain('aria-label="MainPanel Janela perfeita"');
+    expect(page).toContain("ScoreRing");
+    expect(page).toContain("Melhor janela para");
+    expect(page).toContain("09h - 11h");
+    expect(page).toContain("Confianca alta");
+    expect(page).toContain("perfectWindowReasons");
+    expect(page).toContain('aria-label="Estatisticas climaticas"');
+    expect(page).toContain('aria-label="Timeline Janela perfeita"');
+    expect(page).toContain("setSelectedTimelineIndex");
+    expect(page).not.toContain("Timeline placeholder");
+  });
+
+  it("mantem estado vazio premium antes da busca", () => {
+    expect(page).toContain('aria-label="Estado vazio Janela perfeita"');
+    expect(page).toContain("Cockpit pronto");
+    expect(page).toContain("Preencha cidade, atividade e data");
+    expect(page).toContain("hasPerfectWindowResult");
+    expect(page).toContain("onSearch");
   });
 });

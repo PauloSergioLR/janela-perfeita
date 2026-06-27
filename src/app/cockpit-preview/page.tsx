@@ -4,25 +4,30 @@ import { useState } from "react";
 import {
   Bike,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   CircleHelp,
   Clock3,
+  CloudRain,
   CloudSun,
-  Compass,
   Dumbbell,
   Footprints,
-  Gauge,
   History,
   LocateFixed,
   MapPin,
   Radar,
   RotateCcw,
   Search,
+  ShieldCheck,
   Sparkles,
   SunMedium,
+  Thermometer,
   Trash2,
   Waves,
+  Wind,
 } from "lucide-react";
 import Link from "next/link";
+import { ScoreRing } from "@/components/result/score-ring";
 import { WeatherStage } from "@/components/weather/weather-stage";
 
 const decisionModes = [
@@ -100,6 +105,50 @@ const activityCards = [
   },
 ];
 
+const perfectWindowReasons = [
+  "Chuva quase nula",
+  "Vento leve",
+  "Sensacao agradavel",
+  "Luz estavel",
+];
+
+const perfectWindowStats = [
+  {
+    label: "Temperatura",
+    value: "22C",
+    detail: "sensacao 21C",
+    icon: Thermometer,
+  },
+  {
+    label: "Chuva",
+    value: "6%",
+    detail: "0.0 mm",
+    icon: CloudRain,
+  },
+  {
+    label: "Vento",
+    value: "9 km/h",
+    detail: "rajadas 14 km/h",
+    icon: Wind,
+  },
+  {
+    label: "Confianca",
+    value: "Alta",
+    detail: "modelo estavel",
+    icon: ShieldCheck,
+  },
+];
+
+const perfectWindowTimeline = [
+  { time: "07h", score: 61, label: "ok" },
+  { time: "08h", score: 74, label: "boa" },
+  { time: "09h", score: 86, label: "pico" },
+  { time: "10h", score: 88, label: "pico" },
+  { time: "11h", score: 81, label: "boa" },
+  { time: "12h", score: 68, label: "atenção" },
+  { time: "13h", score: 54, label: "fraca" },
+];
+
 interface CockpitRecentSearch {
   id: string;
   city: string;
@@ -128,16 +177,231 @@ const cockpitRecentSearches: CockpitRecentSearch[] = [
   },
 ];
 
-function PlaceholderLine({ className = "" }: { className?: string }) {
+interface LeftControlPanelProps {
+  onSearch: () => void;
+}
+
+interface ModePreviewPanelProps {
+  activeMode: (typeof decisionModes)[number];
+}
+
+interface PerfectWindowViewProps {
+  hasResult: boolean;
+}
+
+function PerfectWindowView({ hasResult }: PerfectWindowViewProps) {
+  const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(2);
+  const selectedPoint = perfectWindowTimeline[selectedTimelineIndex];
+
+  if (!hasResult) {
+    return (
+      <section
+        className="grid h-full min-h-0 place-items-center rounded-lg border border-white/10 bg-white/7 p-6 text-center"
+        aria-label="Estado vazio Janela perfeita"
+      >
+        <div className="max-w-xl">
+          <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-xl border border-weather-accent/45 bg-weather-accent/12 shadow-weather-glow">
+            <Sparkles className="size-7 text-weather-accent" aria-hidden="true" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+            Cockpit pronto
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold">
+            Preencha cidade, atividade e data
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            A melhor janela aparece aqui com score, horario, confianca, motivos
+            climaticos, estatisticas e timeline em uma unica tela.
+          </p>
+          <div className="mt-6 grid gap-2 sm:grid-cols-3">
+            {["Cidade", "Atividade", "Data"].map((item) => (
+              <div
+                key={item}
+                className="rounded-lg border border-white/10 bg-slate-950/28 px-4 py-3"
+              >
+                <p className="text-sm font-semibold text-slate-100">{item}</p>
+                <p className="mt-1 text-xs text-slate-400">necessario</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <span
-      aria-hidden="true"
-      className={`block rounded-full bg-white/12 ${className}`}
-    />
+    <section
+      className="grid h-full min-h-0 gap-4 lg:grid-rows-[minmax(0,1fr)_auto]"
+      aria-label="MainPanel Janela perfeita"
+    >
+      <div className="grid min-h-0 gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
+        <div className="grid min-h-0 rounded-lg border border-white/10 bg-white/7 p-4 lg:grid-cols-[210px_minmax(0,1fr)] lg:items-center">
+          <div className="flex items-center justify-center">
+            <ScoreRing score={86} className="w-44 sm:w-48" />
+          </div>
+          <div className="min-w-0 space-y-3">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Melhor janela para
+            </p>
+            <h2 className="text-3xl font-semibold leading-tight">Caminhada</h2>
+            <p className="text-5xl font-semibold leading-none text-slate-50">
+              09h - 11h
+            </p>
+            <div className="inline-flex h-8 items-center gap-2 rounded-md border border-success/35 bg-success/10 px-3 text-sm font-semibold text-success">
+              <ShieldCheck className="size-4" aria-hidden="true" />
+              Confianca alta
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {perfectWindowReasons.map((reason) => (
+                <span
+                  key={reason}
+                  className="rounded-md border border-weather-accent/30 bg-weather-accent/10 px-2.5 py-1 text-xs font-medium text-weather-accent"
+                >
+                  {reason}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside
+          className="grid min-h-0 gap-3 rounded-lg border border-white/10 bg-slate-950/24 p-3 sm:grid-cols-2"
+          aria-label="Estatisticas climaticas"
+        >
+          {perfectWindowStats.map((stat) => {
+            const Icon = stat.icon;
+
+            return (
+              <div
+                key={stat.label}
+                className="rounded-lg border border-white/10 bg-white/7 p-3"
+              >
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="text-xs text-slate-400">{stat.label}</p>
+                  <Icon className="size-4 text-weather-accent" aria-hidden="true" />
+                </div>
+                <p className="text-xl font-semibold text-slate-50">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">{stat.detail}</p>
+              </div>
+            );
+          })}
+        </aside>
+      </div>
+
+      <section
+        className="rounded-lg border border-white/10 bg-white/7 p-3"
+        aria-label="Timeline Janela perfeita"
+      >
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
+              Timeline
+            </p>
+            <h3 className="text-sm font-semibold">
+              {selectedPoint.time}: score {selectedPoint.score}/100
+            </h3>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Horario anterior"
+              onClick={() =>
+                setSelectedTimelineIndex((index) => Math.max(0, index - 1))
+              }
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Proximo horario"
+              onClick={() =>
+                setSelectedTimelineIndex((index) =>
+                  Math.min(perfectWindowTimeline.length - 1, index + 1),
+                )
+              }
+              className="flex size-8 items-center justify-center rounded-md border border-white/12 bg-slate-950/30 text-slate-200 transition hover:border-weather-accent/45 hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-7 gap-2">
+          {perfectWindowTimeline.map((point, index) => {
+            const isSelected = index === selectedTimelineIndex;
+            const isBest = point.score >= 86;
+
+            return (
+              <button
+                key={point.time}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedTimelineIndex(index)}
+                className={`grid h-20 min-w-0 content-end rounded-md border p-2 text-left transition focus-visible:ring-2 focus-visible:ring-weather-accent focus-visible:outline-none ${
+                  isSelected
+                    ? "border-weather-accent/60 bg-weather-accent/14 shadow-weather-glow"
+                    : "border-white/10 bg-slate-950/22 hover:border-white/25"
+                }`}
+              >
+                <span
+                  className={`mb-1 rounded-sm ${
+                    isBest ? "bg-weather-accent" : "bg-slate-500"
+                  }`}
+                  style={{ height: `${Math.max(20, point.score - 24)}px` }}
+                  aria-hidden="true"
+                />
+                <span className="flex items-center justify-between gap-1 text-xs">
+                  <span>{point.time}</span>
+                  <span className="font-semibold text-slate-50">
+                    {point.score}
+                  </span>
+                </span>
+                <span className="truncate text-[10px] text-slate-400">
+                  {point.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </section>
   );
 }
 
-function LeftControlPanel() {
+function ModePreviewPanel({ activeMode }: ModePreviewPanelProps) {
+  const ActiveModeIcon = activeMode.icon;
+
+  return (
+    <section
+      className="grid h-full min-h-0 rounded-lg border border-white/10 bg-white/7 p-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center"
+      aria-label="MainPanel modo auxiliar"
+    >
+      <div className="mx-auto flex aspect-square max-h-[220px] w-full max-w-[220px] items-center justify-center rounded-full border border-weather-accent/40 bg-weather-accent/10 shadow-weather-glow">
+        <div className="text-center">
+          <p className="text-5xl font-semibold leading-none">
+            {activeMode.metric}
+          </p>
+          <p className="mt-2 text-sm text-slate-300">protagonista</p>
+        </div>
+      </div>
+      <div className="grid gap-3">
+        <div className="rounded-lg border border-white/10 bg-slate-950/24 p-4">
+          <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-100">
+            <ActiveModeIcon className="size-4 text-weather-accent" aria-hidden="true" />
+            Conteudo muda dentro do MainPanel
+          </div>
+          <p className="text-sm leading-6 text-slate-300">
+            {activeMode.description}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LeftControlPanel({ onSearch }: LeftControlPanelProps) {
   const [cityValue, setCityValue] = useState("Sao Paulo, SP");
   const [dateValue, setDateValue] = useState("2026-06-26");
   const [selectedActivityId, setSelectedActivityId] = useState(
@@ -243,7 +507,10 @@ function LeftControlPanel() {
 
       <form
         className="flex h-full min-h-0 flex-col gap-1.5"
-        onSubmit={(event) => event.preventDefault()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSearch();
+        }}
       >
         <section className="rounded-lg border border-white/10 bg-white/7 p-2">
           <div className="mb-1.5 flex items-center gap-2">
@@ -372,9 +639,9 @@ function LeftControlPanel() {
 
 export default function Home() {
   const [activeModeId, setActiveModeId] = useState(decisionModes[0].id);
+  const [hasPerfectWindowResult, setHasPerfectWindowResult] = useState(false);
   const activeMode =
     decisionModes.find((mode) => mode.id === activeModeId) ?? decisionModes[0];
-  const ActiveModeIcon = activeMode.icon;
 
   return (
     <>
@@ -444,81 +711,17 @@ export default function Home() {
           </nav>
 
           <section className="grid min-h-0 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
-            <LeftControlPanel />
+            <LeftControlPanel onSearch={() => setHasPerfectWindowResult(true)} />
 
             <section
-              className="glass-card grid min-h-0 rounded-xl p-4 lg:grid-rows-[auto_minmax(0,1fr)]"
-              aria-label="MainPanel placeholder"
+              className="glass-card grid min-h-0 rounded-xl p-4"
+              aria-label="MainPanel"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-weather-accent">
-                    {activeMode.eyebrow}
-                  </p>
-                  <h2 className="text-xl font-semibold">{activeMode.title}</h2>
-                </div>
-                <div className="flex items-center gap-2 rounded-lg border border-weather-accent/40 bg-weather-accent/12 px-3 py-2 text-weather-accent">
-                  <ActiveModeIcon className="size-5" aria-hidden="true" />
-                  <span className="text-sm font-semibold">
-                    {activeMode.metric}
-                  </span>
-                </div>
-              </div>
-              <div className="grid min-h-0 items-center gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                <div className="mx-auto flex aspect-square max-h-[250px] w-full max-w-[250px] items-center justify-center rounded-full border border-weather-accent/40 bg-weather-accent/10 shadow-weather-glow">
-                  <div className="text-center">
-                    <p className="text-6xl font-semibold leading-none">
-                      {activeMode.metric}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-300">protagonista</p>
-                  </div>
-                </div>
-                <div className="grid gap-3">
-                  <div className="rounded-lg border border-white/10 bg-white/7 p-4">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-100">
-                      <Gauge
-                        className="size-4 text-weather-accent"
-                        aria-hidden="true"
-                      />
-                      Conteudo muda dentro do MainPanel
-                    </div>
-                    <p className="text-sm leading-6 text-slate-300">
-                      {activeMode.description}
-                    </p>
-                    <PlaceholderLine className="mt-3 h-2 w-full" />
-                    <PlaceholderLine className="mt-2 h-2 w-5/6" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    {["Chuva", "Vento", "UV"].map((item) => (
-                      <div
-                        key={item}
-                        className="rounded-lg border border-white/10 bg-white/7 p-3"
-                      >
-                        <p className="text-xs text-slate-400">{item}</p>
-                        <PlaceholderLine className="mt-3 h-2 w-3/4" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="rounded-lg border border-white/10 bg-white/7 p-3">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-                      <Compass
-                        className="size-4 text-weather-accent"
-                        aria-hidden="true"
-                      />
-                      Timeline placeholder
-                    </div>
-                    <div className="grid grid-cols-8 gap-2">
-                      {Array.from({ length: 8 }, (_, index) => (
-                        <span
-                          key={index}
-                          aria-hidden="true"
-                          className="h-10 rounded-md bg-white/10"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {activeMode.id === "janela-perfeita" ? (
+                <PerfectWindowView hasResult={hasPerfectWindowResult} />
+              ) : (
+                <ModePreviewPanel activeMode={activeMode} />
+              )}
             </section>
           </section>
 
