@@ -1,9 +1,13 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 function readHomePage() {
   return readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
+}
+
+function cockpitPreviewExists() {
+  return existsSync(join(process.cwd(), "src/app/cockpit-preview"));
 }
 
 describe("layout Weather Decision Cockpit", () => {
@@ -19,7 +23,7 @@ describe("layout Weather Decision Cockpit", () => {
 
   it("separa seletor de modo, painel lateral e area de resultado", () => {
     expect(page).toContain("<ModeSelector");
-    expect(page).toContain("xl:sticky xl:top-6");
+    expect(page).toContain("xl:sticky xl:top-3");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain(
       "xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)]",
@@ -31,6 +35,14 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).not.toContain("MapLibre");
     expect(page).not.toContain("maptiler");
     expect(page).not.toContain("google.maps");
+  });
+
+  it("mantem a home como entrega unica do cockpit", () => {
+    expect(cockpitPreviewExists()).toBe(false);
+    expect(page).toContain("Janela perfeita");
+    expect(page).toContain("O que fazer hoje?");
+    expect(page).toContain("Consulta do dia");
+    expect(page).toContain("Consulta da semana");
   });
 
   it("apresenta marca, subtitulo e acao discreta no header", () => {
