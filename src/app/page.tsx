@@ -590,9 +590,9 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8 xl:h-dvh xl:min-h-0 xl:overflow-hidden xl:py-3">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 xl:h-full xl:min-h-0 xl:gap-3">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:gap-3 xl:p-3">
+      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8 xl:h-dvh xl:min-h-0 xl:py-3">
+      <div className="mx-auto grid w-full max-w-7xl gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-3">
+        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
             <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
               <CloudSun
@@ -643,7 +643,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2">
+          <div className="grid min-w-0 grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2 xl:col-span-1 xl:border-t-0 xl:pt-0">
             <div className="rounded-md bg-background/45 px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 {activities.length}
@@ -674,9 +674,9 @@ export default function Home() {
           }}
         />
 
-        <section className="grid gap-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start xl:gap-3 xl:overflow-hidden">
-          <aside className="flex flex-col gap-4 xl:sticky xl:top-3 xl:max-h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1">
-          <Card className="glass-card overflow-hidden rounded-xl xl:shrink-0">
+        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(300px,26vw,380px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
+          <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1">
+          <Card className="glass-card rounded-xl xl:shrink-0">
             <CardHeader className="border-b border-soft bg-weather-card">
               <CardTitle>Painel de controle</CardTitle>
               <CardDescription>
@@ -1004,7 +1004,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card overflow-hidden rounded-xl xl:shrink-0">
+          <Card className="glass-card rounded-xl xl:shrink-0">
             <CardHeader className="border-b border-soft bg-weather-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -1067,7 +1067,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4 xl:max-h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1"
+            className="flex min-w-0 flex-col gap-4 xl:h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
@@ -1081,7 +1081,7 @@ export default function Home() {
             ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl xl:min-h-0">
+              <Card className="glass-card min-h-[28rem] rounded-xl xl:min-h-0">
                 <CardHeader className="border-b border-soft bg-weather-card">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
@@ -1155,8 +1155,8 @@ export default function Home() {
             )}
 
             {resultState === "content" && recommendation ? (
-              <section className="space-y-4">
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+              <section className="min-w-0 space-y-4">
+                <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
                   <OpportunityTimeline recommendation={recommendation} />
                   <ScoreBreakdown recommendation={recommendation} />
                 </div>
@@ -1170,7 +1170,7 @@ export default function Home() {
           className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
           aria-label="Resumo da consulta"
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-2">
             <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
               <p className="text-xs text-muted-foreground">Modo</p>
               <p className="truncate text-sm font-medium">
