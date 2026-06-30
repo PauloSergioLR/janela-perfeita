@@ -34,7 +34,7 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
 
   return (
     <section
-      className="glass-panel space-y-4 rounded-xl p-4 sm:p-5"
+      className="glass-panel min-w-0 space-y-4 rounded-xl p-4 sm:p-5 xl:p-3"
       aria-label="Previsão dos próximos dias"
     >
       <div className="flex items-center gap-2">
@@ -49,19 +49,18 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto pb-2">
-        <div className="flex min-w-max gap-3">
-          {overview.days.map((day) => {
-            const WeatherIcon = getWeatherIcon(day.weatherCode);
-            const classification = getForecastClassification(day);
+      <div className="grid min-w-0 gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+        {overview.days.map((day) => {
+          const WeatherIcon = getWeatherIcon(day.weatherCode);
+          const classification = getForecastClassification(day);
 
-            return (
-              <article
-                key={day.date}
-                className="flex w-44 shrink-0 flex-col gap-3 rounded-lg border border-soft bg-weather-card/75 p-3"
-              >
+          return (
+            <article
+              key={day.date}
+              className="flex min-w-0 flex-col gap-3 rounded-lg border border-soft bg-weather-card/75 p-3 xl:gap-2 xl:p-2"
+            >
                 <div className="flex items-start justify-between gap-2">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold capitalize text-slate-950 dark:text-slate-50">
                       {formatForecastDayLabel(day.date, todayDate)}
                     </p>
@@ -75,7 +74,7 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
                   />
                 </div>
 
-                <p className="text-xl font-semibold text-slate-950 dark:text-slate-50">
+                <p className="text-xl font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
                   {formatTemperatureRange(day.temperatureMin, day.temperatureMax)}
                 </p>
 
@@ -96,10 +95,9 @@ export function ForecastStrip({ overview }: ForecastStripProps) {
                   <TemperatureIcon className="size-3.5 text-weather-accent" aria-hidden="true" />
                   {day.weatherLabel}
                 </p>
-              </article>
-            );
-          })}
-        </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

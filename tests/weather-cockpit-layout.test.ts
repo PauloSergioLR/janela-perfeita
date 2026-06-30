@@ -6,6 +6,13 @@ function readHomePage() {
   return readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
 }
 
+function readForecastStrip() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/forecast-strip.tsx"),
+    "utf8",
+  );
+}
+
 function cockpitPreviewExists() {
   return existsSync(join(process.cwd(), "src/app/cockpit-preview"));
 }
@@ -26,8 +33,12 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("xl:sticky xl:top-3");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain(
-      "xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)]",
+      "xl:grid-cols-[clamp(300px,26vw,380px)_minmax(0,1fr)]",
     );
+    expect(page).toContain(
+      "xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto]",
+    );
+    expect(page).toContain("grid min-w-0 gap-6");
   });
 
   it("mantem faixa inferior de resumo sem adicionar mapa", () => {
@@ -35,6 +46,15 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).not.toContain("MapLibre");
     expect(page).not.toContain("maptiler");
     expect(page).not.toContain("google.maps");
+  });
+
+  it("evita scroll horizontal na faixa de previsao", () => {
+    const forecastStrip = readForecastStrip();
+
+    expect(forecastStrip).toContain("grid min-w-0 gap-2");
+    expect(forecastStrip).not.toContain("overflow-x-auto");
+    expect(forecastStrip).not.toContain("min-w-max");
+    expect(forecastStrip).not.toContain("w-44");
   });
 
   it("mantem a home como entrega unica do cockpit", () => {

@@ -9,7 +9,7 @@ const DEFAULT_DISCLAIMER =
 
 export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
   return (
-    <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
+    <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between xl:shrink-0 xl:pt-2 xl:text-xs xl:leading-5">
       <p>
         Dados meteorológicos por{" "}
         <a
