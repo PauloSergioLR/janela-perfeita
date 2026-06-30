@@ -590,9 +590,9 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8 xl:h-dvh xl:min-h-0 xl:overflow-hidden xl:py-3">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 xl:h-full xl:min-h-0 xl:gap-3">
+        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:gap-3 xl:p-3">
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
             <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
               <CloudSun
@@ -674,9 +674,9 @@ export default function Home() {
           }}
         />
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start">
-          <aside className="flex flex-col gap-4 xl:sticky xl:top-6">
-          <Card className="glass-card overflow-hidden rounded-xl">
+        <section className="grid gap-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(320px,0.76fr)_minmax(0,1.24fr)] xl:items-start xl:gap-3 xl:overflow-hidden">
+          <aside className="flex flex-col gap-4 xl:sticky xl:top-3 xl:max-h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1">
+          <Card className="glass-card overflow-hidden rounded-xl xl:shrink-0">
             <CardHeader className="border-b border-soft bg-weather-card">
               <CardTitle>Painel de controle</CardTitle>
               <CardDescription>
@@ -689,7 +689,7 @@ export default function Home() {
                       : "Cidade, atividade e data definem a recomendação."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5">
+            <CardContent className="p-4 sm:p-5 xl:p-3">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 <ControlPanelSection
                   number="1"
@@ -1004,7 +1004,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card overflow-hidden rounded-xl">
+          <Card className="glass-card overflow-hidden rounded-xl xl:shrink-0">
             <CardHeader className="border-b border-soft bg-weather-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -1024,7 +1024,7 @@ export default function Home() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5">
+            <CardContent className="p-4 sm:p-5 xl:p-3">
               {searchHistory.length > 0 ? (
                 <div className="grid gap-2">
                   {searchHistory.map((entry) => {
@@ -1067,7 +1067,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4"
+            className="flex min-w-0 flex-col gap-4 xl:max-h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
@@ -1081,7 +1081,7 @@ export default function Home() {
             ) : resultState === "content" && weeklyOverview ? (
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
-              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl">
+              <Card className="glass-card min-h-[28rem] overflow-hidden rounded-xl xl:min-h-0">
                 <CardHeader className="border-b border-soft bg-weather-card">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
@@ -1100,7 +1100,7 @@ export default function Home() {
                       : "Aguardando seleção"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-5">
+                <CardContent className="p-4 sm:p-5 xl:p-3">
                   {resultState === "initial" ? (
                     <PremiumState
                       variant="initial"
@@ -1167,7 +1167,7 @@ export default function Home() {
         </section>
 
         <section
-          className="glass-panel rounded-xl p-3 sm:p-4"
+          className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
           aria-label="Resumo da consulta"
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

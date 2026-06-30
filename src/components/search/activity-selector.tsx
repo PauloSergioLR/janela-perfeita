@@ -63,7 +63,7 @@ export function ActivitySelector({
 }: ActivitySelectorProps) {
   return (
     <div
-      className="grid gap-2 sm:grid-cols-2"
+      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1 xl:gap-1.5"
       role="radiogroup"
       aria-labelledby="atividade-label"
     >
@@ -77,7 +77,7 @@ export function ActivitySelector({
             key={activity.id}
             type="button"
             className={cn(
-              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45",
+              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-14 xl:p-2",
               selected
                 ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
                 : "",
@@ -90,18 +90,18 @@ export function ActivitySelector({
             <span className="flex items-start gap-3">
               <span
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card",
+                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-8",
                   selected && "bg-background/25 motion-safe:scale-105",
                 )}
               >
                 <Icon
-                  className={cn("size-5", visual.iconClassName)}
+                  className={cn("size-5 xl:size-4", visual.iconClassName)}
                   aria-hidden="true"
                 />
               </span>
-              <span className="min-w-0 space-y-1">
+              <span className="min-w-0 space-y-1 xl:space-y-0">
                 <span className="block font-medium">{activity.name}</span>
-                <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground">
+                <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground xl:hidden">
                   {activity.shortDescription}
                 </span>
               </span>
