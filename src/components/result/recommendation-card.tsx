@@ -125,7 +125,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         : "text-danger";
 
   return (
-    <Card className="glass-card overflow-hidden rounded-xl">
+    <Card className="glass-card min-w-0 overflow-hidden rounded-xl">
       <CardHeader className="gap-3 border-b border-soft bg-weather-card">
         <div className="flex items-start justify-between gap-3">
           <div>

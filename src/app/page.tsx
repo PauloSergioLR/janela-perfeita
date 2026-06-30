@@ -590,8 +590,8 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-4 py-5 text-foreground sm:px-6 lg:px-8 xl:h-dvh xl:min-h-0 xl:py-3">
-      <div className="mx-auto grid w-full max-w-7xl gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-3">
+      <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-4 xl:py-3 2xl:px-6">
+      <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-3">
         <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
             <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
@@ -674,7 +674,7 @@ export default function Home() {
           }}
         />
 
-        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(300px,26vw,380px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
+        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
           <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1">
           <Card className="glass-card rounded-xl xl:shrink-0">
             <CardHeader className="border-b border-soft bg-weather-card">
@@ -1067,7 +1067,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-w-0 flex-col gap-4 xl:h-full xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1"
+            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
@@ -1155,8 +1155,8 @@ export default function Home() {
             )}
 
             {resultState === "content" && recommendation ? (
-              <section className="min-w-0 space-y-4">
-                <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+              <section className="min-h-0 min-w-0 space-y-4">
+                <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)]">
                   <OpportunityTimeline recommendation={recommendation} />
                   <ScoreBreakdown recommendation={recommendation} />
                 </div>
