@@ -30,7 +30,7 @@ export function ScoreBreakdown({ recommendation }: ScoreBreakdownProps) {
   const source = getBreakdownSource(recommendation);
 
   return (
-    <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+    <Card className="min-w-0 rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
       <CardHeader>
         <div className="flex items-start gap-2">
           <SlidersHorizontal className="mt-0.5 size-4 shrink-0 text-sky-700" aria-hidden="true" />

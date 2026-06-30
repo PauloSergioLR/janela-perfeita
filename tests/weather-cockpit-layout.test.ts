@@ -32,8 +32,11 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("<ModeSelector");
     expect(page).toContain("xl:sticky xl:top-3");
     expect(page).toContain('aria-label="Resultado da decisão"');
+    expect(page).toContain("w-full max-w-none");
+    expect(page).not.toContain("max-w-7xl");
+    expect(page).not.toContain("xl:overflow-hidden");
     expect(page).toContain(
-      "xl:grid-cols-[clamp(300px,26vw,380px)_minmax(0,1fr)]",
+      "xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)]",
     );
     expect(page).toContain(
       "xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto]",

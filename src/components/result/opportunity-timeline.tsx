@@ -45,7 +45,7 @@ export function OpportunityTimeline({ recommendation }: OpportunityTimelineProps
 
   return (
     <Card
-      className="glass-card overflow-hidden rounded-xl"
+      className="glass-card min-w-0 overflow-hidden rounded-xl"
       aria-label="Timeline de oportunidade"
     >
       <CardHeader className="gap-3 border-b border-soft bg-weather-card">
