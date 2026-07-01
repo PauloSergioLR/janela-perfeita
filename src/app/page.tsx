@@ -934,9 +934,29 @@ export default function Home() {
                 <div className="grid gap-3">
                   {usesDate ? (
                     <div className="space-y-2">
-                      <Label htmlFor="date">
-                        {searchMode === "semana" ? "A partir de" : "Data"}
-                      </Label>
+                      <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="date">
+                          {searchMode === "semana" ? "A partir de" : "Data"}
+                        </Label>
+                        {dateOptions[0] ? (
+                          <button
+                            type="button"
+                            className={cn(
+                              "hidden h-6 rounded-md border px-2 text-xs font-medium transition hover:border-foreground/30 xl:inline-flex xl:items-center 2xl:hidden",
+                              selectedDate === dateOptions[0].value
+                                ? "border-sky-600 bg-sky-50 text-sky-900"
+                                : "border-border bg-background text-muted-foreground",
+                            )}
+                            aria-pressed={selectedDate === dateOptions[0].value}
+                            onClick={() => {
+                              setSelectedDate(dateOptions[0].value);
+                              resetRecommendationState();
+                            }}
+                          >
+                            {dateOptions[0].label}
+                          </button>
+                        ) : null}
+                      </div>
                       <div className="relative">
                         <CalendarDays className="pointer-events-none absolute top-3 left-2.5 size-4 text-muted-foreground" aria-hidden="true" />
                         <Input
