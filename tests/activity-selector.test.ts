@@ -41,6 +41,11 @@ describe("ActivitySelector", () => {
 
   it("permanece responsivo e sem mapa", () => {
     expect(source).toContain("sm:grid-cols-2");
+    expect(source).toContain("xl:grid-cols-7");
+    expect(source).toContain("xl:min-h-10");
+    expect(source).toContain("xl:size-5");
+    expect(source).toContain("aria-label={activity.name}");
+    expect(source).toContain("ACTIVITY_COMPACT_LABELS");
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
   });

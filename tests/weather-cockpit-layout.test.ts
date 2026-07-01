@@ -74,4 +74,14 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("Previsão por hora");
     expect(page).toContain("glow-primary");
   });
+
+  it("compacta painel de controle sem mover funcionalidade principal", () => {
+    expect(page).toContain("xl:overflow-y-auto xl:pr-1");
+    expect(page).toContain("Usar localização");
+    expect(page).toContain("h-11 w-full");
+    expect(page).toContain("<details");
+    expect(page).toContain("max-h-40");
+    expect(page).toContain("overflow-visible rounded-xl");
+    expect(page).not.toContain("<CardTitle>Buscas recentes</CardTitle>");
+  });
 });

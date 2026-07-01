@@ -49,7 +49,6 @@ import {
   buildCurrentLocationCity,
   canUseBrowserGeolocation,
   CURRENT_LOCATION_ATTRIBUTION,
-  CURRENT_LOCATION_PRIVACY_NOTE,
   CURRENT_LOCATION_RESOLVING_MESSAGE,
   CURRENT_LOCATION_SUCCESS_MESSAGE,
   CURRENT_LOCATION_WAITING_MESSAGE,
@@ -586,6 +585,43 @@ export default function Home() {
     dailyOverview,
     weeklyOverview,
   });
+  const locationFeedback = isDetectingLocation
+    ? {
+        className:
+          "border-sky-400/30 bg-sky-400/10 text-sky-900 dark:text-sky-100",
+        description: locationMessage || CURRENT_LOCATION_WAITING_MESSAGE,
+        disabled: true,
+        title: "Detectando sua cidade",
+      }
+    : locationStatus === "error"
+      ? {
+          className:
+            "border-danger/35 bg-danger/10 text-danger dark:text-danger",
+          description: locationMessage || "Use a busca manual ou tente novamente.",
+          disabled: false,
+          title: "Localização indisponível",
+        }
+      : locationStatus === "success"
+        ? {
+            className:
+              "border-success/35 bg-success/10 text-success dark:text-success",
+            description: locationMessage || "Pronto para usar na consulta.",
+            disabled: false,
+            title: "Cidade detectada",
+          }
+        : {
+            className:
+              "border-weather-accent/30 bg-weather-accent/10 text-weather-accent",
+            description: "Não armazenamos sua localização.",
+            disabled: false,
+            title: "Localização atual",
+          };
+  const locationActionLabel =
+    locationStatus === "error"
+      ? "Tentar novamente"
+      : locationStatus === "success"
+        ? "Atualizar"
+        : "Usar localização";
 
   return (
     <>
@@ -675,22 +711,86 @@ export default function Home() {
         />
 
         <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
-          <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:pr-1">
-          <Card className="glass-card rounded-xl xl:shrink-0">
-            <CardHeader className="border-b border-soft bg-weather-card">
-              <CardTitle>Painel de controle</CardTitle>
-              <CardDescription>
-                {searchMode === "clima_semana"
-                  ? "Cidade define a consulta dos próximos 7 dias."
-                  : searchMode === "dia"
-                    ? "Cidade e data definem a consulta do dia."
-                    : searchMode === "atividades"
-                      ? "Cidade e data definem o ranking de atividades."
-                      : "Cidade, atividade e data definem a recomendação."}
-              </CardDescription>
+          <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3">
+          <Card className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0">
+            <CardHeader className="border-b border-soft bg-weather-card xl:pb-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <CardTitle>Painel de controle</CardTitle>
+                  <CardDescription className="text-xs leading-4 xl:hidden 2xl:block">
+                    {searchMode === "clima_semana"
+                      ? "Cidade define a consulta dos próximos 7 dias."
+                      : searchMode === "dia"
+                        ? "Cidade e data definem a consulta do dia."
+                        : searchMode === "atividades"
+                          ? "Cidade e data definem o ranking de atividades."
+                          : "Cidade, atividade e data definem a recomendação."}
+                  </CardDescription>
+                </div>
+                <details className="group relative shrink-0 text-xs">
+                  <summary className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-md border border-soft bg-background/45 px-2 font-medium text-muted-foreground marker:hidden">
+                    <History className="size-3.5 text-sky-700" aria-hidden="true" />
+                    {searchHistory.length}
+                  </summary>
+                  <div className="absolute top-full right-0 z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-soft bg-popover p-2 shadow-lg">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <p className="font-medium text-foreground">Buscas recentes</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 rounded-md px-2 text-xs"
+                        disabled={searchHistory.length === 0}
+                        onClick={handleClearHistory}
+                      >
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                        Limpar
+                      </Button>
+                    </div>
+                    {searchHistory.length > 0 ? (
+                      <div className="grid max-h-40 gap-2 overflow-y-auto pr-1">
+                        {searchHistory.map((entry) => {
+                          const mode = SEARCH_MODE_OPTIONS.find(
+                            (option) => option.id === entry.mode,
+                          );
+
+                          return (
+                            <button
+                              key={`${entry.id}-${entry.createdAt}`}
+                              type="button"
+                              className="grid gap-2 rounded-lg border border-border bg-background p-2 text-left transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none"
+                              onClick={() => handleHistorySelect(entry)}
+                            >
+                              <span className="min-w-0">
+                                <span className="flex items-center gap-2 font-medium text-slate-950 dark:text-slate-50">
+                                  <History className="size-4 text-sky-700" aria-hidden="true" />
+                                  {getSearchHistoryLabel(entry)}
+                                </span>
+                                <span className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                  <span>{mode?.label ?? "Busca"}</span>
+                                  <span>{entry.date}</span>
+                                </span>
+                              </span>
+                              <span className="inline-flex h-7 w-fit items-center gap-1 rounded-md border border-border px-2 text-xs text-muted-foreground">
+                                <RotateCcw className="size-3" aria-hidden="true" />
+                                Repetir
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-border bg-muted/30 p-3 text-muted-foreground">
+                        Nenhuma busca recente.
+                      </div>
+                    )}
+                  </div>
+                </details>
+              </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-5 xl:p-3">
-              <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-3">
+              <form className="flex min-h-0 flex-1 flex-col gap-3" onSubmit={handleSubmit}>
+                <div className="min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:pr-1">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -698,30 +798,33 @@ export default function Home() {
                   className="order-1"
                 >
                 <div className="space-y-2">
-                  <Label htmlFor="city">Cidade</Label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute top-2 left-2.5 text-muted-foreground">
-                      <MapPin className="size-4" aria-hidden="true" />
-                    </div>
-                    <Input
-                      id="city"
-                      value={cityQuery}
-                      onChange={(event) =>
-                        handleCityQueryChange(event.target.value)
-                      }
-                      placeholder="Ex.: Criciúma"
-                      className="h-11 rounded-md pl-8"
-                      autoComplete="off"
-                      role="combobox"
-                      aria-expanded={cityQueryEnabled}
-                      aria-controls="city-suggestions"
-                    />
-                    {cityQueryEnabled ? (
-                      <div
-                        id="city-suggestions"
-                        role="listbox"
-                        className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
-                      >
+                  <Label htmlFor="city" className="text-xs">
+                    Cidade
+                  </Label>
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="relative">
+                      <div className="pointer-events-none absolute top-2 left-2.5 text-muted-foreground">
+                        <MapPin className="size-4" aria-hidden="true" />
+                      </div>
+                      <Input
+                        id="city"
+                        value={cityQuery}
+                        onChange={(event) =>
+                          handleCityQueryChange(event.target.value)
+                        }
+                        placeholder="Ex.: Criciúma"
+                        className="h-10 rounded-md pl-8"
+                        autoComplete="off"
+                        role="combobox"
+                        aria-expanded={cityQueryEnabled}
+                        aria-controls="city-suggestions"
+                      />
+                      {cityQueryEnabled ? (
+                        <div
+                          id="city-suggestions"
+                          role="listbox"
+                          className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
+                        >
                         {cityQueryResult.isFetching ? (
                           <PremiumState
                             compact
@@ -784,83 +887,43 @@ export default function Home() {
                             </span>
                           </button>
                         ))}
-                      </div>
-                    ) : null}
+                        </div>
+                      ) : null}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-10 shrink-0 border-glass bg-background/45 text-xs"
+                      disabled={locationFeedback.disabled}
+                      onClick={handleLocationRetry}
+                    >
+                      {isDetectingLocation ? (
+                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <MapPin className="size-3.5" aria-hidden="true" />
+                      )}
+                      {isDetectingLocation ? "Detectando" : locationActionLabel}
+                    </Button>
                   </div>
-                  {isDetectingLocation ? (
-                    <PremiumState
-                      compact
-                      variant="loading"
-                      eyebrow="Localização atual"
-                      title="Detectando sua cidade"
-                      description={locationMessage || CURRENT_LOCATION_WAITING_MESSAGE}
-                    />
-                  ) : locationStatus === "error" ? (
-                    <PremiumState
-                      compact
-                      variant="error"
-                      eyebrow="Localização atual"
-                      title="Localização indisponível"
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                      action={{
-                        label: "Tentar novamente",
-                        onClick: handleLocationRetry,
-                      }}
-                    />
-                  ) : (
-                    <PremiumState
-                      compact
-                      variant="initial"
-                      eyebrow="Localização atual"
-                      title={
-                        locationStatus === "success"
-                          ? "Cidade detectada"
-                          : "Use sua localização se quiser"
-                      }
-                      description={
-                        <>
-                          <span className="block">
-                            {locationMessage || CURRENT_LOCATION_PRIVACY_NOTE}
-                          </span>
-                          <span className="block text-sky-800/80 dark:text-sky-200/80">
-                            {CURRENT_LOCATION_ATTRIBUTION}
-                          </span>
-                        </>
-                      }
-                    />
-                  )}
+                  {locationStatus !== "idle" ? (
+                    <div
+                      className={cn(
+                        "rounded-md border px-2 py-1.5 text-[11px] leading-4",
+                        locationFeedback.className,
+                      )}
+                    >
+                      <span className="font-medium">{locationFeedback.title}: </span>
+                      <span className="text-muted-foreground">
+                        {locationFeedback.description}
+                      </span>
+                      <span className="block text-muted-foreground xl:hidden 2xl:block">
+                        {CURRENT_LOCATION_ATTRIBUTION}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
                 </ControlPanelSection>
-
-                {modeUsesActivity(searchMode) ? (
-                  <ControlPanelSection
-                    number="3"
-                    title="O que você quer fazer?"
-                    description="Escolha uma atividade para receber a melhor janela."
-                    className="order-3"
-                  >
-                  <div className="space-y-3">
-                    <Label id="atividade-label">Atividade</Label>
-                    <ActivitySelector
-                      activities={activities}
-                      value={selectedActivityId}
-                      onChange={(activityId) => {
-                        setSelectedActivityId(activityId);
-                        resetRecommendationState();
-                      }}
-                    />
-                  </div>
-                  </ControlPanelSection>
-                ) : null}
 
                 <ControlPanelSection
                   number="2"
@@ -868,46 +931,7 @@ export default function Home() {
                   description="Defina a data e, se quiser, sua disponibilidade."
                   className="order-2"
                 >
-                {usesAvailability ? (
-                  <div className="space-y-3 border-t border-soft pt-3">
-                    <div className="space-y-1">
-                      <Label>Disponibilidade opcional</Label>
-                      <p className="text-xs leading-5 text-muted-foreground">
-                        Limita a busca ao periodo em que voce pode fazer a atividade.
-                      </p>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="available-from">Disponivel de</Label>
-                        <Input
-                          id="available-from"
-                          type="time"
-                          value={availableFrom}
-                          onChange={(event) => {
-                            setAvailableFrom(event.target.value);
-                            resetRecommendationState();
-                          }}
-                          className="h-11 rounded-md"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="available-to">Disponivel ate</Label>
-                        <Input
-                          id="available-to"
-                          type="time"
-                          value={availableTo}
-                          onChange={(event) => {
-                            setAvailableTo(event.target.value);
-                            resetRecommendationState();
-                          }}
-                          className="h-11 rounded-md"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="grid gap-4">
+                <div className="grid gap-3">
                   {usesDate ? (
                     <div className="space-y-2">
                       <Label htmlFor="date">
@@ -925,16 +949,16 @@ export default function Home() {
                             setSelectedDate(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-11 rounded-md pl-8"
+                          className="h-10 rounded-md pl-8"
                         />
                       </div>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5 xl:hidden 2xl:flex">
                         {dateOptions.map((option) => (
                           <button
                             key={option.value}
                             type="button"
                             className={cn(
-                              "h-8 rounded-md border px-3 text-xs font-medium transition hover:border-foreground/30",
+                              "h-7 rounded-md border px-2 text-xs font-medium transition hover:border-foreground/30",
                               selectedDate === option.value
                                 ? "border-sky-600 bg-sky-50 text-sky-900"
                                 : "border-border bg-background text-muted-foreground",
@@ -952,11 +976,78 @@ export default function Home() {
                     </div>
                   ) : null}
 
+                  {usesAvailability ? (
+                    <div className="grid gap-2 rounded-lg border border-soft bg-background/30 p-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <Label className="text-xs">Disponibilidade opcional</Label>
+                        <p className="text-[11px] leading-4 text-muted-foreground">
+                          Filtra horário livre
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <Label htmlFor="available-from" className="text-xs">
+                            De
+                          </Label>
+                          <Input
+                            id="available-from"
+                            type="time"
+                            value={availableFrom}
+                            onChange={(event) => {
+                              setAvailableFrom(event.target.value);
+                              resetRecommendationState();
+                            }}
+                            className="h-9 rounded-md"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="available-to" className="text-xs">
+                            Até
+                          </Label>
+                          <Input
+                            id="available-to"
+                            type="time"
+                            value={availableTo}
+                            onChange={(event) => {
+                              setAvailableTo(event.target.value);
+                              resetRecommendationState();
+                            }}
+                            className="h-9 rounded-md"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
                 </ControlPanelSection>
 
+                {modeUsesActivity(searchMode) ? (
+                  <ControlPanelSection
+                    number="3"
+                    title="O que você quer fazer?"
+                    description="Escolha uma atividade para receber a melhor janela."
+                    className="order-3"
+                  >
+                  <div className="space-y-2">
+                    <Label id="atividade-label" className="sr-only">
+                      Atividade
+                    </Label>
+                    <ActivitySelector
+                      activities={activities}
+                      value={selectedActivityId}
+                      onChange={(activityId) => {
+                        setSelectedActivityId(activityId);
+                        resetRecommendationState();
+                      }}
+                    />
+                  </div>
+                  </ControlPanelSection>
+                ) : null}
+                </div>
+
+                <div className="space-y-2 border-t border-soft pt-3 xl:shrink-0">
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="order-4 flex items-start gap-3 rounded-lg border border-soft bg-background/35 p-3 text-sm">
+                  <label className="flex items-start gap-2 rounded-lg border border-soft bg-background/35 p-2 text-xs">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -964,13 +1055,13 @@ export default function Home() {
                         setCompareModels(event.target.checked);
                         resetRecommendationState();
                       }}
-                      className="mt-1 size-4"
+                      className="mt-0.5 size-4"
                     />
                     <span className="min-w-0">
                       <span className="block font-medium">
                         Comparar modelos Open-Meteo
                       </span>
-                      <span className="block text-xs leading-5 text-muted-foreground">
+                      <span className="block leading-4 text-muted-foreground">
                         Mostra concordância quando a recomendação for calculada.
                       </span>
                     </span>
@@ -980,7 +1071,7 @@ export default function Home() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="glow-primary order-4 h-12 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
+                  className="glow-primary h-11 w-full rounded-md bg-weather-accent text-slate-950 hover:bg-weather-accent/90"
                   disabled={!canSearch || recommendationMutation.isPending}
                 >
                   {recommendationMutation.isPending ? (
@@ -1000,68 +1091,9 @@ export default function Home() {
                           ? "Comparar semana"
                           : "Encontrar janela"}
                 </Button>
+
+                </div>
               </form>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card rounded-xl xl:shrink-0">
-            <CardHeader className="border-b border-soft bg-weather-card">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle>Buscas recentes</CardTitle>
-                  <CardDescription>Apenas neste navegador</CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-8 rounded-md"
-                  disabled={searchHistory.length === 0}
-                  onClick={handleClearHistory}
-                >
-                  <Trash2 className="size-3.5" aria-hidden="true" />
-                  Limpar
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-5 xl:p-3">
-              {searchHistory.length > 0 ? (
-                <div className="grid gap-2">
-                  {searchHistory.map((entry) => {
-                    const mode = SEARCH_MODE_OPTIONS.find(
-                      (option) => option.id === entry.mode,
-                    );
-
-                    return (
-                      <button
-                        key={`${entry.id}-${entry.createdAt}`}
-                        type="button"
-                        className="grid gap-2 rounded-lg border border-border bg-background p-3 text-left transition hover:border-foreground/30 hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
-                        onClick={() => handleHistorySelect(entry)}
-                      >
-                        <span className="min-w-0">
-                          <span className="flex items-center gap-2 font-medium text-slate-950 dark:text-slate-50">
-                            <History className="size-4 text-sky-700" aria-hidden="true" />
-                            {getSearchHistoryLabel(entry)}
-                          </span>
-                          <span className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            <span>{mode?.label ?? "Busca"}</span>
-                            <span>{entry.date}</span>
-                          </span>
-                        </span>
-                        <span className="inline-flex h-8 items-center gap-1 rounded-md border border-border px-2 text-xs text-muted-foreground">
-                          <RotateCcw className="size-3" aria-hidden="true" />
-                          Repetir
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-                  Nenhuma busca recente.
-                </div>
-              )}
             </CardContent>
           </Card>
           </aside>
