@@ -48,6 +48,16 @@ const ACTIVITY_VISUALS = {
   },
 } satisfies Record<ActivityId, ActivityVisual>;
 
+const ACTIVITY_COMPACT_LABELS = {
+  correr: "Correr",
+  caminhar: "Caminh.",
+  pedalar: "Pedal",
+  fotografar_por_do_sol: "Sol",
+  observar_estrelas: "Estrelas",
+  lavar_carro: "Carro",
+  lavar_roupa: "Roupa",
+} satisfies Record<ActivityId, string>;
+
 interface ActivitySelectorProps {
   activities: Activity[];
   value: ActivityId | "";
@@ -63,7 +73,7 @@ export function ActivitySelector({
 }: ActivitySelectorProps) {
   return (
     <div
-      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1 xl:gap-1.5"
+      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-7 xl:gap-1"
       role="radiogroup"
       aria-labelledby="atividade-label"
     >
@@ -76,8 +86,9 @@ export function ActivitySelector({
           <button
             key={activity.id}
             type="button"
+            aria-label={activity.name}
             className={cn(
-              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-14 xl:p-2",
+              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-10 xl:p-1",
               selected
                 ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
                 : "",
@@ -87,20 +98,25 @@ export function ActivitySelector({
             disabled={disabled}
             onClick={() => onChange(activity.id)}
           >
-            <span className="flex items-start gap-3">
+            <span className="flex items-center gap-2 xl:flex-col xl:justify-center xl:gap-0.5 xl:text-center">
               <span
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-8",
+                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-5",
                   selected && "bg-background/25 motion-safe:scale-105",
                 )}
               >
                 <Icon
-                  className={cn("size-5 xl:size-4", visual.iconClassName)}
+                  className={cn("size-5 xl:size-3", visual.iconClassName)}
                   aria-hidden="true"
                 />
               </span>
               <span className="min-w-0 space-y-1 xl:space-y-0">
-                <span className="block font-medium">{activity.name}</span>
+                <span className="block text-sm font-medium leading-4 xl:hidden">
+                  {activity.name}
+                </span>
+                <span className="hidden text-[9px] leading-3 font-medium xl:block">
+                  {ACTIVITY_COMPACT_LABELS[activity.id]}
+                </span>
                 <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground xl:hidden">
                   {activity.shortDescription}
                 </span>

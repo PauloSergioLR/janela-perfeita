@@ -19,18 +19,18 @@ export function ControlPanelSection({
   return (
     <section
       className={cn(
-        "space-y-3 border-t border-soft pt-5 first:border-t-0 first:pt-0 xl:space-y-2 xl:pt-3",
+        "space-y-2 border-t border-soft pt-4 first:border-t-0 first:pt-0 xl:space-y-1.5 xl:pt-2.5",
         className,
       )}
     >
-      <div className="flex items-start gap-3 xl:gap-2">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-xs font-semibold text-weather-accent xl:size-6">
+      <div className="flex items-start gap-2">
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-xs font-semibold text-weather-accent">
           {number}
         </span>
         <div className="min-w-0 space-y-0.5">
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
           {description ? (
-            <p className="text-xs leading-5 text-muted-foreground xl:leading-4">
+            <p className="text-xs leading-4 text-muted-foreground xl:hidden 2xl:block">
               {description}
             </p>
           ) : null}
