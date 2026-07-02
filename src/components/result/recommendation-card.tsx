@@ -141,7 +141,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             <p className="text-sm font-medium text-weather-accent">
               Decisão principal
             </p>
-            <CardTitle className="mt-1 text-base">Janela perfeita</CardTitle>
+            <CardTitle className="mt-1 text-base">Recomendação</CardTitle>
             <CardDescription className="line-clamp-1 xl:hidden 2xl:block">
               {recommendation.activity.name} ·{" "}
               {formatRecommendationLocation(recommendation)} ·{" "}

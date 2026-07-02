@@ -51,8 +51,14 @@ export function ReasonChips({
 
   if (isCompact) {
     return (
-      <section className="space-y-2" aria-label="Motivos da recomendação">
-        <div className="flex flex-wrap gap-2 max-h-16 overflow-y-auto pr-1">
+      <section
+        className="flex flex-wrap items-center gap-2"
+        aria-label="Motivos da recomendação"
+      >
+        <h3 className="shrink-0 text-[10px] leading-3 font-medium text-muted-foreground">
+          Motivos da recomendação
+        </h3>
+        <div className="flex min-w-0 flex-1 flex-wrap gap-2 max-h-16 overflow-y-auto pr-1">
           {groups.flatMap((group) => {
             const style = reasonStyles[group.kind];
             const Icon = style.icon;
