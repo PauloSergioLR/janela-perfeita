@@ -1205,7 +1205,7 @@ export default function Home() {
             )}
 
             {resultState === "content" && recommendation && forecastStrip ? (
-              <section className="min-h-0 min-w-0 space-y-4">
+              <section className="min-h-0 min-w-0 space-y-4 xl:hidden">
                 <ForecastStrip overview={forecastStrip} />
               </section>
             ) : null}

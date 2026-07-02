@@ -52,9 +52,6 @@ export function ReasonChips({
   if (isCompact) {
     return (
       <section className="space-y-2" aria-label="Motivos da recomendação">
-        <h3 className="text-xs font-medium text-muted-foreground">
-          Motivos da recomendação
-        </h3>
         <div className="flex flex-wrap gap-2 max-h-16 overflow-y-auto pr-1">
           {groups.flatMap((group) => {
             const style = reasonStyles[group.kind];
@@ -70,7 +67,7 @@ export function ReasonChips({
                 )}
               >
                 <Icon className="size-3.5 shrink-0" aria-hidden="true" />
-                <span>{rule.reason}</span>
+                <span className="line-clamp-1">{rule.reason}</span>
               </Badge>
             ));
           })}

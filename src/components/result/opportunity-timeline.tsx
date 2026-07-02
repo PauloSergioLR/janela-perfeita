@@ -60,7 +60,12 @@ export function OpportunityTimeline({
       )}
     >
       <div>
-        <p className="text-sm font-medium text-weather-accent">
+        <p
+          className={cn(
+            "text-sm font-medium text-weather-accent",
+            isEmbedded && "text-xs",
+          )}
+        >
           Oportunidade por hora
         </p>
         <CardTitle className={cn("mt-1", isEmbedded && "text-sm")}>
@@ -75,7 +80,7 @@ export function OpportunityTimeline({
           variant="outline"
           className={cn(
             "h-7 border-success/45 bg-success/10 px-3 text-success",
-            isEmbedded && "h-6 px-2 text-xs",
+            isEmbedded && "h-5 px-2 text-[10px]",
           )}
           aria-label={`Score mínimo recomendado: ${minRecommendedScore}/100`}
         >
@@ -86,7 +91,7 @@ export function OpportunityTimeline({
             variant="outline"
             className={cn(
               "h-7 border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent",
-              isEmbedded && "h-6 px-2 text-xs",
+              isEmbedded && "h-5 px-2 text-[10px]",
             )}
             aria-label={`Melhor janela: ${bestWindowLabel}`}
           >
@@ -135,7 +140,7 @@ export function OpportunityTimeline({
                     <span
                       className={cn(
                         "flex h-36 items-end rounded-md border border-soft bg-muted/35 p-1",
-                        isEmbedded && "h-12 2xl:h-16",
+                        isEmbedded && "h-6 2xl:h-16",
                       )}
                     >
                       <span
@@ -152,7 +157,7 @@ export function OpportunityTimeline({
                       className={cn(
                         "flex items-center justify-between gap-1 text-xs text-muted-foreground",
                         isEmbedded &&
-                          "text-[10px] leading-3 xl:flex-col xl:items-center xl:gap-0.5",
+                          "text-[10px] leading-3 xl:sr-only 2xl:not-sr-only 2xl:flex-col 2xl:items-center 2xl:gap-0.5",
                       )}
                     >
                       <span>{datum.hourLabel}</span>
@@ -171,6 +176,7 @@ export function OpportunityTimeline({
               className={cn(
                 "border-y border-soft py-4",
                 isEmbedded && "rounded-lg border bg-background/25 px-2 py-1.5",
+                isEmbedded && "xl:sr-only",
               )}
               aria-live="polite"
               aria-label={`Detalhes de ${selectedDatum.hourLabel}`}

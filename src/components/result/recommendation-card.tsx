@@ -133,16 +133,16 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   return (
     <Card
       size="sm"
-      className="glass-card min-w-0 overflow-hidden rounded-xl xl:flex xl:min-h-0 xl:flex-col"
+      className="glass-card min-w-0 overflow-hidden rounded-xl !py-0 xl:flex xl:min-h-0 xl:shrink-0 xl:flex-col xl:gap-0"
     >
-      <CardHeader className="gap-2 border-b border-soft bg-weather-card px-3 py-0 sm:px-4">
+      <CardHeader className="gap-2 border-b border-soft bg-weather-card px-3 !py-2 !pb-2 sm:px-4 xl:!py-1 xl:!pb-1 2xl:!py-2 2xl:!pb-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-medium text-weather-accent">
               Decisão principal
             </p>
             <CardTitle className="mt-1 text-base">Janela perfeita</CardTitle>
-            <CardDescription className="line-clamp-1">
+            <CardDescription className="line-clamp-1 xl:hidden 2xl:block">
               {recommendation.activity.name} ·{" "}
               {formatRecommendationLocation(recommendation)} ·{" "}
               {formatRecommendationDate(recommendation.date)}
@@ -157,43 +157,62 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               )}
               {qualityLabel}
             </Badge>
-            <ShareResultButton title="Janela Perfeita" text={shareText} />
+            <div className="xl:hidden 2xl:block">
+              <ShareResultButton title="Janela Perfeita" text={shareText} />
+            </div>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-2 p-2 sm:p-3 xl:min-h-0">
-        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)]">
-          <section className="grid min-h-36 place-items-center rounded-lg border border-soft bg-weather-card/65 p-2">
+      <CardContent className="grid gap-2 p-2 sm:p-3 xl:min-h-0 xl:gap-1 xl:p-2 2xl:p-3">
+        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)] xl:gap-1">
+          <section className="grid min-h-36 place-items-center rounded-lg border border-soft bg-weather-card/65 p-2 xl:h-28 2xl:h-40">
             <div className="grid place-items-center gap-2">
-              <ScoreRing score={displayScore} className="!w-36 2xl:!w-44" />
+              <ScoreRing score={displayScore} className="!w-28 2xl:!w-44" />
               <span className="text-xs text-muted-foreground">
                 Mínimo {recommendation.activity.minRecommendedScore}/100
               </span>
             </div>
           </section>
 
-          <section className="grid min-w-0 content-start gap-2 rounded-lg border border-soft bg-background/25 p-2">
+          <section className="grid min-w-0 content-start gap-2 rounded-lg border border-soft bg-background/25 p-2 xl:h-28 xl:overflow-y-auto 2xl:h-40">
             <div>
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
-                <Timer
-                  className="size-4 text-weather-accent"
-                  aria-hidden="true"
-                />
-                Janela recomendada
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
+                <span className="inline-flex items-center gap-2">
+                  <Timer
+                    className="size-4 text-weather-accent"
+                    aria-hidden="true"
+                  />
+                  Janela recomendada
+                </span>
+                {bestWindow ? (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "hidden h-6 px-2 text-xs xl:inline-flex 2xl:hidden",
+                      getConfidenceTone(bestWindow.confidence.level),
+                    )}
+                  >
+                    {formatForecastConfidenceLevel(
+                      bestWindow.confidence.level,
+                    )}
+                  </Badge>
+                ) : null}
               </div>
-              <p className="mt-1 text-2xl leading-tight font-semibold text-slate-950 dark:text-slate-50 2xl:text-3xl">
+              <p className="mt-1 text-xl leading-tight font-semibold text-slate-950 dark:text-slate-50 2xl:text-3xl">
                 {decisionWindow}
               </p>
-              <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
-                {recommendation.activity.name}
-              </p>
               {bestWindow ? (
-                <p className="text-xs text-muted-foreground">
-                  Duração: {formatDurationHours(bestWindow.durationHours)}
+                <p className="text-xs font-medium text-slate-700 dark:text-slate-200">
+                  {recommendation.activity.name} ·{" "}
+                  {formatDurationHours(bestWindow.durationHours)}
                 </p>
-              ) : null}
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              ) : (
+                <p className="text-xs font-medium text-slate-700 dark:text-slate-200">
+                  {recommendation.activity.name}
+                </p>
+              )}
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground xl:hidden 2xl:flex">
                 <span className="inline-flex min-w-0 items-center gap-1.5">
                   <CalendarDays className="size-3.5 shrink-0 text-cyan-700" aria-hidden="true" />
                   {formatRecommendationDate(recommendation.date)}
@@ -208,7 +227,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
 
             {bestWindow ? (
-              <div className="rounded-lg border border-soft bg-background/30 p-2">
+              <div className="hidden rounded-lg border border-soft bg-background/30 p-2 2xl:block">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
                   {ConfidenceIcon ? (
                     <ConfidenceIcon
@@ -264,7 +283,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             />
           </section>
 
-          <aside className="min-w-0 rounded-lg border border-soft bg-background/25 p-2">
+          <aside className="min-w-0 rounded-lg border border-soft bg-background/25 p-2 xl:h-28 xl:overflow-y-auto 2xl:h-40">
             <WeatherStatsPanel
               weather={resultScore?.weather ?? null}
               sunrise={recommendation.sunrise}

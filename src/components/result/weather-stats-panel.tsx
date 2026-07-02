@@ -36,7 +36,7 @@ export function WeatherStatsPanel({
       <dl
         className={cn(
           "grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border",
-          isCompact ? "sm:grid-cols-2" : "sm:grid-cols-3 lg:grid-cols-5",
+          isCompact ? "sm:grid-cols-2 xl:grid-cols-5" : "sm:grid-cols-3 lg:grid-cols-5",
         )}
       >
         {stats.map((stat) => {
@@ -47,25 +47,31 @@ export function WeatherStatsPanel({
               key={stat.id}
               className={cn(
                 "bg-weather-card/80 dark:bg-weather-card/55",
-                isCompact ? "min-h-9 p-1.5" : "min-h-24 p-3",
+                isCompact ? "min-h-9 p-1.5 xl:min-h-7 xl:p-1" : "min-h-24 p-3",
               )}
             >
               <dt
                 className={cn(
                   "flex items-center gap-2 font-medium text-muted-foreground",
-                  isCompact ? "text-[10px] leading-3" : "text-xs",
+                  isCompact
+                    ? "text-[10px] leading-3 xl:leading-[0.625rem]"
+                    : "text-xs",
                 )}
               >
                 <Icon
                   className="size-3.5 text-weather-accent"
                   aria-hidden="true"
                 />
-                {stat.label}
+                <span className={cn(isCompact && "xl:sr-only")}>
+                  {stat.label}
+                </span>
               </dt>
               <dd
                 className={cn(
                   "font-semibold text-slate-950 dark:text-slate-50",
-                  isCompact ? "mt-0.5 text-xs 2xl:text-sm" : "mt-3 text-lg",
+                  isCompact
+                    ? "mt-0.5 text-xs xl:mt-0 xl:text-[11px] 2xl:text-sm"
+                    : "mt-3 text-lg",
                 )}
               >
                 {stat.value}
