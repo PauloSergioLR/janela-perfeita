@@ -13,6 +13,27 @@ function readForecastStrip() {
   );
 }
 
+function readRecommendationCard() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/recommendation-card.tsx"),
+    "utf8",
+  );
+}
+
+function readOpportunityTimeline() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/opportunity-timeline.tsx"),
+    "utf8",
+  );
+}
+
+function readScoreBreakdown() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/score-breakdown.tsx"),
+    "utf8",
+  );
+}
+
 function cockpitPreviewExists() {
   return existsSync(join(process.cwd(), "src/app/cockpit-preview"));
 }
@@ -83,5 +104,38 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("max-h-40");
     expect(page).toContain("overflow-visible rounded-xl");
     expect(page).not.toContain("<CardTitle>Buscas recentes</CardTitle>");
+  });
+
+  it("concentra Janela perfeita em um card protagonista sem duplicar timeline", () => {
+    const recommendationCard = readRecommendationCard();
+
+    expect(recommendationCard).toContain('variant="embedded"');
+    expect(recommendationCard).toContain('variant="compact"');
+    expect(recommendationCard).toContain('density="compact"');
+    expect(recommendationCard).toContain(
+      "xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)]",
+    );
+    expect(recommendationCard).toContain("<WeatherStatsPanel");
+    expect(recommendationCard).toContain("<OpportunityTimeline");
+    expect(recommendationCard).toContain("<ScoreBreakdown");
+    expect(page).not.toContain(
+      "<OpportunityTimeline recommendation={recommendation} />",
+    );
+    expect(page).not.toContain(
+      "<ScoreBreakdown recommendation={recommendation} />",
+    );
+  });
+
+  it("usa timeline embutida sem overflow horizontal no desktop", () => {
+    const opportunityTimeline = readOpportunityTimeline();
+    const scoreBreakdown = readScoreBreakdown();
+
+    expect(opportunityTimeline).toContain('variant?: "card" | "embedded"');
+    expect(opportunityTimeline).toContain("xl:overflow-visible");
+    expect(opportunityTimeline).toContain(
+      "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
+    );
+    expect(scoreBreakdown).toContain('variant?: "card" | "compact"');
+    expect(scoreBreakdown).toContain("<details");
   });
 });

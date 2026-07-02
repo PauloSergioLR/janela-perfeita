@@ -2,11 +2,14 @@ import {
   AlertTriangle,
   CalendarDays,
   CheckCircle2,
+  ChevronDown,
   MapPin,
   ShieldCheck,
   Timer,
 } from "lucide-react";
+import { OpportunityTimeline } from "@/components/result/opportunity-timeline";
 import { ReasonChips } from "@/components/result/reason-chips";
+import { ScoreBreakdown } from "@/components/result/score-breakdown";
 import { ShareResultButton } from "@/components/result/share-result-button";
 import { ScoreRing } from "@/components/result/score-ring";
 import { WeatherStatsPanel } from "@/components/result/weather-stats-panel";
@@ -18,9 +21,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getForecastConfidenceIcon } from "@/lib/ui/icon-system";
 import {
-  formatDurationHours,
   formatDecisionWindow,
+  formatDurationHours,
   formatForecastConfidenceLevel,
   formatRecommendationDate,
   formatRecommendationLocation,
@@ -28,7 +32,6 @@ import {
   getAlternativeWindows,
   getPeakHourScore,
 } from "@/lib/ui/recommendation-result";
-import { getForecastConfidenceIcon } from "@/lib/ui/icon-system";
 import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
@@ -123,30 +126,30 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
       : bestWindow?.confidence.level === "media"
         ? "text-warning"
         : "text-danger";
+  const hasSecondaryContext = Boolean(
+    modelAgreement || providerComparison || alternatives.length > 0,
+  );
 
   return (
-    <Card className="glass-card min-w-0 overflow-hidden rounded-xl">
-      <CardHeader className="gap-3 border-b border-soft bg-weather-card">
+    <Card
+      size="sm"
+      className="glass-card min-w-0 overflow-hidden rounded-xl xl:flex xl:min-h-0 xl:flex-col"
+    >
+      <CardHeader className="gap-2 border-b border-soft bg-weather-card px-3 py-0 sm:px-4">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-medium text-weather-accent">
               Decisão principal
             </p>
-            <CardTitle className="mt-1">Recomendação</CardTitle>
-            <CardDescription>
+            <CardTitle className="mt-1 text-base">Janela perfeita</CardTitle>
+            <CardDescription className="line-clamp-1">
               {recommendation.activity.name} ·{" "}
               {formatRecommendationLocation(recommendation)} ·{" "}
               {formatRecommendationDate(recommendation.date)}
             </CardDescription>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
-            <Badge
-              variant="outline"
-              className={cn(
-                "h-7 px-3",
-                scoreTone,
-              )}
-            >
+            <Badge variant="outline" className={cn("h-7 px-3", scoreTone)}>
               {bestWindow ? (
                 <CheckCircle2 className="size-3" aria-hidden="true" />
               ) : (
@@ -154,53 +157,58 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
               )}
               {qualityLabel}
             </Badge>
-            <ShareResultButton
-              title="Janela Perfeita"
-              text={shareText}
-            />
+            <ShareResultButton title="Janela Perfeita" text={shareText} />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-4 sm:p-5">
-        <div className="grid gap-5 lg:grid-cols-[minmax(180px,0.48fr)_minmax(0,1fr)]">
-          <div className="grid min-h-52 place-items-center rounded-lg border border-soft bg-weather-card/65 p-4">
+      <CardContent className="grid gap-2 p-2 sm:p-3 xl:min-h-0">
+        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)]">
+          <section className="grid min-h-36 place-items-center rounded-lg border border-soft bg-weather-card/65 p-2">
             <div className="grid place-items-center gap-2">
-              <ScoreRing score={displayScore} />
+              <ScoreRing score={displayScore} className="!w-36 2xl:!w-44" />
               <span className="text-xs text-muted-foreground">
                 Mínimo {recommendation.activity.minRecommendedScore}/100
               </span>
             </div>
-          </div>
+          </section>
 
-          <div className="grid gap-3">
-            <div className="border-y border-soft py-4">
+          <section className="grid min-w-0 content-start gap-2 rounded-lg border border-soft bg-background/25 p-2">
+            <div>
               <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
-                <Timer className="size-4 text-weather-accent" aria-hidden="true" />
+                <Timer
+                  className="size-4 text-weather-accent"
+                  aria-hidden="true"
+                />
                 Janela recomendada
               </div>
-              <p className="mt-2 text-4xl font-semibold text-slate-950 dark:text-slate-50">
+              <p className="mt-1 text-2xl leading-tight font-semibold text-slate-950 dark:text-slate-50 2xl:text-3xl">
                 {decisionWindow}
               </p>
+              <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+                {recommendation.activity.name}
+              </p>
               {bestWindow ? (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Duração: {formatDurationHours(bestWindow.durationHours)}
                 </p>
               ) : null}
-              <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
-                <div className="flex items-center gap-2">
-                  <CalendarDays className="size-4 text-cyan-700" aria-hidden="true" />
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <CalendarDays className="size-3.5 shrink-0 text-cyan-700" aria-hidden="true" />
                   {formatRecommendationDate(recommendation.date)}
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="size-4 text-sky-700" aria-hidden="true" />
-                  {formatRecommendationLocation(recommendation)}
-                </div>
+                </span>
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <MapPin className="size-3.5 shrink-0 text-sky-700" aria-hidden="true" />
+                  <span className="truncate">
+                    {formatRecommendationLocation(recommendation)}
+                  </span>
+                </span>
               </div>
             </div>
 
             {bestWindow ? (
-              <div className="border-b border-soft pb-4">
+              <div className="rounded-lg border border-soft bg-background/30 p-2">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-slate-50">
                   {ConfidenceIcon ? (
                     <ConfidenceIcon
@@ -222,136 +230,152 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                       bestWindow.confidence.level,
                     )}
                   </Badge>
-                  <p className="min-w-0 flex-1 text-sm leading-6 text-muted-foreground">
+                  <p className="min-w-0 flex-1 text-xs leading-4 text-muted-foreground line-clamp-2">
                     {bestWindow.confidence.reason}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="relative overflow-hidden rounded-xl border border-warning/45 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--warning)_14%,transparent),transparent_64%)] p-4 text-sm leading-6 text-warning">
-                <div
-                  aria-hidden="true"
-                  className="absolute -right-10 -bottom-14 size-32 rounded-full bg-warning/15 blur-3xl"
-                />
-                <div className="relative">
-                  <div className="flex items-center gap-2 font-medium">
-                    <span className="flex size-7 items-center justify-center rounded-lg border border-warning/45 bg-warning/12">
-                      <AlertTriangle className="size-3.5" aria-hidden="true" />
-                    </span>
-                    Sem janela ideal hoje
-                  </div>
-                  <p className="mt-3">
-                    Nenhuma janela atingiu o mínimo de{" "}
-                    {recommendation.activity.minRecommendedScore}/100. O melhor
-                    horário isolado ainda aparece para comparação.
-                  </p>
+              <div className="relative rounded-lg border border-warning/45 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--warning)_14%,transparent),transparent_64%)] p-2 text-xs leading-4 text-warning">
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="flex size-7 items-center justify-center rounded-lg border border-warning/45 bg-warning/12">
+                    <AlertTriangle className="size-3.5" aria-hidden="true" />
+                  </span>
+                  Sem janela ideal hoje
                 </div>
+                <p className="mt-1 line-clamp-2">
+                  Nenhuma janela atingiu o mínimo de{" "}
+                  {recommendation.activity.minRecommendedScore}/100. O melhor
+                  horário isolado ainda aparece para comparação.
+                </p>
               </div>
             )}
-          </div>
+
+            {timeFilterNotice ? (
+              <div className="line-clamp-2 rounded-lg border border-sky-200 bg-sky-50 p-2 text-xs leading-4 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
+                {timeFilterNotice}
+              </div>
+            ) : null}
+
+            <ReasonChips rules={reasonRules} density="compact" />
+            <ScoreBreakdown
+              recommendation={recommendation}
+              variant="compact"
+            />
+          </section>
+
+          <aside className="min-w-0 rounded-lg border border-soft bg-background/25 p-2">
+            <WeatherStatsPanel
+              weather={resultScore?.weather ?? null}
+              sunrise={recommendation.sunrise}
+              sunset={recommendation.sunset}
+              variant="compact"
+            />
+          </aside>
         </div>
 
-        {timeFilterNotice ? (
-          <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
-            {timeFilterNotice}
-          </div>
-        ) : null}
-
-        <ReasonChips rules={reasonRules} />
-
-        <WeatherStatsPanel
-          weather={resultScore?.weather ?? null}
-          sunrise={recommendation.sunrise}
-          sunset={recommendation.sunset}
+        <OpportunityTimeline
+          recommendation={recommendation}
+          variant="embedded"
         />
 
-        {modelAgreement ? (
-          <div
-            className={cn(
-              "rounded-lg border p-4 text-sm leading-6",
-              getAgreementTone(modelAgreement.level),
-            )}
-          >
-            <div className="flex items-center gap-2 font-medium">
-              {modelAgreement.level === "alta" ? (
-                <ShieldCheck className="size-4" aria-hidden="true" />
-              ) : (
-                <AlertTriangle className="size-4" aria-hidden="true" />
-              )}
-              Concordância entre modelos:{" "}
-              {formatModelAgreementLevel(modelAgreement.level)} (
-              {modelAgreement.score}/100)
-            </div>
-            <p className="mt-2">{modelAgreement.reason}</p>
-            {worstDivergence ? (
-              <p className="mt-1">
-                Maior divergência: {worstDivergence.reason}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        {providerComparison ? (
-          <div
-            className={cn(
-              "rounded-lg border p-4 text-sm leading-6",
-              getAgreementTone(providerComparison.level),
-            )}
-          >
-            <div className="flex items-center gap-2 font-medium">
-              {providerComparison.level === "alta" ? (
-                <ShieldCheck className="size-4" aria-hidden="true" />
-              ) : (
-                <AlertTriangle className="size-4" aria-hidden="true" />
-              )}
-              Concordância entre fontes:{" "}
-              {formatModelAgreementLevel(providerComparison.level)} (
-              {providerComparison.score}/100)
-            </div>
-            <p className="mt-2">{providerComparison.reason}</p>
-            {worstProviderDivergence ? (
-              <p className="mt-1">
-                Maior divergência: {worstProviderDivergence.reason}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        {alternatives.length > 0 ? (
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
-              Alternativas
-            </h3>
-            <div className="grid gap-2">
-              {alternatives.map((window) => (
-                <div
-                  key={`${window.startTime}-${window.endTime}`}
-                  className="grid gap-3 rounded-lg border border-border bg-white px-3 py-3 text-sm dark:bg-muted/20 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
-                >
-                  <div className="min-w-0 space-y-1">
-                    <p className="font-medium text-slate-950 dark:text-slate-50">
-                      {formatWindowTimeRange(window)}
-                    </p>
-                    <p className="line-clamp-2 text-muted-foreground">
-                      {formatDurationHours(window.durationHours)}
-                      {window.highlights[0] ? ` - ${window.highlights[0]}` : ""}
-                    </p>
-                    <p className="text-muted-foreground">
-                      Confiança{" "}
-                      {formatForecastConfidenceLevel(
-                        window.confidence.level,
-                      ).toLowerCase()}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="h-8 shrink-0 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
-                  >
-                    {window.avgScore}/100
-                  </Badge>
+        {hasSecondaryContext ? (
+          <div className="grid min-w-0 gap-2 lg:grid-cols-3">
+            {modelAgreement ? (
+              <div
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-sm leading-5",
+                  getAgreementTone(modelAgreement.level),
+                )}
+              >
+                <div className="flex items-center gap-2 font-medium">
+                  {modelAgreement.level === "alta" ? (
+                    <ShieldCheck className="size-4" aria-hidden="true" />
+                  ) : (
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                  )}
+                  Modelos: {formatModelAgreementLevel(modelAgreement.level)} (
+                  {modelAgreement.score}/100)
                 </div>
-              ))}
-            </div>
+                <p className="mt-1 line-clamp-2">{modelAgreement.reason}</p>
+                {worstDivergence ? (
+                  <p className="mt-1 line-clamp-1 text-xs">
+                    Maior divergência: {worstDivergence.reason}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {providerComparison ? (
+              <div
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-sm leading-5",
+                  getAgreementTone(providerComparison.level),
+                )}
+              >
+                <div className="flex items-center gap-2 font-medium">
+                  {providerComparison.level === "alta" ? (
+                    <ShieldCheck className="size-4" aria-hidden="true" />
+                  ) : (
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                  )}
+                  Fontes: {formatModelAgreementLevel(providerComparison.level)} (
+                  {providerComparison.score}/100)
+                </div>
+                <p className="mt-1 line-clamp-2">{providerComparison.reason}</p>
+                {worstProviderDivergence ? (
+                  <p className="mt-1 line-clamp-1 text-xs">
+                    Maior divergência: {worstProviderDivergence.reason}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {alternatives.length > 0 ? (
+              <details className="group rounded-lg border border-soft bg-background/25 p-3 lg:col-span-1">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-slate-950 dark:text-slate-50 [&::-webkit-details-marker]:hidden">
+                  <span>Alternativas</span>
+                  <span className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className="h-7 border-weather-accent/45 bg-weather-accent/10 px-3 text-weather-accent"
+                    >
+                      {alternatives.length}
+                    </Badge>
+                    <ChevronDown
+                      className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </summary>
+                <div className="mt-3 grid gap-2">
+                  {alternatives.map((window) => (
+                    <div
+                      key={`${window.startTime}-${window.endTime}`}
+                      className="grid gap-2 rounded-lg border border-soft bg-background/35 px-3 py-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-950 dark:text-slate-50">
+                          {formatWindowTimeRange(window)}
+                        </p>
+                        <p className="line-clamp-1 text-xs text-muted-foreground">
+                          {formatDurationHours(window.durationHours)}
+                          {window.highlights[0]
+                            ? ` · ${window.highlights[0]}`
+                            : ""}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="h-7 shrink-0 justify-self-start border-sky-200 bg-sky-50 px-3 text-sky-900 sm:justify-self-end"
+                      >
+                        {window.avgScore}/100
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
           </div>
         ) : null}
       </CardContent>
