@@ -5,15 +5,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  getReasonGroups,
-  type ReasonKind,
-} from "@/lib/ui/reason-chips";
+import { getReasonGroups, type ReasonKind } from "@/lib/ui/reason-chips";
 import { cn } from "@/lib/utils";
 import type { RuleResult } from "@/types";
 
 interface ReasonChipsProps {
   rules: RuleResult[];
+  density?: "normal" | "compact";
 }
 
 interface ReasonStyle {
@@ -40,11 +38,48 @@ const reasonStyles: Record<ReasonKind, ReasonStyle> = {
   },
 };
 
-export function ReasonChips({ rules }: ReasonChipsProps) {
+export function ReasonChips({
+  rules,
+  density = "normal",
+}: ReasonChipsProps) {
   const groups = getReasonGroups(rules);
+  const isCompact = density === "compact";
 
   if (groups.length === 0) {
     return null;
+  }
+
+  if (isCompact) {
+    return (
+      <section
+        className="flex flex-wrap items-center gap-2"
+        aria-label="Motivos da recomendação"
+      >
+        <h3 className="shrink-0 text-[10px] leading-3 font-medium text-muted-foreground">
+          Motivos da recomendação
+        </h3>
+        <div className="flex min-w-0 flex-1 flex-wrap gap-2 max-h-16 overflow-y-auto pr-1">
+          {groups.flatMap((group) => {
+            const style = reasonStyles[group.kind];
+            const Icon = style.icon;
+
+            return group.rules.map((rule) => (
+              <Badge
+                key={`${rule.factor}-${rule.reason}`}
+                variant="outline"
+                className={cn(
+                  "motion-chip-enter min-h-7 max-w-full justify-start gap-2 whitespace-normal px-2 py-0.5 text-left text-xs leading-4",
+                  style.badgeClassName,
+                )}
+              >
+                <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="line-clamp-1">{rule.reason}</span>
+              </Badge>
+            ));
+          })}
+        </div>
+      </section>
+    );
   }
 
   return (

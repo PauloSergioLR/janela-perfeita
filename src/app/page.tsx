@@ -21,8 +21,6 @@ import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
 import { ForecastStrip } from "@/components/result/forecast-strip";
 import { RecommendationCard } from "@/components/result/recommendation-card";
-import { ScoreBreakdown } from "@/components/result/score-breakdown";
-import { OpportunityTimeline } from "@/components/result/opportunity-timeline";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
 import { WeatherStage } from "@/components/weather/weather-stage";
@@ -1206,13 +1204,9 @@ export default function Home() {
               </Card>
             )}
 
-            {resultState === "content" && recommendation ? (
-              <section className="min-h-0 min-w-0 space-y-4">
-                <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)]">
-                  <OpportunityTimeline recommendation={recommendation} />
-                  <ScoreBreakdown recommendation={recommendation} />
-                </div>
-                {forecastStrip ? <ForecastStrip overview={forecastStrip} /> : null}
+            {resultState === "content" && recommendation && forecastStrip ? (
+              <section className="min-h-0 min-w-0 space-y-4 xl:sr-only">
+                <ForecastStrip overview={forecastStrip} />
               </section>
             ) : null}
           </section>
