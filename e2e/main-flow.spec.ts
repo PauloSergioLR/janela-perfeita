@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function openHome(page: Page) {
-  await page.goto("/");
+async function openHome(page: Page, path = "/") {
+  await page.goto(path);
   await expect(
     page.getByRole("heading", { name: "Janela Perfeita" }),
   ).toBeVisible();
@@ -12,9 +12,9 @@ async function selectCity(page: Page, query: string) {
   await page.getByRole("option", { name: /Cric/i }).first().click();
 }
 
-test("fluxo principal gera recomendação real", async ({ page }) => {
-  await openHome(page);
-  await selectCity(page, "Criciuma");
+test("fluxo principal gera recomendação em modo demo", async ({ page }) => {
+  await openHome(page, "/?demo=true");
+  await selectCity(page, "demo");
   await page.getByRole("radio", { name: /Correr/ }).click();
   await page.getByRole("button", { name: "Hoje" }).click();
 
@@ -44,7 +44,15 @@ test("fluxo principal gera recomendação real", async ({ page }) => {
   await expect(page.getByText("Timeline de scores")).toBeVisible();
 });
 
-test("busca de cidade exibe estado sem resultado real", async ({ page }) => {
+test("busca de cidade exibe estado sem resultado", async ({ page }) => {
+  await page.route("**/api/geocoding**", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      json: { cities: [] },
+      status: 200,
+    });
+  });
+
   await openHome(page);
   await page.getByLabel("Cidade").fill("cidadeinexistentejanela");
 
