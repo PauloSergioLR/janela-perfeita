@@ -1,5 +1,8 @@
 import { getWeatherIcon, getWeatherMetricIcon } from "@/lib/ui/icon-system";
-import { getWeatherStats } from "@/lib/ui/weather-stats";
+import {
+  getCompactWeatherStats,
+  type WeatherStatId,
+} from "@/lib/ui/weather-stats";
 import { cn } from "@/lib/utils";
 import type { HourlyWeather } from "@/types";
 
@@ -11,6 +14,19 @@ interface WeatherStatsPanelProps {
   className?: string;
 }
 
+const statToneClasses = {
+  temperature: "text-rose-400",
+  "apparent-temperature": "text-rose-300",
+  precipitation: "text-sky-400",
+  wind: "text-cyan-300",
+  gusts: "text-cyan-200",
+  humidity: "text-teal-300",
+  uv: "text-amber-300",
+  "cloud-cover": "text-slate-300",
+  sunrise: "text-yellow-300",
+  sunset: "text-orange-300",
+} satisfies Record<WeatherStatId, string>;
+
 export function WeatherStatsPanel({
   weather,
   sunrise,
@@ -18,25 +34,28 @@ export function WeatherStatsPanel({
   variant = "wide",
   className,
 }: WeatherStatsPanelProps) {
-  const stats = getWeatherStats({ weather, sunrise, sunset });
+  const stats = getCompactWeatherStats({ weather, sunrise, sunset });
   const HeaderIcon = getWeatherIcon(null);
   const isCompact = variant === "compact";
 
   return (
     <section
-      className={cn("space-y-3", isCompact && "space-y-2", className)}
+      className={cn("min-w-0 space-y-3", isCompact && "space-y-1.5", className)}
       aria-label="Estatísticas climáticas"
     >
-      <div className="flex items-center gap-2">
-        <HeaderIcon className="size-4 text-weather-accent" aria-hidden="true" />
-        <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
+      <div className="flex min-w-0 items-center gap-2">
+        <HeaderIcon
+          className="size-4 shrink-0 text-weather-accent"
+          aria-hidden="true"
+        />
+        <h3 className="truncate text-sm font-medium text-slate-950 dark:text-slate-50">
           Estatísticas climáticas
         </h3>
       </div>
       <dl
         className={cn(
-          "grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border",
-          isCompact ? "sm:grid-cols-2 xl:grid-cols-5" : "sm:grid-cols-3 lg:grid-cols-5",
+          "grid min-w-0 grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5",
+          isCompact ? "xl:grid-cols-2" : "sm:grid-cols-3",
         )}
       >
         {stats.map((stat) => {
@@ -46,48 +65,50 @@ export function WeatherStatsPanel({
             <div
               key={stat.id}
               className={cn(
-                "bg-weather-card/80 dark:bg-weather-card/55",
-                isCompact ? "min-h-9 p-1.5 xl:min-h-7 xl:p-1" : "min-h-24 p-3",
+                "min-w-0 bg-weather-card/80 dark:bg-weather-card/50",
+                isCompact
+                  ? "min-h-12 p-1.5 xl:min-h-[31px] xl:p-1.5 2xl:min-h-12 2xl:p-2"
+                  : "min-h-24 p-3",
               )}
             >
               <dt
                 className={cn(
-                  "flex items-center gap-2 font-medium text-muted-foreground",
-                  isCompact
-                    ? "text-[10px] leading-3 xl:leading-[0.625rem]"
-                    : "text-xs",
+                  "flex min-w-0 items-center gap-1.5 font-medium text-muted-foreground",
+                  isCompact ? "text-[10px] leading-3" : "text-xs",
                 )}
               >
                 <Icon
-                  className="size-3.5 text-weather-accent"
+                  className={cn(
+                    "size-3.5 shrink-0",
+                    statToneClasses[stat.id],
+                  )}
                   aria-hidden="true"
                 />
-                <span className={cn(isCompact && "xl:sr-only")}>
-                  {stat.label}
-                </span>
+                <span className="truncate">{stat.label}</span>
               </dt>
               <dd
+                title={stat.value}
                 className={cn(
-                  "font-semibold text-slate-950 dark:text-slate-50",
+                  "min-w-0 truncate font-semibold tabular-nums text-slate-950 dark:text-slate-50",
                   isCompact
-                    ? "mt-0.5 text-xs xl:mt-0 xl:text-[11px] 2xl:text-sm"
+                    ? "mt-0.5 text-[11px] leading-3 xl:text-[11px] 2xl:text-sm 2xl:leading-4"
                     : "mt-3 text-lg",
                 )}
               >
                 {stat.value}
               </dd>
-              {stat.detail && !isCompact ? (
+              {stat.detail ? (
                 <p
                   className={cn(
-                    "text-muted-foreground",
-                    "mt-1 text-xs",
+                    "mt-0.5 line-clamp-1 min-w-0 text-muted-foreground",
+                    isCompact
+                      ? "text-[9px] leading-3 xl:sr-only 2xl:not-sr-only"
+                      : "text-xs",
                   )}
+                  title={stat.detail}
                 >
                   {stat.detail}
                 </p>
-              ) : null}
-              {stat.detail && isCompact ? (
-                <span className="sr-only">{stat.detail}</span>
               ) : null}
             </div>
           );

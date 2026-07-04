@@ -50,10 +50,16 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
   const HumidityIcon = getWeatherMetricIcon("humidity");
   const UvIcon = getWeatherMetricIcon("uv");
   const SunIcon = getWeatherMetricIcon("sunrise");
-  const ApparentTemperatureIcon = getWeatherMetricIcon("apparent-temperature");
   const climateSummary = getDailyClimateSummary(overview.hourly);
   const hasHourlyData = overview.hourly.length > 0;
   const metrics = [
+    {
+      label: "Temperatura",
+      value: `${formatValue(overview.temperatureMin, "°C")} / ${formatValue(overview.temperatureMax, "°C")}`,
+      detail: `Sensação ${formatValue(overview.apparentTemperatureMin, "°C")} / ${formatValue(overview.apparentTemperatureMax, "°C")}`,
+      icon: TemperatureIcon,
+      tone: "text-rose-400",
+    },
     {
       label: "Chuva",
       value: formatDecimal(overview.precipitationSum, " mm"),
@@ -91,13 +97,6 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
       detail: `${formatHour(overview.sunrise)} → ${formatHour(overview.sunset)}`,
       icon: SunIcon,
       tone: "text-amber-400",
-    },
-    {
-      label: "Sensação",
-      value: `${formatValue(overview.apparentTemperatureMin, "°C")} / ${formatValue(overview.apparentTemperatureMax, "°C")}`,
-      detail: "Mínima / máxima",
-      icon: ApparentTemperatureIcon,
-      tone: "text-rose-400",
     },
   ];
 
@@ -141,20 +140,34 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-5 p-4 sm:p-5">
-        <div className="grid gap-px overflow-hidden rounded-lg border border-soft bg-border sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid min-w-0 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5 sm:grid-cols-2 lg:grid-cols-3">
           {metrics.map((metric) => {
             const Icon = metric.icon;
 
             return (
-              <div key={metric.label} className="min-h-28 bg-weather-card/70 p-4 dark:bg-weather-card/45">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <Icon className={cn("size-4", metric.tone)} aria-hidden="true" />
-                  {metric.label}
+              <div
+                key={metric.label}
+                className="min-w-0 bg-weather-card/75 p-3 dark:bg-weather-card/45"
+              >
+                <div className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <Icon
+                    className={cn("size-4 shrink-0", metric.tone)}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">{metric.label}</span>
                 </div>
-                <p className="mt-3 text-xl font-semibold text-slate-950 dark:text-slate-50">
+                <p
+                  className="mt-2 min-w-0 truncate text-lg font-semibold tabular-nums text-slate-950 dark:text-slate-50"
+                  title={metric.value}
+                >
                   {metric.value}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">{metric.detail}</p>
+                <p
+                  className="mt-1 line-clamp-1 min-w-0 text-[11px] leading-4 text-muted-foreground"
+                  title={metric.detail}
+                >
+                  {metric.detail}
+                </p>
               </div>
             );
           })}

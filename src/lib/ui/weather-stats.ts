@@ -47,6 +47,56 @@ function unavailableStat(id: WeatherStatId, label: string): WeatherStat {
   return { id, label, value: UNAVAILABLE_VALUE };
 }
 
+function findStat(
+  stats: WeatherStat[],
+  id: WeatherStatId,
+  label: string,
+): WeatherStat {
+  return stats.find((stat) => stat.id === id) ?? unavailableStat(id, label);
+}
+
+function withAvailableDetail(stat: WeatherStat, detail?: string): WeatherStat {
+  if (stat.value === UNAVAILABLE_VALUE || !detail) {
+    return stat;
+  }
+
+  return { ...stat, detail };
+}
+
+function buildSolarWindow(sunrise?: string | null, sunset?: string | null): WeatherStat {
+  const sunriseTime = formatLocalTime(sunrise);
+  const sunsetTime = formatLocalTime(sunset);
+
+  if (sunriseTime === UNAVAILABLE_VALUE && sunsetTime === UNAVAILABLE_VALUE) {
+    return unavailableStat("sunrise", "Sol");
+  }
+
+  if (sunriseTime === UNAVAILABLE_VALUE) {
+    return {
+      id: "sunrise",
+      label: "Sol",
+      value: sunsetTime,
+      detail: "Pôr do sol",
+    };
+  }
+
+  if (sunsetTime === UNAVAILABLE_VALUE) {
+    return {
+      id: "sunrise",
+      label: "Sol",
+      value: sunriseTime,
+      detail: "Nascer do sol",
+    };
+  }
+
+  return {
+    id: "sunrise",
+    label: "Sol",
+    value: `${sunriseTime} - ${sunsetTime}`,
+    detail: "Nascer / pôr",
+  };
+}
+
 function buildWeatherStats(weather: HourlyWeather): WeatherStat[] {
   const precipitation = Math.max(
     weather.precipitation,
@@ -136,4 +186,24 @@ export function getWeatherStats({
   }
 
   return [...buildWeatherStats(weather), ...solarStats];
+}
+
+export function getCompactWeatherStats(input: WeatherStatsInput): WeatherStat[] {
+  const stats = getWeatherStats(input);
+  const temperature = findStat(stats, "temperature", "Temperatura");
+  const apparentTemperature = findStat(stats, "apparent-temperature", "Sensação");
+  const precipitation = findStat(stats, "precipitation", "Chuva");
+  const wind = findStat(stats, "wind", "Vento");
+  const gusts = findStat(stats, "gusts", "Rajadas");
+  const humidity = findStat(stats, "humidity", "Umidade");
+  const uv = findStat(stats, "uv", "UV");
+
+  return [
+    withAvailableDetail(temperature, `Sensação ${apparentTemperature.value}`),
+    withAvailableDetail(precipitation, precipitation.detail ?? "Probabilidade"),
+    withAvailableDetail(wind, `Rajadas ${gusts.value}`),
+    withAvailableDetail(humidity, "Umidade relativa"),
+    withAvailableDetail(uv, "Índice UV"),
+    buildSolarWindow(input.sunrise, input.sunset),
+  ];
 }

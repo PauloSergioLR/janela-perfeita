@@ -31,9 +31,12 @@ describe("DailyOverviewCard", () => {
     const source = readDailyOverviewCard();
 
     expect(source).toContain("Condição principal");
+    expect(source).toContain("Temperatura");
     expect(source).toContain("Umidade");
     expect(source).toContain("Sensação");
     expect(source).toContain("Timeline horária");
+    expect(source).toContain("tabular-nums");
+    expect(source).toContain("line-clamp-1");
     expect(source).toContain('aria-label="Timeline horária"');
     expect(source).toContain('role="list"');
     expect(source).toContain("overflow-x-auto");
