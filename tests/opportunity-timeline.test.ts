@@ -53,13 +53,17 @@ describe("OpportunityTimeline", () => {
     );
   });
 
-  it("mantém seleção acessível, detalhes ao clique e scroll mobile", () => {
+  it("mantém seleção acessível, detalhes ao clique e faixa compacta", () => {
     const source = readOpportunityTimeline();
 
     expect(source).toContain("aria-pressed={isSelected}");
     expect(source).toContain("title={buildOpportunityTooltip(datum)}");
     expect(source).toContain('aria-label="Timeline de oportunidade"');
-    expect(source).toContain("overflow-x-auto");
+    expect(source).toContain(
+      "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
+    );
+    expect(source).toContain("datum.hourLabel.slice(0, 2)");
+    expect(source).not.toContain("overflow-x-auto");
     expect(source).toContain('aria-live="polite"');
     expect(source).toContain("selectedDatum.rainRisk");
     expect(source).toContain("selectedDatum.wind");

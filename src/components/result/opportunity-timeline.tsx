@@ -105,12 +105,19 @@ export function OpportunityTimeline({
     <div className={cn("space-y-4", isEmbedded && "space-y-2")}>
       {data.length > 0 ? (
         <>
-          <div className="overflow-x-auto pb-2 xl:overflow-visible xl:pb-1">
+          <div
+            className={cn(
+              "rounded-lg border border-soft bg-background/25 p-2",
+              isEmbedded && "xl:p-1.5",
+            )}
+          >
             <div
               className={cn(
-                "flex min-w-max items-end gap-2 px-1 pt-4",
+                "grid min-w-0 grid-cols-6 gap-1 sm:grid-cols-12",
                 isEmbedded &&
-                  "xl:grid xl:min-w-0 xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))] xl:gap-1 xl:px-0 xl:pt-1",
+                  "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))] xl:gap-0.5",
+                !isEmbedded &&
+                  "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
               )}
               style={timelineStyle}
             >
@@ -127,25 +134,41 @@ export function OpportunityTimeline({
                     aria-pressed={isSelected}
                     aria-label={`${datum.hourLabel}, score ${datum.score} de 100. ${tone.label}. ${datum.reason}`}
                     className={cn(
-                      "group grid w-[4.75rem] shrink-0 gap-2 rounded-lg border border-transparent p-2 text-left transition-[transform,border-color,background-color,box-shadow,opacity] duration-200 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
+                      "group relative grid min-h-20 min-w-0 grid-rows-[auto_1fr_auto] gap-1 rounded-md border border-soft bg-weather-card/45 p-1 text-center transition-[transform,border-color,background-color,box-shadow,opacity] duration-200 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
                       isEmbedded &&
-                        "w-14 gap-1.5 p-1.5 xl:w-auto xl:min-w-0 xl:shrink xl:gap-1 xl:p-1",
-                      datum.score < 40 && "opacity-55 hover:opacity-100",
+                        "min-h-16 xl:min-h-14 2xl:min-h-[4.75rem]",
+                      datum.score < 40 && "opacity-65 hover:opacity-100",
                       datum.isBestWindow &&
-                        "motion-timeline-best ring-1 ring-weather-accent/35",
+                        "motion-timeline-best border-weather-accent/60 bg-weather-accent/10",
                       isSelected &&
-                        "border-weather-accent/55 bg-weather-accent/10 motion-safe:-translate-y-1 shadow-weather-glow",
+                        "border-weather-accent/70 bg-weather-accent/15 shadow-weather-glow ring-1 ring-weather-accent/50",
                     )}
                   >
+                    {datum.isBestWindow ? (
+                      <span
+                        className="pointer-events-none absolute inset-x-1 top-1 h-0.5 rounded-full bg-weather-accent shadow-weather-glow"
+                        aria-hidden="true"
+                      />
+                    ) : null}
                     <span
                       className={cn(
-                        "flex h-36 items-end rounded-md border border-soft bg-muted/35 p-1",
-                        isEmbedded && "h-6 2xl:h-16",
+                        "truncate text-[10px] leading-3 font-medium text-muted-foreground",
+                        datum.isBestWindow && "text-weather-accent",
+                      )}
+                    >
+                      {datum.hourLabel.slice(0, 2)}h
+                    </span>
+                    <span
+                      className={cn(
+                        "flex h-12 min-h-0 items-end rounded-[0.35rem] border border-soft bg-muted/25 p-0.5",
+                        isEmbedded && "h-10 xl:h-8 2xl:h-12",
+                        datum.isBestWindow &&
+                          "border-weather-accent/55 bg-weather-accent/10",
                       )}
                     >
                       <span
                         className={cn(
-                          "w-full rounded-sm transition-[height] duration-200 motion-reduce:transition-none",
+                          "w-full rounded-[0.2rem] transition-[height] duration-200 motion-reduce:transition-none",
                           tone.barClassName,
                         )}
                         style={{
@@ -155,15 +178,11 @@ export function OpportunityTimeline({
                     </span>
                     <span
                       className={cn(
-                        "flex items-center justify-between gap-1 text-xs text-muted-foreground",
-                        isEmbedded &&
-                          "text-[10px] leading-3 xl:sr-only 2xl:not-sr-only 2xl:flex-col 2xl:items-center 2xl:gap-0.5",
+                        "truncate text-[10px] leading-3 font-semibold text-slate-950 dark:text-slate-50",
+                        datum.isBestWindow && "text-weather-accent",
                       )}
                     >
-                      <span>{datum.hourLabel}</span>
-                      <span className="font-semibold text-slate-950 dark:text-slate-50">
-                        {datum.score}
-                      </span>
+                      {datum.score}
                     </span>
                   </button>
                 );
