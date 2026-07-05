@@ -131,7 +131,7 @@ describe("layout Weather Decision Cockpit", () => {
     const scoreBreakdown = readScoreBreakdown();
 
     expect(opportunityTimeline).toContain('variant?: "card" | "embedded"');
-    expect(opportunityTimeline).toContain("xl:overflow-visible");
+    expect(opportunityTimeline).not.toContain("overflow-x-auto");
     expect(opportunityTimeline).toContain(
       "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
     );
