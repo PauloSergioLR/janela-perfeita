@@ -141,7 +141,7 @@ export function OpportunityTimeline({
                       datum.isBestWindow &&
                         "motion-timeline-best border-weather-accent/60 bg-weather-accent/10",
                       isSelected &&
-                        "border-weather-accent/70 bg-weather-accent/15 shadow-weather-glow ring-1 ring-weather-accent/50",
+                        "border-weather-accent/70 bg-weather-accent/15 motion-safe:-translate-y-1 shadow-weather-glow ring-1 ring-weather-accent/50",
                     )}
                   >
                     {datum.isBestWindow ? (
