@@ -57,13 +57,16 @@ describe("ForecastStrip", () => {
     expect(getForecastShortSummary("", "Nublado")).toBe("Nublado");
   });
 
-  it("mantém cards compactos sem scroll horizontal e sem mapa", () => {
+  it("mantém cards compactos com navegação discreta e sem mapa", () => {
     const source = readForecastStrip();
 
     expect(source).toContain('aria-label="Previsão dos próximos dias"');
-    expect(source).toContain("grid min-w-0 gap-2");
-    expect(source).toContain("xl:grid-cols-7");
-    expect(source).not.toContain("overflow-x-auto");
+    expect(source).toContain("scrollbar-none");
+    expect(source).toContain("overflow-x-auto");
+    expect(source).toContain("scrollBy");
+    expect(source).toContain("ChevronLeft");
+    expect(source).toContain("ChevronRight");
+    expect(source).toContain("Máx / mín");
     expect(source).not.toContain("min-w-max");
     expect(source).not.toContain("w-44");
     expect(source).toContain("getWeatherIcon");

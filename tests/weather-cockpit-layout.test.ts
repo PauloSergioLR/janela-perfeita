@@ -67,16 +67,20 @@ describe("layout Weather Decision Cockpit", () => {
 
   it("mantem faixa inferior de resumo sem adicionar mapa", () => {
     expect(page).toContain('aria-label="Resumo da consulta"');
+    expect(page).toContain("contextualForecastOverview");
+    expect(page).toContain("Próximos dias para decidir");
+    expect(page).not.toContain("xl:sr-only");
     expect(page).not.toContain("MapLibre");
     expect(page).not.toContain("maptiler");
     expect(page).not.toContain("google.maps");
   });
 
-  it("evita scroll horizontal na faixa de previsao", () => {
+  it("usa carrossel compacto sem scrollbar visivel na faixa de previsao", () => {
     const forecastStrip = readForecastStrip();
 
-    expect(forecastStrip).toContain("grid min-w-0 gap-2");
-    expect(forecastStrip).not.toContain("overflow-x-auto");
+    expect(forecastStrip).toContain("scrollbar-none");
+    expect(forecastStrip).toContain("overflow-x-auto");
+    expect(forecastStrip).toContain("Ver próximos dias");
     expect(forecastStrip).not.toContain("min-w-max");
     expect(forecastStrip).not.toContain("w-44");
   });

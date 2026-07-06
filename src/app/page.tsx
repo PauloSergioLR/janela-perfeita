@@ -575,6 +575,20 @@ export default function Home() {
               : recommendationMutation.isError
                 ? "Atenção"
                 : "Aguardando busca";
+  const contextualForecastOverview =
+    resultState === "content" && recommendation && forecastStrip
+      ? forecastStrip
+      : resultState === "content" && weeklyOverview
+        ? weeklyOverview
+        : undefined;
+  const contextualForecastTitle = recommendation
+    ? "Próximos dias para decidir"
+    : weeklyOverview
+      ? "Faixa da semana"
+      : "Próximos dias";
+  const contextualForecastSubtitle = recommendation
+    ? `${cockpitActivityLabel} · ${cockpitCityLabel}`
+    : `${cockpitCityLabel} · ${cockpitDateLabel}`;
   const weatherStageVariant = getWeatherStageVariant({
     activityId: selectedActivityId || undefined,
     recommendation,
@@ -1204,47 +1218,50 @@ export default function Home() {
               </Card>
             )}
 
-            {resultState === "content" && recommendation && forecastStrip ? (
-              <section className="min-h-0 min-w-0 space-y-4 xl:sr-only">
-                <ForecastStrip overview={forecastStrip} />
-              </section>
-            ) : null}
           </section>
         </section>
 
-        <section
-          className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
-          aria-label="Resumo da consulta"
-        >
-          <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-2">
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Modo</p>
-              <p className="truncate text-sm font-medium">
-                {selectedModeOption?.label ?? "Janela perfeita"}
-              </p>
+        {contextualForecastOverview ? (
+          <ForecastStrip
+            overview={contextualForecastOverview}
+            title={contextualForecastTitle}
+            subtitle={contextualForecastSubtitle}
+          />
+        ) : (
+          <section
+            className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
+            aria-label="Resumo da consulta"
+          >
+            <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-2">
+              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+                <p className="text-xs text-muted-foreground">Modo</p>
+                <p className="truncate text-sm font-medium">
+                  {selectedModeOption?.label ?? "Janela perfeita"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+                <p className="text-xs text-muted-foreground">Cidade</p>
+                <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
+              </div>
+              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+                <p className="text-xs text-muted-foreground">Período</p>
+                <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
+              </div>
+              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+                <p className="text-xs text-muted-foreground">Atividade</p>
+                <p className="truncate text-sm font-medium">
+                  {cockpitActivityLabel}
+                </p>
+              </div>
+              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+                <p className="text-xs text-muted-foreground">Resultado</p>
+                <p className="truncate text-sm font-medium">
+                  {cockpitResultLabel}
+                </p>
+              </div>
             </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Cidade</p>
-              <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Período</p>
-              <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Atividade</p>
-              <p className="truncate text-sm font-medium">
-                {cockpitActivityLabel}
-              </p>
-            </div>
-            <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
-              <p className="text-xs text-muted-foreground">Resultado</p>
-              <p className="truncate text-sm font-medium">
-                {cockpitResultLabel}
-              </p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <AttributionFooter disclaimer={resultDisclaimer} />
       </div>
