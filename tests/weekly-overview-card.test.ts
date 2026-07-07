@@ -14,21 +14,22 @@ describe("WeeklyOverviewCard", () => {
     const source = readWeeklyOverviewCard();
 
     expect(source).toContain("Consulta da semana");
-    expect(source).toContain("Próximos 7 dias");
+    expect(source).toContain("Resumo da semana");
     expect(source).toContain("Melhor dia");
     expect(source).toContain("Pior dia");
     expect(source).toContain("Maior chance de chuva");
-    expect(source).toContain("getWeatherIcon");
+    expect(source).toContain("Mais quente");
+    expect(source).toContain("Mais frio");
   });
 
-  it("mantém cards acessíveis e rolagem horizontal em telas menores", () => {
+  it("mantém resumo compacto sem carrossel duplicado no painel principal", () => {
     const source = readWeeklyOverviewCard();
 
-    expect(source).toContain('aria-label="Previsão dos próximos 7 dias"');
-    expect(source).toContain("overflow-x-auto");
-    expect(source).toContain('role="list"');
-    expect(source).toContain('role="listitem"');
-    expect(source).toContain("motion-reduce:transition-none");
+    expect(source).toContain('aria-label="Resumo climático da semana"');
+    expect(source).toContain("xl:h-full xl:min-h-0");
+    expect(source).toContain("xl:overflow-y-auto");
+    expect(source).not.toContain("overflow-x-auto");
+    expect(source).not.toContain('role="list"');
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
   });

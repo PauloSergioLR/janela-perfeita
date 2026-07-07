@@ -1,9 +1,7 @@
 import {
   CalendarDays,
-  CloudRain,
   Droplets,
   Sparkles,
-  Thermometer,
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
@@ -16,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getWeatherIcon } from "@/lib/ui/icon-system";
 import { formatCityLabel } from "@/lib/ui/search-page";
 import type { WeeklyWeatherDayOverview, WeeklyWeatherOverview } from "@/types";
 
@@ -53,9 +50,9 @@ function formatShortDate(date: string): string {
 
 function getHighlightClasses(tone: HighlightTone): string {
   const tones = {
-    success: "border-emerald-400/30 bg-emerald-400/10 text-emerald-600 dark:text-emerald-300",
-    danger: "border-rose-400/30 bg-rose-400/10 text-rose-600 dark:text-rose-300",
-    warning: "border-sky-400/30 bg-sky-400/10 text-sky-600 dark:text-sky-300",
+    success: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+    danger: "border-rose-400/30 bg-rose-400/10 text-rose-300",
+    warning: "border-sky-400/30 bg-sky-400/10 text-sky-300",
   };
 
   return tones[tone];
@@ -80,7 +77,7 @@ function Highlight({
 
   return (
     <article
-      className={`rounded-xl border p-3.5 ${getHighlightClasses(tone)}`}
+      className={`rounded-xl border p-3 ${getHighlightClasses(tone)}`}
       aria-label={`${label}: ${formatWeekday(day.date)}`}
     >
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]">
@@ -89,7 +86,7 @@ function Highlight({
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div>
-          <p className="font-semibold capitalize text-slate-950 dark:text-slate-50">
+          <p className="font-semibold capitalize text-slate-50">
             {formatWeekday(day.date)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -104,10 +101,15 @@ function Highlight({
 
 export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
   const hasDays = overview.days.length > 0;
+  const hottestDay = overview.highlights.hottestDay;
+  const coldestDay = overview.highlights.coldestDay;
 
   return (
-    <Card className="glass-card overflow-hidden rounded-xl">
-      <CardHeader className="gap-4 border-b border-soft bg-weather-card p-4 sm:p-5">
+    <Card
+      size="sm"
+      className="glass-card min-w-0 rounded-xl !py-0 xl:h-full xl:min-h-0"
+    >
+      <CardHeader className="gap-2 border-b border-soft bg-weather-card p-3 sm:p-4 xl:px-3 xl:!py-2 xl:!pb-2">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm font-medium text-weather-accent">
@@ -115,7 +117,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
               Clima por decisão
             </p>
             <CardTitle className="mt-1">Consulta da semana</CardTitle>
-            <CardDescription>
+            <CardDescription className="line-clamp-1">
               {formatCityLabel(overview.city)} · {formatShortDate(overview.startDate)} a{" "}
               {formatShortDate(overview.endDate)}
             </CardDescription>
@@ -130,7 +132,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-4 sm:p-5">
+      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)] xl:overflow-y-auto xl:p-3">
         {hasDays ? (
           <>
             <section aria-label="Destaques da semana">
@@ -162,91 +164,65 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
               </div>
             </section>
 
-            <section className="space-y-3" aria-label="Previsão dos próximos 7 dias">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="font-semibold text-slate-950 dark:text-slate-50">
-                    Próximos 7 dias
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Deslize para explorar a previsão completa.
-                  </p>
-                </div>
-                <span className="hidden text-xs text-muted-foreground sm:block">
-                  {overview.days.length} previsões
-                </span>
+            <section
+              className="grid min-h-0 gap-3 rounded-xl border border-soft bg-background/25 p-3 xl:grid-cols-3"
+              aria-label="Resumo climático da semana"
+            >
+              <div className="min-w-0 xl:col-span-1">
+                <h3 className="font-semibold text-slate-50">
+                  Resumo da semana
+                </h3>
+                <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                  Melhor conforto, pior conforto, chuva e extremos de
+                  temperatura do período.
+                </p>
               </div>
 
-              <div className="overflow-x-auto pb-2">
-                <div className="flex min-w-max gap-3" role="list">
-                  {overview.days.map((day) => {
-                    const WeatherIcon = getWeatherIcon(day.weatherCode);
-
-                    return (
-                      <article
-                        key={day.date}
-                        role="listitem"
-                        className="group flex w-64 shrink-0 flex-col rounded-xl border border-soft bg-weather-card/70 p-4 shadow-weather-soft transition-transform motion-safe:hover:-translate-y-1 motion-reduce:transition-none dark:bg-weather-card/45"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="font-semibold capitalize text-slate-950 dark:text-slate-50">
-                              {formatWeekday(day.date)}
-                            </p>
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              {formatShortDate(day.date)}
-                            </p>
-                          </div>
-                          <div className="grid size-10 place-items-center rounded-lg border border-weather-accent/30 bg-weather-accent/10 text-weather-accent">
-                            <WeatherIcon className="size-5" aria-hidden="true" />
-                          </div>
-                        </div>
-
-                        <div className="mt-5">
-                          <p className="text-sm text-muted-foreground">{day.weatherLabel}</p>
-                          <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
-                            {formatNumber(day.temperatureMin, "°C")} <span className="text-base font-medium text-muted-foreground">/</span>{" "}
-                            {formatNumber(day.temperatureMax, "°C")}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">Mínima / máxima</p>
-                        </div>
-
-                        <div className="mt-5 grid grid-cols-2 gap-2 border-y border-soft py-3 text-xs">
-                          <span className="flex items-center gap-1.5 text-muted-foreground">
-                            <Droplets className="size-3.5 text-sky-500" aria-hidden="true" />
-                            {formatNumber(day.precipitationProbabilityMax, "%")}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-muted-foreground">
-                            <CloudRain className="size-3.5 text-cyan-500" aria-hidden="true" />
-                            {formatNumber(day.precipitationSum, " mm")}
-                          </span>
-                        </div>
-
-                        <p className="mt-4 text-sm leading-6 text-muted-foreground">{day.summary}</p>
-
-                        <div className="mt-auto pt-5">
-                          <div className="flex items-center justify-between gap-3 text-xs">
-                            <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
-                              <Thermometer className="size-3.5 text-rose-400" aria-hidden="true" />
-                              Conforto
-                            </span>
-                            <span className="font-semibold tabular-nums text-slate-950 dark:text-slate-50">
-                              {day.comfortScore}/100
-                            </span>
-                          </div>
-                          <div
-                            className="mt-2 h-1.5 overflow-hidden rounded-full bg-weather-muted"
-                            aria-label={`Conforto: ${day.comfortScore} de 100`}
-                          >
-                            <div
-                              className="h-full rounded-full bg-weather-accent transition-[width] duration-500 motion-reduce:transition-none"
-                              style={{ width: `${Math.max(0, Math.min(day.comfortScore, 100))}%` }}
-                            />
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
+              <div className="grid min-w-0 gap-2 sm:grid-cols-2 xl:col-span-2">
+                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Mais quente
+                  </p>
+                  <p className="mt-1 truncate font-semibold capitalize text-slate-50">
+                    {hottestDay ? formatWeekday(hottestDay.date) : "Sem dados"}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {formatNumber(hottestDay?.temperatureMax ?? null, "°C")}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Mais frio
+                  </p>
+                  <p className="mt-1 truncate font-semibold capitalize text-slate-50">
+                    {coldestDay ? formatWeekday(coldestDay.date) : "Sem dados"}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {formatNumber(coldestDay?.temperatureMin ?? null, "°C")}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Dias avaliados
+                  </p>
+                  <p className="mt-1 font-semibold tabular-nums text-slate-50">
+                    {overview.days.length}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Previsões consolidadas.
+                  </p>
+                </div>
+                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Janela temporal
+                  </p>
+                  <p className="mt-1 font-semibold text-slate-50">
+                    {formatShortDate(overview.startDate)} a{" "}
+                    {formatShortDate(overview.endDate)}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Próximos dias para comparar.
+                  </p>
                 </div>
               </div>
             </section>

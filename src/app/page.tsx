@@ -639,7 +639,7 @@ export default function Home() {
     <>
       <WeatherStage variant={weatherStageVariant} />
       <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-4 xl:py-3 2xl:px-6">
-      <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-3">
+      <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,auto)_auto] xl:gap-3">
         <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
             <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
@@ -1131,7 +1131,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1"
+            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
