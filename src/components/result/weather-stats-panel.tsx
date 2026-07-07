@@ -54,7 +54,7 @@ export function WeatherStatsPanel({
       </div>
       <dl
         className={cn(
-          "grid min-w-0 grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5",
+          "grid min-w-0 grid-cols-2 gap-px overflow-hidden rounded-lg border border-soft bg-border/60 shadow-inner shadow-white/5",
           isCompact ? "xl:grid-cols-2" : "sm:grid-cols-3",
         )}
       >
@@ -65,7 +65,7 @@ export function WeatherStatsPanel({
             <div
               key={stat.id}
               className={cn(
-                "min-w-0 bg-weather-card/80 dark:bg-weather-card/50",
+                "min-w-0 bg-weather-card/70 shadow-inner shadow-white/5 dark:bg-weather-card/50",
                 isCompact
                   ? "min-h-12 p-1.5 xl:min-h-[31px] xl:p-1.5 2xl:min-h-12 2xl:p-2"
                   : "min-h-24 p-3",

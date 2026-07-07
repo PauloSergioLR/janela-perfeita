@@ -136,19 +136,19 @@
 }
 
 .dark {
-  --background: oklch(0.16 0.025 245);
-  --foreground: oklch(0.96 0.012 220);
-  --card: oklch(0.21 0.026 245);
+  --background: oklch(0.105 0.032 252);
+  --foreground: oklch(0.965 0.012 220);
+  --card: oklch(0.18 0.034 246);
   --card-foreground: oklch(0.96 0.012 220);
-  --popover: oklch(0.2 0.026 245);
+  --popover: oklch(0.17 0.034 246);
   --popover-foreground: oklch(0.96 0.012 220);
   --primary: oklch(0.72 0.13 180);
   --primary-foreground: oklch(0.15 0.024 245);
-  --secondary: oklch(0.26 0.03 245);
+  --secondary: oklch(0.235 0.035 246);
   --secondary-foreground: oklch(0.94 0.012 220);
-  --muted: oklch(0.28 0.03 245);
-  --muted-foreground: oklch(0.74 0.025 230);
-  --accent: oklch(0.3 0.045 205);
+  --muted: oklch(0.255 0.035 246);
+  --muted-foreground: oklch(0.765 0.026 226);
+  --accent: oklch(0.285 0.052 204);
   --accent-foreground: oklch(0.96 0.012 220);
   --success: oklch(0.72 0.15 155);
   --success-foreground: oklch(0.12 0.025 155);
@@ -158,7 +158,7 @@
   --danger-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.68 0.19 25);
   --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
+  --input: oklch(1 0 0 / 17%);
   --ring: oklch(0.7 0.13 180);
   --chart-1: oklch(0.7 0.14 165);
   --chart-2: oklch(0.72 0.12 215);
@@ -173,13 +173,13 @@
   --sidebar-accent-foreground: oklch(0.94 0.012 220);
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.7 0.13 180);
-  --weather-background: oklch(0.13 0.032 255);
-  --weather-background-muted: oklch(0.18 0.04 248);
-  --weather-card: oklch(0.24 0.035 248 / 68%);
-  --weather-card-strong: oklch(0.28 0.038 246 / 82%);
-  --weather-border: oklch(0.86 0.035 220 / 16%);
-  --weather-border-strong: oklch(0.86 0.045 210 / 26%);
-  --weather-accent: oklch(0.72 0.13 190);
+  --weather-background: oklch(0.095 0.035 258);
+  --weather-background-muted: oklch(0.155 0.047 248);
+  --weather-card: oklch(0.215 0.04 247 / 60%);
+  --weather-card-strong: oklch(0.275 0.044 245 / 76%);
+  --weather-border: oklch(0.88 0.04 220 / 14%);
+  --weather-border-strong: oklch(0.9 0.05 205 / 25%);
+  --weather-accent: oklch(0.76 0.135 188);
   --weather-success: var(--success);
   --weather-warning: var(--warning);
   --weather-danger: var(--danger);
@@ -188,14 +188,14 @@
   --weather-sun: oklch(0.82 0.15 78);
   --weather-night: oklch(0.18 0.04 255);
   --weather-glass: color-mix(in oklab, var(--weather-card) 86%, transparent);
-  --weather-gradient-stage: radial-gradient(circle at 12% 12%, oklch(0.62 0.14 215 / 28%), transparent 28rem), radial-gradient(circle at 86% 4%, oklch(0.82 0.15 78 / 18%), transparent 24rem), linear-gradient(145deg, var(--weather-background) 0%, var(--weather-background-muted) 52%, oklch(0.12 0.03 260) 100%);
+  --weather-gradient-stage: radial-gradient(circle at 10% 8%, oklch(0.62 0.14 215 / 30%), transparent 29rem), radial-gradient(circle at 84% 2%, oklch(0.82 0.15 78 / 18%), transparent 25rem), radial-gradient(circle at 74% 88%, oklch(0.62 0.16 168 / 16%), transparent 28rem), linear-gradient(145deg, var(--weather-background) 0%, var(--weather-background-muted) 52%, oklch(0.075 0.03 264) 100%);
   --weather-gradient-dawn: linear-gradient(135deg, oklch(0.42 0.09 65) 0%, oklch(0.36 0.085 215) 48%, oklch(0.18 0.04 252) 100%);
   --weather-gradient-sunset: linear-gradient(135deg, oklch(0.5 0.14 38) 0%, oklch(0.36 0.12 325) 44%, oklch(0.16 0.045 260) 100%);
   --weather-gradient-night: radial-gradient(circle at 22% 10%, oklch(0.54 0.12 230 / 32%), transparent 24rem), linear-gradient(145deg, oklch(0.1 0.035 260) 0%, oklch(0.16 0.04 248) 56%, oklch(0.08 0.03 260) 100%);
-  --weather-shadow-soft: 0 18px 56px oklch(0.05 0.02 255 / 38%);
-  --weather-shadow-card: 0 28px 80px oklch(0.04 0.02 255 / 46%);
-  --weather-shadow-glow: 0 0 42px oklch(0.72 0.13 195 / 28%);
-  --weather-glow-primary: 0 0 38px oklch(0.72 0.13 195 / 34%);
+  --weather-shadow-soft: 0 18px 56px oklch(0.035 0.018 255 / 42%), inset 0 1px 0 oklch(1 0 0 / 8%);
+  --weather-shadow-card: 0 28px 86px oklch(0.03 0.018 255 / 52%), inset 0 1px 0 oklch(1 0 0 / 8%);
+  --weather-shadow-glow: 0 0 46px oklch(0.76 0.13 190 / 28%);
+  --weather-glow-primary: 0 0 42px oklch(0.76 0.13 190 / 36%), 0 0 90px oklch(0.82 0.15 78 / 10%);
   --weather-glow-success: 0 0 32px oklch(0.72 0.15 155 / 26%);
   --weather-glow-warning: 0 0 32px oklch(0.82 0.15 78 / 26%);
   --weather-glow-danger: 0 0 32px oklch(0.68 0.19 25 / 28%);
@@ -213,6 +213,26 @@
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  input[type="date"],
+  input[type="time"] {
+    color-scheme: light dark;
+  }
+
+  .dark input[type="date"],
+  .dark input[type="time"] {
+    color-scheme: dark;
+  }
+
+  input[type="date"]::-webkit-datetime-edit,
+  input[type="time"]::-webkit-datetime-edit {
+    color: currentColor;
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.82);
   }
 }
 
@@ -235,14 +255,49 @@
 
   .glass-card {
     border: 1px solid var(--weather-border);
-    background: var(--weather-glass);
+    background:
+      linear-gradient(145deg, oklch(1 0 0 / 7%), transparent 42%),
+      radial-gradient(circle at 20% 0%, color-mix(in oklab, var(--weather-accent) 18%, transparent), transparent 22rem),
+      var(--weather-glass);
     box-shadow: var(--weather-shadow-card);
   }
 
   .glass-panel {
     border: 1px solid var(--weather-border);
-    background: color-mix(in oklab, var(--weather-card-strong) 82%, transparent);
+    background:
+      linear-gradient(145deg, oklch(1 0 0 / 8%), transparent 45%),
+      color-mix(in oklab, var(--weather-card-strong) 82%, transparent);
     box-shadow: var(--weather-shadow-soft);
+  }
+
+  .cockpit-surface {
+    border-color: var(--weather-border);
+    background:
+      linear-gradient(145deg, oklch(1 0 0 / 6%), transparent 48%),
+      color-mix(in oklab, var(--weather-card) 74%, transparent);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 7%);
+  }
+
+  .cockpit-surface-strong {
+    border-color: var(--weather-border-strong);
+    background:
+      radial-gradient(circle at 20% 0%, color-mix(in oklab, var(--weather-accent) 18%, transparent), transparent 15rem),
+      color-mix(in oklab, var(--weather-card-strong) 78%, transparent);
+    box-shadow: var(--weather-shadow-soft);
+  }
+
+  .cockpit-active {
+    border-color: color-mix(in oklab, var(--weather-accent) 72%, transparent);
+    background:
+      linear-gradient(145deg, color-mix(in oklab, var(--weather-accent) 18%, transparent), transparent 58%),
+      color-mix(in oklab, var(--weather-card-strong) 82%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--weather-accent) 18%, transparent), var(--weather-shadow-glow);
+  }
+
+  .score-orb {
+    background:
+      radial-gradient(circle, color-mix(in oklab, var(--weather-accent) 22%, transparent), transparent 62%),
+      radial-gradient(circle at 50% 80%, oklch(0.82 0.15 78 / 14%), transparent 56%);
   }
 
   .border-soft {

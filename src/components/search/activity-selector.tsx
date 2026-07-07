@@ -88,7 +88,7 @@ export function ActivitySelector({
             type="button"
             aria-label={activity.name}
             className={cn(
-              "group relative min-h-30 rounded-lg border border-soft bg-background/40 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-10 xl:p-1",
+              "cockpit-surface group relative min-h-30 rounded-lg border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-10 xl:p-1",
               selected
                 ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
                 : "",
@@ -102,7 +102,7 @@ export function ActivitySelector({
               <span
                 className={cn(
                   "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-5",
-                  selected && "bg-background/25 motion-safe:scale-105",
+                  selected && "bg-background/30 motion-safe:scale-105",
                 )}
               >
                 <Icon
@@ -114,7 +114,7 @@ export function ActivitySelector({
                 <span className="block text-sm font-medium leading-4 xl:hidden">
                   {activity.name}
                 </span>
-                <span className="hidden text-[9px] leading-3 font-medium xl:block">
+                <span className="hidden text-[10px] leading-3 font-medium xl:block">
                   {ACTIVITY_COMPACT_LABELS[activity.id]}
                 </span>
                 <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground xl:hidden">

@@ -69,7 +69,7 @@ export function ForecastStrip({
     >
       <div className="flex min-w-0 items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <div className="grid size-8 shrink-0 place-items-center rounded-lg border border-weather-accent/35 bg-weather-accent/10 text-weather-accent">
+          <div className="grid size-8 shrink-0 place-items-center rounded-lg border border-weather-accent/35 bg-weather-accent/10 text-weather-accent shadow-inner shadow-white/10">
             <CalendarDays className="size-4" aria-hidden="true" />
           </div>
           <div className="min-w-0">
@@ -85,7 +85,7 @@ export function ForecastStrip({
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
-            className="grid size-7 place-items-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/50 hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="grid size-7 place-items-center rounded-md border border-soft bg-background/40 text-muted-foreground transition hover:border-weather-accent/50 hover:bg-weather-card hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             aria-label="Ver dias anteriores"
             title="Ver dias anteriores"
             onClick={() => scrollForecast("previous")}
@@ -94,7 +94,7 @@ export function ForecastStrip({
           </button>
           <button
             type="button"
-            className="grid size-7 place-items-center rounded-md border border-soft bg-background/45 text-muted-foreground transition hover:border-weather-accent/50 hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="grid size-7 place-items-center rounded-md border border-soft bg-background/40 text-muted-foreground transition hover:border-weather-accent/50 hover:bg-weather-card hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             aria-label="Ver próximos dias"
             title="Ver próximos dias"
             onClick={() => scrollForecast("next")}
@@ -117,7 +117,7 @@ export function ForecastStrip({
           return (
             <article
               key={day.date}
-              className="grid h-[7rem] min-w-[9.4rem] flex-[0_0_9.4rem] snap-start grid-rows-[auto_1fr_auto] rounded-lg border border-soft bg-weather-card/75 p-2 shadow-inner shadow-white/5 sm:min-w-[10.25rem] sm:flex-[0_0_10.25rem] xl:h-[5.65rem] xl:min-w-0 xl:flex-[0_0_clamp(8.75rem,13vw,10.5rem)] xl:p-1.5"
+              className="cockpit-surface grid h-[7rem] min-w-[9.4rem] flex-[0_0_9.4rem] snap-start grid-rows-[auto_1fr_auto] rounded-lg border p-2 shadow-inner shadow-white/5 sm:min-w-[10.25rem] sm:flex-[0_0_10.25rem] xl:h-[5.65rem] xl:min-w-0 xl:flex-[0_0_clamp(8.75rem,13vw,10.5rem)] xl:p-1.5"
               role="listitem"
             >
               <div className="flex min-w-0 items-start justify-between gap-2">

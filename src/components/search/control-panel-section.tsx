@@ -24,7 +24,7 @@ export function ControlPanelSection({
       )}
     >
       <div className="flex items-start gap-2">
-        <span className="flex size-6 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-xs font-semibold text-weather-accent">
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-md border border-weather-accent/45 bg-weather-accent/10 text-xs font-semibold text-weather-accent shadow-inner shadow-white/10">
           {number}
         </span>
         <div className="min-w-0 space-y-0.5">

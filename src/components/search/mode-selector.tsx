@@ -25,7 +25,7 @@ export function ModeSelector({
 }: ModeSelectorProps) {
   return (
     <section
-      className="glass-card rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-3"
+      className="glass-card rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2.5"
       aria-labelledby="modo-label"
     >
       <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center xl:gap-2">
@@ -38,7 +38,7 @@ export function ModeSelector({
           </p>
         </div>
         <div
-          className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4"
+          className="cockpit-surface grid gap-1.5 rounded-lg border p-1.5 sm:grid-cols-2 xl:grid-cols-4"
           role="radiogroup"
           aria-labelledby="modo-label"
         >
@@ -53,9 +53,9 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-20 rounded-lg border border-soft bg-background/45 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none xl:min-h-14 xl:p-2",
+                  "group relative min-h-20 rounded-md border border-transparent bg-background/25 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/50 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none xl:min-h-14 xl:p-2",
                   selected
-                    ? "border-weather-accent/80 bg-weather-card text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
+                    ? "cockpit-active text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",
                 )}
                 onClick={() => onChange(mode.id)}
@@ -63,8 +63,9 @@ export function ModeSelector({
                 <span className="flex items-start gap-3">
                   <span
                     className={cn(
-                      "flex size-9 shrink-0 items-center justify-center rounded-md bg-weather-muted/55 transition-[background-color,transform] duration-200 motion-reduce:transition-none xl:size-8",
-                      selected && "bg-weather-accent/20 motion-safe:scale-105",
+                      "flex size-9 shrink-0 items-center justify-center rounded-md border border-soft bg-weather-muted/45 transition-[background-color,transform,border-color] duration-200 motion-reduce:transition-none xl:size-8",
+                      selected &&
+                        "border-weather-accent/45 bg-weather-accent/20 motion-safe:scale-105",
                     )}
                   >
                     <Icon

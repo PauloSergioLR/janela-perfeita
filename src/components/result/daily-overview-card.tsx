@@ -105,11 +105,11 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
       size="sm"
       className="glass-card min-w-0 rounded-xl !py-0 xl:h-full xl:min-h-0"
     >
-      <CardHeader className="gap-3 border-b border-soft bg-weather-card p-3 sm:p-4 xl:gap-2 xl:px-3 xl:!py-2 xl:!pb-2">
+      <CardHeader className="cockpit-surface-strong gap-3 border-b p-3 sm:p-4 xl:gap-2 xl:px-3 xl:!py-2 xl:!pb-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-weather-accent">Clima por decisão</p>
-            <CardTitle className="mt-1 text-slate-50">Consulta do dia</CardTitle>
+            <CardTitle className="mt-1 text-slate-950 dark:text-slate-50">Consulta do dia</CardTitle>
             <CardDescription className="line-clamp-1">
               {formatCityLabel(overview.city)} · {formatRecommendationDate(overview.date)}
             </CardDescription>
@@ -122,7 +122,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
               <WeatherIcon className="size-4" aria-hidden="true" />
               {overview.weatherLabel}
             </Badge>
-            <p className="hidden text-xl font-semibold text-slate-50 xl:block">
+            <p className="hidden text-xl font-semibold text-slate-950 dark:text-slate-50 xl:block">
               {formatValue(overview.temperatureMin, "°C")} /{" "}
               {formatValue(overview.temperatureMax, "°C")}
             </p>
@@ -135,13 +135,13 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
           </div>
           <div className="min-w-0">
             <p className="text-sm text-muted-foreground">Condição principal</p>
-            <p className="mt-1 truncate text-lg font-semibold text-slate-50">
+            <p className="mt-1 truncate text-lg font-semibold text-slate-950 dark:text-slate-50">
               {overview.weatherLabel}
             </p>
           </div>
           <div className="flex items-center gap-2 sm:justify-self-end">
             <TemperatureIcon className="size-5 text-rose-400" aria-hidden="true" />
-            <p className="text-xl font-semibold text-slate-50 xl:text-2xl">
+            <p className="text-xl font-semibold text-slate-950 dark:text-slate-50 xl:text-2xl">
               {formatValue(overview.temperatureMin, "°C")} / {formatValue(overview.temperatureMax, "°C")}
             </p>
           </div>
@@ -156,7 +156,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
             return (
               <div
                 key={metric.label}
-                className="min-w-0 bg-weather-card/75 p-3 dark:bg-weather-card/45"
+                className="min-w-0 bg-weather-card/70 p-3 shadow-inner shadow-white/5 dark:bg-weather-card/45"
               >
                 <div className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
                   <Icon
@@ -166,7 +166,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
                   <span className="truncate">{metric.label}</span>
                 </div>
                 <p
-                  className="mt-2 min-w-0 truncate text-lg font-semibold tabular-nums text-slate-50 xl:text-sm 2xl:text-base"
+                  className="mt-2 min-w-0 truncate text-lg font-semibold tabular-nums text-slate-950 dark:text-slate-50 xl:text-sm 2xl:text-base"
                   title={metric.value}
                 >
                   {metric.value}
@@ -185,7 +185,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
         <section className="grid min-h-0 gap-3" aria-label="Timeline horária">
           <div className="flex items-center gap-2">
             <Clock3 className="size-4 text-weather-accent" aria-hidden="true" />
-            <h3 className="text-sm font-medium text-slate-50">
+            <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
               Timeline horária
             </h3>
           </div>
@@ -203,13 +203,13 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
                     <article
                       key={weather.time}
                       role="listitem"
-                      className="grid w-24 shrink-0 gap-1 rounded-lg border border-soft bg-weather-card/70 p-2 text-center dark:bg-weather-card/45 xl:w-[calc((100%-5.5rem)/12)] xl:basis-[calc((100%-5.5rem)/12)] xl:gap-0.5 xl:p-1.5"
+                      className="cockpit-surface grid w-24 shrink-0 gap-1 rounded-lg border p-2 text-center xl:w-[calc((100%-5.5rem)/12)] xl:basis-[calc((100%-5.5rem)/12)] xl:gap-0.5 xl:p-1.5"
                     >
                       <span className="text-xs font-medium text-muted-foreground">
                         {formatHour(weather.time)}
                       </span>
                       <HourWeatherIcon className="mx-auto size-5 text-weather-accent" aria-hidden="true" />
-                      <span className="text-base font-semibold text-slate-50 xl:text-sm 2xl:text-base">
+                      <span className="text-base font-semibold text-slate-950 dark:text-slate-50 xl:text-sm 2xl:text-base">
                         {Math.round(weather.temperature_2m)}°
                       </span>
                       <span className="text-xs text-muted-foreground">
