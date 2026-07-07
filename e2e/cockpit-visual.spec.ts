@@ -1,0 +1,179 @@
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+const DESKTOP_VIEWPORTS = [
+  { width: 1366, height: 768 },
+  { width: 1440, height: 900 },
+  { width: 1600, height: 900 },
+  { width: 1920, height: 1080 },
+] as const;
+
+const MAIN_MODES = [
+  { cta: "Encontrar janela", name: "Janela perfeita" },
+  { cta: "Ver o que fazer", name: "O que fazer hoje?" },
+  { cta: "Consultar dia", name: "Consulta do dia" },
+  { cta: "Consultar semana", name: "Consulta da semana" },
+] as const;
+
+const LAYOUT_TOLERANCE_PX = 4;
+
+async function openCockpitDemo(page: Page) {
+  await page.goto("/?demo=true");
+  await expect(
+    page.getByRole("heading", { name: "Janela Perfeita" }),
+  ).toBeVisible();
+}
+
+async function selectDemoCity(page: Page) {
+  await page.getByLabel("Cidade").fill("demo");
+  await page.getByRole("option", { name: /Cric/i }).first().click();
+}
+
+async function expectNoHorizontalOverflow(page: Page, context: string) {
+  const metrics = await page.evaluate(() => {
+    const main = document.querySelector("main");
+    const resultPanel = document.querySelector(
+      '[aria-label="Resultado da decisão"]',
+    );
+
+    return {
+      bodyClientWidth: document.body.clientWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+      documentClientWidth: document.documentElement.clientWidth,
+      documentScrollWidth: document.documentElement.scrollWidth,
+      mainClientWidth: main?.clientWidth ?? 0,
+      mainScrollWidth: main?.scrollWidth ?? 0,
+      resultClientWidth: resultPanel?.clientWidth ?? 0,
+      resultScrollWidth: resultPanel?.scrollWidth ?? 0,
+    };
+  });
+
+  expect(
+    metrics.documentScrollWidth,
+    `${context}: documento não deve gerar overflow horizontal`,
+  ).toBeLessThanOrEqual(metrics.documentClientWidth + LAYOUT_TOLERANCE_PX);
+  expect(
+    metrics.bodyScrollWidth,
+    `${context}: body não deve gerar overflow horizontal`,
+  ).toBeLessThanOrEqual(metrics.bodyClientWidth + LAYOUT_TOLERANCE_PX);
+  expect(
+    metrics.mainScrollWidth,
+    `${context}: cockpit principal não deve gerar overflow horizontal`,
+  ).toBeLessThanOrEqual(metrics.mainClientWidth + LAYOUT_TOLERANCE_PX);
+  expect(
+    metrics.resultScrollWidth,
+    `${context}: painel de resultado não deve gerar overflow horizontal`,
+  ).toBeLessThanOrEqual(metrics.resultClientWidth + LAYOUT_TOLERANCE_PX);
+}
+
+async function expectNoDesktopPageScroll(page: Page, context: string) {
+  const metrics = await page.evaluate(() => ({
+    bodyScrollHeight: document.body.scrollHeight,
+    documentScrollHeight: document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+  }));
+
+  expect(
+    metrics.documentScrollHeight,
+    `${context}: documento não deve virar página longa no desktop`,
+  ).toBeLessThanOrEqual(metrics.viewportHeight + LAYOUT_TOLERANCE_PX);
+  expect(
+    metrics.bodyScrollHeight,
+    `${context}: body não deve virar página longa no desktop`,
+  ).toBeLessThanOrEqual(metrics.viewportHeight + LAYOUT_TOLERANCE_PX);
+}
+
+async function expectWithinViewport(locator: Locator, page: Page, label: string) {
+  await expect(locator, `${label} deve estar visível`).toBeVisible();
+
+  const box = await locator.boundingBox();
+  const viewport = page.viewportSize();
+
+  expect(box, `${label} deve ter área renderizada`).not.toBeNull();
+  expect(viewport, "viewport deve estar definido").not.toBeNull();
+
+  if (!box || !viewport) {
+    return;
+  }
+
+  expect(box.x, `${label} não deve vazar à esquerda`).toBeGreaterThanOrEqual(
+    -LAYOUT_TOLERANCE_PX,
+  );
+  expect(box.x + box.width, `${label} não deve vazar à direita`).toBeLessThanOrEqual(
+    viewport.width + LAYOUT_TOLERANCE_PX,
+  );
+  expect(box.y, `${label} não deve vazar acima`).toBeGreaterThanOrEqual(
+    -LAYOUT_TOLERANCE_PX,
+  );
+  expect(box.y + box.height, `${label} não deve vazar abaixo`).toBeLessThanOrEqual(
+    viewport.height + LAYOUT_TOLERANCE_PX,
+  );
+}
+
+async function expectCockpitLayout(page: Page, context: string) {
+  await expectNoHorizontalOverflow(page, context);
+  await expectNoDesktopPageScroll(page, context);
+  await expectWithinViewport(
+    page.getByRole("radiogroup", { name: "Modo" }),
+    page,
+    `${context}: modos`,
+  );
+  await expectWithinViewport(
+    page.getByLabel("Resultado da decisão"),
+    page,
+    `${context}: painel principal`,
+  );
+  await expectWithinViewport(
+    page
+      .locator(
+        'section[aria-label="Resumo da consulta"], section[aria-label="Previsão dos próximos dias"]',
+      )
+      .first(),
+    page,
+    `${context}: faixa inferior`,
+  );
+}
+
+test.describe("QA visual do cockpit desktop", () => {
+  for (const viewport of DESKTOP_VIEWPORTS) {
+    test(`não gera scroll ou cortes em ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await openCockpitDemo(page);
+
+      await expectCockpitLayout(page, "estado inicial");
+      await expectWithinViewport(
+        page.getByRole("button", { name: "Encontrar janela" }),
+        page,
+        "CTA inicial",
+      );
+
+      await selectDemoCity(page);
+      await page.getByRole("radio", { name: "Correr" }).click();
+
+      const recommendationResponse = page.waitForResponse(
+        (response) =>
+          response.url().includes("/api/recommendation") &&
+          response.request().method() === "POST",
+      );
+
+      await page.getByRole("button", { name: "Encontrar janela" }).click();
+      await expect((await recommendationResponse).ok()).toBe(true);
+      await expect(page.getByText("Janela recomendada")).toBeVisible();
+      await expectCockpitLayout(page, "resultado calculado");
+
+      for (const mode of MAIN_MODES) {
+        await page.getByRole("radio", { name: mode.name }).click();
+        await expect(
+          page.getByRole("radio", { name: mode.name }),
+        ).toHaveAttribute("aria-checked", "true");
+        await expectWithinViewport(
+          page.getByRole("button", { name: mode.cta }),
+          page,
+          `CTA do modo ${mode.name}`,
+        );
+        await expectCockpitLayout(page, `modo ${mode.name}`);
+      }
+    });
+  }
+});
