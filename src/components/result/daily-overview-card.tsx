@@ -101,46 +101,55 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
   ];
 
   return (
-    <Card className="glass-card overflow-hidden rounded-xl">
-      <CardHeader className="gap-4 border-b border-soft bg-weather-card p-4 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <Card
+      size="sm"
+      className="glass-card min-w-0 rounded-xl !py-0 xl:h-full xl:min-h-0"
+    >
+      <CardHeader className="gap-3 border-b border-soft bg-weather-card p-3 sm:p-4 xl:gap-2 xl:px-3 xl:!py-2 xl:!pb-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-weather-accent">Clima por decisão</p>
-            <CardTitle className="mt-1">Consulta do dia</CardTitle>
-            <CardDescription>
+            <CardTitle className="mt-1 text-slate-50">Consulta do dia</CardTitle>
+            <CardDescription className="line-clamp-1">
               {formatCityLabel(overview.city)} · {formatRecommendationDate(overview.date)}
             </CardDescription>
           </div>
-          <Badge
-            variant="outline"
-            className="h-8 w-fit border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent"
-          >
-            <WeatherIcon className="size-4" aria-hidden="true" />
-            {overview.weatherLabel}
-          </Badge>
+          <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
+            <Badge
+              variant="outline"
+              className="h-8 w-fit border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent"
+            >
+              <WeatherIcon className="size-4" aria-hidden="true" />
+              {overview.weatherLabel}
+            </Badge>
+            <p className="hidden text-xl font-semibold text-slate-50 xl:block">
+              {formatValue(overview.temperatureMin, "°C")} /{" "}
+              {formatValue(overview.temperatureMax, "°C")}
+            </p>
+          </div>
         </div>
 
-        <div className="grid gap-4 border-t border-soft pt-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
-          <div className="grid size-16 place-items-center rounded-lg border border-weather-accent/40 bg-weather-accent/10 text-weather-accent">
-            <WeatherIcon className="size-8" aria-hidden="true" />
+        <div className="grid gap-3 border-t border-soft pt-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center xl:hidden">
+          <div className="grid size-14 place-items-center rounded-lg border border-weather-accent/40 bg-weather-accent/10 text-weather-accent xl:size-12">
+            <WeatherIcon className="size-7 xl:size-6" aria-hidden="true" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-muted-foreground">Condição principal</p>
-            <p className="mt-1 text-xl font-semibold text-slate-950 dark:text-slate-50">
+            <p className="mt-1 truncate text-lg font-semibold text-slate-50">
               {overview.weatherLabel}
             </p>
           </div>
           <div className="flex items-center gap-2 sm:justify-self-end">
             <TemperatureIcon className="size-5 text-rose-400" aria-hidden="true" />
-            <p className="text-2xl font-semibold text-slate-950 dark:text-slate-50">
+            <p className="text-xl font-semibold text-slate-50 xl:text-2xl">
               {formatValue(overview.temperatureMin, "°C")} / {formatValue(overview.temperatureMax, "°C")}
             </p>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-4 sm:p-5">
-        <div className="grid min-w-0 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5 sm:grid-cols-2 lg:grid-cols-3">
+      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)_auto] xl:overflow-y-auto xl:p-3">
+        <div className="grid min-w-0 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {metrics.map((metric) => {
             const Icon = metric.icon;
 
@@ -157,7 +166,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
                   <span className="truncate">{metric.label}</span>
                 </div>
                 <p
-                  className="mt-2 min-w-0 truncate text-lg font-semibold tabular-nums text-slate-950 dark:text-slate-50"
+                  className="mt-2 min-w-0 truncate text-lg font-semibold tabular-nums text-slate-50 xl:text-sm 2xl:text-base"
                   title={metric.value}
                 >
                   {metric.value}
@@ -173,17 +182,20 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
           })}
         </div>
 
-        <section className="space-y-3" aria-label="Timeline horária">
+        <section className="grid min-h-0 gap-3" aria-label="Timeline horária">
           <div className="flex items-center gap-2">
             <Clock3 className="size-4 text-weather-accent" aria-hidden="true" />
-            <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
+            <h3 className="text-sm font-medium text-slate-50">
               Timeline horária
             </h3>
           </div>
 
           {hasHourlyData ? (
-            <div className="overflow-x-auto pb-2">
-              <div className="flex min-w-max gap-2" role="list">
+            <div className="overflow-x-auto pb-1">
+              <div
+                className="flex min-w-max gap-2 xl:min-w-0"
+                role="list"
+              >
                 {overview.hourly.map((weather) => {
                   const HourWeatherIcon = getWeatherIcon(weather.weather_code);
 
@@ -191,19 +203,19 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
                     <article
                       key={weather.time}
                       role="listitem"
-                      className="grid w-24 shrink-0 gap-2 rounded-lg border border-soft bg-weather-card/70 p-3 text-center dark:bg-weather-card/45"
+                      className="grid w-24 shrink-0 gap-1 rounded-lg border border-soft bg-weather-card/70 p-2 text-center dark:bg-weather-card/45 xl:w-[calc((100%-5.5rem)/12)] xl:basis-[calc((100%-5.5rem)/12)] xl:gap-0.5 xl:p-1.5"
                     >
                       <span className="text-xs font-medium text-muted-foreground">
                         {formatHour(weather.time)}
                       </span>
                       <HourWeatherIcon className="mx-auto size-5 text-weather-accent" aria-hidden="true" />
-                      <span className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+                      <span className="text-base font-semibold text-slate-50 xl:text-sm 2xl:text-base">
                         {Math.round(weather.temperature_2m)}°
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {getHourlyRainRisk(weather)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground xl:hidden 2xl:block">
                         {Math.round(weather.wind_speed_10m)} km/h
                       </span>
                     </article>

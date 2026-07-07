@@ -20,6 +20,27 @@ function readRecommendationCard() {
   );
 }
 
+function readActivityRankingCard() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/activity-ranking-card.tsx"),
+    "utf8",
+  );
+}
+
+function readDailyOverviewCard() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/daily-overview-card.tsx"),
+    "utf8",
+  );
+}
+
+function readWeeklyOverviewCard() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/weekly-overview-card.tsx"),
+    "utf8",
+  );
+}
+
 function readOpportunityTimeline() {
   return readFileSync(
     join(process.cwd(), "src/components/result/opportunity-timeline.tsx"),
@@ -60,7 +81,7 @@ describe("layout Weather Decision Cockpit", () => {
       "xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)]",
     );
     expect(page).toContain(
-      "xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto]",
+      "xl:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,auto)_auto]",
     );
     expect(page).toContain("grid min-w-0 gap-6");
   });
@@ -141,5 +162,24 @@ describe("layout Weather Decision Cockpit", () => {
     );
     expect(scoreBreakdown).toContain('variant?: "card" | "compact"');
     expect(scoreBreakdown).toContain("<details");
+  });
+
+  it("mantem modos contextuais compactos no mesmo painel principal", () => {
+    const activityRankingCard = readActivityRankingCard();
+    const dailyOverviewCard = readDailyOverviewCard();
+    const weeklyOverviewCard = readWeeklyOverviewCard();
+
+    expect(page).toContain("<ActivityRankingCard ranking={activityRanking} />");
+    expect(page).toContain("<DailyOverviewCard overview={dailyOverview} />");
+    expect(page).toContain("<WeeklyOverviewCard overview={weeklyOverview} />");
+    expect(page).toContain(
+      "flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1",
+    );
+    expect(activityRankingCard).toContain("xl:h-full xl:min-h-0");
+    expect(activityRankingCard).toContain("xl:grid-cols-2");
+    expect(dailyOverviewCard).toContain("xl:basis-[calc((100%-5.5rem)/12)]");
+    expect(dailyOverviewCard).toContain("overflow-x-auto");
+    expect(weeklyOverviewCard).toContain("Resumo da semana");
+    expect(weeklyOverviewCard).not.toContain("overflow-x-auto");
   });
 });
