@@ -1131,7 +1131,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3"
+            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (

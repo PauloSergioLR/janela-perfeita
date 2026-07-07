@@ -172,8 +172,8 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("<ActivityRankingCard ranking={activityRanking} />");
     expect(page).toContain("<DailyOverviewCard overview={dailyOverview} />");
     expect(page).toContain("<WeeklyOverviewCard overview={weeklyOverview} />");
-    expect(page).not.toContain(
-      "flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto",
+    expect(page).toContain(
+      "flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1",
     );
     expect(activityRankingCard).toContain("xl:h-full xl:min-h-0");
     expect(activityRankingCard).toContain("xl:grid-cols-2");
