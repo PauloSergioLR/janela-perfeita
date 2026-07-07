@@ -49,7 +49,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
       size="sm"
       className="glass-card min-w-0 rounded-xl !py-0 xl:h-full xl:min-h-0"
     >
-      <CardHeader className="border-b border-soft bg-weather-card px-3 !py-2 sm:px-4">
+      <CardHeader className="cockpit-surface-strong border-b px-3 !py-2 sm:px-4">
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-medium text-weather-accent">
@@ -68,7 +68,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
       <CardContent className="flex min-h-0 flex-col gap-3 p-3 sm:p-4 xl:flex-1 xl:overflow-y-auto">
         <div className="grid min-h-0 gap-3 xl:flex-1 xl:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)]">
           {bestRecommendation ? (
-            <section className="rounded-lg border border-sky-400/30 bg-sky-400/10 p-3 text-sky-900 dark:text-sky-50 xl:min-h-0">
+            <section className="rounded-lg border border-sky-400/35 bg-sky-400/10 p-3 text-sky-900 shadow-inner shadow-white/10 dark:text-sky-50 xl:min-h-0">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal">
                 <Trophy className="size-4" aria-hidden="true" />
                 Melhor opção
@@ -101,8 +101,8 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
                   className={cn(
                     "rounded-lg border p-3",
                     item.isRecommended
-                      ? "border-sky-400/25 bg-sky-400/10"
-                      : "border-soft bg-background/25",
+                      ? "border-sky-400/30 bg-sky-400/10 shadow-inner shadow-white/5"
+                      : "cockpit-surface",
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">

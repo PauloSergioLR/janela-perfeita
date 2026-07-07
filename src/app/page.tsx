@@ -555,6 +555,9 @@ export default function Home() {
     searchMode === "clima_semana"
       ? "Próximos 7 dias"
       : selectedDate || "Data pendente";
+  const selectedDateCompactLabel =
+    dateOptions.find((option) => option.value === selectedDate)?.label ??
+    selectedDate;
   const cockpitActivityLabel = modeUsesActivity(searchMode)
     ? selectedActivity?.name ?? "Atividade pendente"
     : "Sem atividade obrigatória";
@@ -640,9 +643,13 @@ export default function Home() {
       <WeatherStage variant={weatherStageVariant} />
       <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-4 xl:py-3 2xl:px-6">
       <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,auto)_auto] xl:gap-3">
-        <header className="glass-panel grid gap-5 rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
+        <header className="glass-panel relative grid gap-5 overflow-hidden rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
+          <div
+            className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-weather-accent/55 to-transparent"
+            aria-hidden="true"
+          />
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-card">
+            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10">
               <CloudSun
                 className="size-6 text-weather-accent"
                 aria-hidden="true"
@@ -652,7 +659,7 @@ export default function Home() {
               <p className="text-sm font-medium text-weather-accent">
                 Clima por decisão
               </p>
-              <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-50 sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-3xl">
                 Janela Perfeita
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
@@ -664,13 +671,13 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
             <Badge
               variant="outline"
-              className="h-7 border-weather-accent/50 bg-weather-card px-3 text-weather-accent"
+              className="h-7 border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent shadow-inner shadow-white/5"
             >
               Previsão por hora
             </Badge>
             <Badge
               variant="outline"
-              className="h-7 border-success/45 bg-success/10 px-3 text-success"
+              className="h-7 border-success/45 bg-success/10 px-3 text-success shadow-inner shadow-white/5"
             >
               Open-Meteo
             </Badge>
@@ -684,7 +691,7 @@ export default function Home() {
             ) : null}
             <Link
               href="/como-funciona"
-              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-weather-card px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-background/40 px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:bg-weather-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <CircleHelp className="size-3.5" aria-hidden="true" />
               Como funciona
@@ -692,19 +699,19 @@ export default function Home() {
           </div>
 
           <div className="grid min-w-0 grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2 xl:col-span-1 xl:border-t-0 xl:pt-0">
-            <div className="rounded-md bg-background/45 px-3 py-2">
+            <div className="cockpit-surface rounded-md border px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 {activities.length}
               </p>
               <p className="text-xs text-muted-foreground">atividades</p>
             </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
+            <div className="cockpit-surface rounded-md border px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 7
               </p>
               <p className="text-xs text-muted-foreground">dias</p>
             </div>
-            <div className="rounded-md bg-background/45 px-3 py-2">
+            <div className="cockpit-surface rounded-md border px-3 py-2">
               <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
                 0-100
               </p>
@@ -725,7 +732,7 @@ export default function Home() {
         <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
           <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3">
           <Card className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0">
-            <CardHeader className="border-b border-soft bg-weather-card xl:pb-3">
+            <CardHeader className="cockpit-surface-strong border-b xl:pb-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <CardTitle>Painel de controle</CardTitle>
@@ -740,11 +747,11 @@ export default function Home() {
                   </CardDescription>
                 </div>
                 <details className="group relative shrink-0 text-xs">
-                  <summary className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-md border border-soft bg-background/45 px-2 font-medium text-muted-foreground marker:hidden">
-                    <History className="size-3.5 text-sky-700" aria-hidden="true" />
+                  <summary className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-md border border-soft bg-background/40 px-2 font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:text-foreground marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <History className="size-3.5 text-weather-accent" aria-hidden="true" />
                     {searchHistory.length}
                   </summary>
-                  <div className="absolute top-full right-0 z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-soft bg-popover p-2 shadow-lg">
+                  <div className="glass-panel absolute top-full right-0 z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-lg p-2 shadow-lg">
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <p className="font-medium text-foreground">Buscas recentes</p>
                       <Button
@@ -825,7 +832,7 @@ export default function Home() {
                           handleCityQueryChange(event.target.value)
                         }
                         placeholder="Ex.: Criciúma"
-                        className="h-10 rounded-md pl-8"
+                        className="h-10 rounded-md border-glass bg-background/35 pl-8 focus-visible:ring-weather-accent/45"
                         autoComplete="off"
                         role="combobox"
                         aria-expanded={cityQueryEnabled}
@@ -835,7 +842,7 @@ export default function Home() {
                         <div
                           id="city-suggestions"
                           role="listbox"
-                          className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-popover p-1 text-sm shadow-lg"
+                          className="glass-panel absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg p-1 text-sm shadow-lg"
                         >
                         {cityQueryResult.isFetching ? (
                           <PremiumState
@@ -883,10 +890,10 @@ export default function Home() {
                             type="button"
                             role="option"
                             aria-selected={false}
-                            className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-muted focus:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-weather-card focus:bg-weather-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             onClick={() => handleCitySelect(city)}
                           >
-                            <MapPin className="mt-0.5 size-4 shrink-0 text-sky-700" aria-hidden="true" />
+                            <MapPin className="mt-0.5 size-4 shrink-0 text-weather-accent" aria-hidden="true" />
                             <span className="flex min-w-0 flex-col">
                               <span className="truncate font-medium">
                                 {city.name}
@@ -906,7 +913,7 @@ export default function Home() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-10 shrink-0 border-glass bg-background/45 text-xs"
+                      className="h-10 shrink-0 border-glass bg-background/40 text-xs hover:border-weather-accent/50 hover:bg-weather-card"
                       disabled={locationFeedback.disabled}
                       onClick={handleLocationRetry}
                     >
@@ -921,7 +928,7 @@ export default function Home() {
                   {locationStatus !== "idle" ? (
                     <div
                       className={cn(
-                        "rounded-md border px-2 py-1.5 text-[11px] leading-4",
+                        "rounded-md border px-2 py-1.5 text-[11px] leading-4 shadow-inner shadow-white/5",
                         locationFeedback.className,
                       )}
                     >
@@ -954,10 +961,10 @@ export default function Home() {
                           <button
                             type="button"
                             className={cn(
-                              "hidden h-6 rounded-md border px-2 text-xs font-medium transition hover:border-foreground/30 xl:inline-flex xl:items-center 2xl:hidden",
+                              "hidden h-6 rounded-md border px-2 text-xs font-medium transition hover:border-weather-accent/50 xl:inline-flex xl:items-center 2xl:hidden",
                               selectedDate === dateOptions[0].value
-                                ? "border-sky-600 bg-sky-50 text-sky-900"
-                                : "border-border bg-background text-muted-foreground",
+                                ? "border-weather-accent/70 bg-weather-accent/15 text-foreground shadow-weather-glow"
+                                : "border-soft bg-background/35 text-muted-foreground",
                             )}
                             aria-pressed={selectedDate === dateOptions[0].value}
                             onClick={() => {
@@ -981,8 +988,14 @@ export default function Home() {
                             setSelectedDate(event.target.value);
                             resetRecommendationState();
                           }}
-                          className="h-10 rounded-md pl-8"
+                          className="peer h-10 rounded-md border-glass bg-background/35 pl-8 focus-visible:ring-weather-accent/45 xl:opacity-0 xl:text-transparent 2xl:opacity-100 2xl:text-foreground"
                         />
+                        <span
+                          className="pointer-events-none absolute inset-0 z-20 hidden items-center rounded-md border border-glass bg-background/35 pl-8 text-sm font-semibold text-slate-950 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/40 dark:text-slate-50 xl:flex 2xl:hidden"
+                          aria-hidden="true"
+                        >
+                          {selectedDateCompactLabel || "Selecionar data"}
+                        </span>
                       </div>
                       <div className="flex flex-wrap gap-1.5 xl:hidden 2xl:flex">
                         {dateOptions.map((option) => (
@@ -990,10 +1003,10 @@ export default function Home() {
                             key={option.value}
                             type="button"
                             className={cn(
-                              "h-7 rounded-md border px-2 text-xs font-medium transition hover:border-foreground/30",
+                              "h-7 rounded-md border px-2 text-xs font-medium transition hover:border-weather-accent/50",
                               selectedDate === option.value
-                                ? "border-sky-600 bg-sky-50 text-sky-900"
-                                : "border-border bg-background text-muted-foreground",
+                                ? "border-weather-accent/70 bg-weather-accent/15 text-foreground shadow-weather-glow"
+                                : "border-soft bg-background/35 text-muted-foreground",
                             )}
                             aria-pressed={selectedDate === option.value}
                             onClick={() => {
@@ -1009,7 +1022,7 @@ export default function Home() {
                   ) : null}
 
                   {usesAvailability ? (
-                    <div className="grid gap-2 rounded-lg border border-soft bg-background/30 p-2">
+                    <div className="cockpit-surface grid gap-2 rounded-lg border p-2">
                       <div className="flex items-center justify-between gap-2">
                         <Label className="text-xs">Disponibilidade opcional</Label>
                         <p className="text-[11px] leading-4 text-muted-foreground">
@@ -1029,7 +1042,7 @@ export default function Home() {
                               setAvailableFrom(event.target.value);
                               resetRecommendationState();
                             }}
-                            className="h-9 rounded-md"
+                            className="h-9 rounded-md border-glass bg-background/35 focus-visible:ring-weather-accent/45"
                           />
                         </div>
                         <div className="space-y-1">
@@ -1044,7 +1057,7 @@ export default function Home() {
                               setAvailableTo(event.target.value);
                               resetRecommendationState();
                             }}
-                            className="h-9 rounded-md"
+                            className="h-9 rounded-md border-glass bg-background/35 focus-visible:ring-weather-accent/45"
                           />
                         </div>
                       </div>
@@ -1079,7 +1092,7 @@ export default function Home() {
 
                 <div className="space-y-2 border-t border-soft pt-3 xl:shrink-0">
                 {searchMode === "janela" && !demoMode ? (
-                  <label className="flex items-start gap-2 rounded-lg border border-soft bg-background/35 p-2 text-xs">
+                  <label className="cockpit-surface flex items-start gap-2 rounded-lg border p-2 text-xs">
                     <input
                       type="checkbox"
                       checked={compareModels}
@@ -1087,7 +1100,7 @@ export default function Home() {
                         setCompareModels(event.target.checked);
                         resetRecommendationState();
                       }}
-                      className="mt-0.5 size-4"
+                      className="mt-0.5 size-4 accent-weather-accent"
                     />
                     <span className="min-w-0">
                       <span className="block font-medium">
@@ -1146,7 +1159,7 @@ export default function Home() {
               <WeeklyOverviewCard overview={weeklyOverview} />
             ) : (
               <Card className="glass-card min-h-[28rem] rounded-xl xl:min-h-0">
-                <CardHeader className="border-b border-soft bg-weather-card">
+                <CardHeader className="cockpit-surface-strong border-b">
                   <CardTitle>Status</CardTitle>
                   <CardDescription>
                     {searchMode === "atividades"
@@ -1233,27 +1246,27 @@ export default function Home() {
             aria-label="Resumo da consulta"
           >
             <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-2">
-              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <div className="cockpit-surface rounded-lg border px-3 py-2">
                 <p className="text-xs text-muted-foreground">Modo</p>
                 <p className="truncate text-sm font-medium">
                   {selectedModeOption?.label ?? "Janela perfeita"}
                 </p>
               </div>
-              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <div className="cockpit-surface rounded-lg border px-3 py-2">
                 <p className="text-xs text-muted-foreground">Cidade</p>
                 <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
               </div>
-              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <div className="cockpit-surface rounded-lg border px-3 py-2">
                 <p className="text-xs text-muted-foreground">Período</p>
                 <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
               </div>
-              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <div className="cockpit-surface rounded-lg border px-3 py-2">
                 <p className="text-xs text-muted-foreground">Atividade</p>
                 <p className="truncate text-sm font-medium">
                   {cockpitActivityLabel}
                 </p>
               </div>
-              <div className="rounded-lg border border-soft bg-background/45 px-3 py-2">
+              <div className="cockpit-surface rounded-lg border px-3 py-2">
                 <p className="text-xs text-muted-foreground">Resultado</p>
                 <p className="truncate text-sm font-medium">
                   {cockpitResultLabel}

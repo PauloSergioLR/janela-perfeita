@@ -107,7 +107,7 @@ export function OpportunityTimeline({
         <>
           <div
             className={cn(
-              "rounded-lg border border-soft bg-background/25 p-2",
+              "cockpit-surface rounded-lg border p-2",
               isEmbedded && "xl:p-1.5",
             )}
           >
@@ -134,7 +134,7 @@ export function OpportunityTimeline({
                     aria-pressed={isSelected}
                     aria-label={`${datum.hourLabel}, score ${datum.score} de 100. ${tone.label}. ${datum.reason}`}
                     className={cn(
-                      "group relative grid min-h-20 min-w-0 grid-rows-[auto_1fr_auto] gap-1 rounded-md border border-soft bg-weather-card/45 p-1 text-center transition-[transform,border-color,background-color,box-shadow,opacity] duration-200 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
+                      "group relative grid min-h-20 min-w-0 grid-rows-[auto_1fr_auto] gap-1 rounded-md border border-soft bg-weather-card/45 p-1 text-center shadow-inner shadow-white/5 transition-[transform,border-color,background-color,box-shadow,opacity] duration-200 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/45",
                       isEmbedded &&
                         "min-h-16 xl:min-h-14 2xl:min-h-[4.75rem]",
                       datum.score < 40 && "opacity-65 hover:opacity-100",
@@ -194,7 +194,7 @@ export function OpportunityTimeline({
             <div
               className={cn(
                 "border-y border-soft py-4",
-                isEmbedded && "rounded-lg border bg-background/25 px-2 py-1.5",
+                isEmbedded && "cockpit-surface rounded-lg border px-2 py-1.5",
                 isEmbedded && "xl:sr-only",
               )}
               aria-live="polite"
@@ -261,7 +261,7 @@ export function OpportunityTimeline({
     return (
       <section
         className={cn(
-          "min-w-0 rounded-lg border border-soft bg-background/25 p-3",
+          "cockpit-surface min-w-0 rounded-lg border p-3",
           isEmbedded && "xl:p-2",
           className,
         )}

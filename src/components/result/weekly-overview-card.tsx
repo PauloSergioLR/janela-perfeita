@@ -77,7 +77,7 @@ function Highlight({
 
   return (
     <article
-      className={`rounded-xl border p-3 ${getHighlightClasses(tone)}`}
+      className={`rounded-lg border p-3 shadow-inner shadow-white/10 ${getHighlightClasses(tone)}`}
       aria-label={`${label}: ${formatWeekday(day.date)}`}
     >
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]">
@@ -86,7 +86,7 @@ function Highlight({
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div>
-          <p className="font-semibold capitalize text-slate-50">
+          <p className="font-semibold capitalize text-slate-950 dark:text-slate-50">
             {formatWeekday(day.date)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -109,7 +109,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
       size="sm"
       className="glass-card min-w-0 rounded-xl !py-0 xl:h-full xl:min-h-0"
     >
-      <CardHeader className="gap-2 border-b border-soft bg-weather-card p-3 sm:p-4 xl:px-3 xl:!py-2 xl:!pb-2">
+      <CardHeader className="cockpit-surface-strong gap-2 border-b p-3 sm:p-4 xl:px-3 xl:!py-2 xl:!pb-2">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm font-medium text-weather-accent">
@@ -165,11 +165,11 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
             </section>
 
             <section
-              className="grid min-h-0 gap-3 rounded-xl border border-soft bg-background/25 p-3 xl:grid-cols-3"
+              className="cockpit-surface grid min-h-0 gap-3 rounded-xl border p-3 xl:grid-cols-3"
               aria-label="Resumo climático da semana"
             >
               <div className="min-w-0 xl:col-span-1">
-                <h3 className="font-semibold text-slate-50">
+                <h3 className="font-semibold text-slate-950 dark:text-slate-50">
                   Resumo da semana
                 </h3>
                 <p className="mt-1 text-sm leading-5 text-muted-foreground">
@@ -179,44 +179,44 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
               </div>
 
               <div className="grid min-w-0 gap-2 sm:grid-cols-2 xl:col-span-2">
-                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                <div className="cockpit-surface rounded-lg border p-3">
                   <p className="text-xs font-medium text-muted-foreground">
                     Mais quente
                   </p>
-                  <p className="mt-1 truncate font-semibold capitalize text-slate-50">
+                  <p className="mt-1 truncate font-semibold capitalize text-slate-950 dark:text-slate-50">
                     {hottestDay ? formatWeekday(hottestDay.date) : "Sem dados"}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {formatNumber(hottestDay?.temperatureMax ?? null, "°C")}
                   </p>
                 </div>
-                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                <div className="cockpit-surface rounded-lg border p-3">
                   <p className="text-xs font-medium text-muted-foreground">
                     Mais frio
                   </p>
-                  <p className="mt-1 truncate font-semibold capitalize text-slate-50">
+                  <p className="mt-1 truncate font-semibold capitalize text-slate-950 dark:text-slate-50">
                     {coldestDay ? formatWeekday(coldestDay.date) : "Sem dados"}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {formatNumber(coldestDay?.temperatureMin ?? null, "°C")}
                   </p>
                 </div>
-                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                <div className="cockpit-surface rounded-lg border p-3">
                   <p className="text-xs font-medium text-muted-foreground">
                     Dias avaliados
                   </p>
-                  <p className="mt-1 font-semibold tabular-nums text-slate-50">
+                  <p className="mt-1 font-semibold tabular-nums text-slate-950 dark:text-slate-50">
                     {overview.days.length}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Previsões consolidadas.
                   </p>
                 </div>
-                <div className="rounded-lg border border-soft bg-weather-card/70 p-3">
+                <div className="cockpit-surface rounded-lg border p-3">
                   <p className="text-xs font-medium text-muted-foreground">
                     Janela temporal
                   </p>
-                  <p className="mt-1 font-semibold text-slate-50">
+                  <p className="mt-1 font-semibold text-slate-950 dark:text-slate-50">
                     {formatShortDate(overview.startDate)} a{" "}
                     {formatShortDate(overview.endDate)}
                   </p>
@@ -228,7 +228,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
             </section>
           </>
         ) : (
-          <div className="rounded-xl border border-soft bg-weather-card/70 p-4 text-sm text-muted-foreground dark:bg-weather-card/45">
+          <div className="cockpit-surface rounded-xl border p-4 text-sm text-muted-foreground">
             Sem dados diários para montar a previsão da semana.
           </div>
         )}

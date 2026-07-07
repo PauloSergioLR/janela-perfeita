@@ -46,8 +46,8 @@ function ScoreRuleList({ rules, compact = false }: ScoreRuleListProps) {
         <li
           key={rule.factor}
           className={cn(
-            "rounded-lg border border-border px-3 py-3",
-            compact && "bg-background/35 px-2.5 py-2",
+            "rounded-lg border border-soft px-3 py-3",
+            compact && "cockpit-surface px-2.5 py-2",
           )}
         >
           <div className="flex items-start justify-between gap-3">
@@ -100,7 +100,7 @@ export function ScoreBreakdown({
     return (
       <details
         className={cn(
-          "group rounded-lg border border-soft bg-background/25 p-2",
+          "cockpit-surface group rounded-lg border p-2",
           className,
         )}
       >
@@ -121,7 +121,7 @@ export function ScoreBreakdown({
           </span>
           <Badge
             variant="outline"
-            className="h-6 shrink-0 border-weather-accent/45 bg-weather-accent/10 px-2 text-xs text-weather-accent"
+            className="h-6 shrink-0 border-weather-accent/45 bg-weather-accent/10 px-2 text-xs text-weather-accent shadow-inner shadow-white/5"
           >
             Detalhes
           </Badge>

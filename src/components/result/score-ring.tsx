@@ -52,8 +52,18 @@ export function ScoreRing({ score, className }: ScoreRingProps) {
       role="img"
       aria-label={`Score ${normalizedScore} de 100: ${band.label}`}
     >
+      <span
+        className={cn(
+          "absolute inset-3 rounded-full bg-current opacity-10 blur-2xl",
+          getToneClassName(band.tone),
+        )}
+        aria-hidden="true"
+      />
       <svg
-        className="size-full -rotate-90"
+        className={cn(
+          "relative size-full -rotate-90 drop-shadow-[0_0_22px_currentColor]",
+          getToneClassName(band.tone),
+        )}
         viewBox="0 0 120 120"
         aria-hidden="true"
       >
@@ -63,7 +73,7 @@ export function ScoreRing({ score, className }: ScoreRingProps) {
           r={RING_RADIUS}
           fill="none"
           strokeWidth="9"
-          className="stroke-weather-muted/45"
+          className="stroke-weather-muted/35"
         />
         <circle
           cx="60"
