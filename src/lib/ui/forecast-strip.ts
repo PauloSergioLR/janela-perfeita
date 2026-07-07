@@ -1,5 +1,18 @@
 import type { WeeklyWeatherDayOverview } from "@/types";
 
+export type ForecastStripView = "today" | "next-days" | "weekly";
+
+export interface ForecastStripViewOption {
+  value: ForecastStripView;
+  label: string;
+}
+
+export const forecastStripViewOptions = [
+  { value: "today", label: "Hoje" },
+  { value: "next-days", label: "Próximos dias" },
+  { value: "weekly", label: "Visão semanal" },
+] satisfies ForecastStripViewOption[];
+
 export type ForecastClassificationTone =
   | "excellent"
   | "good"
@@ -35,6 +48,23 @@ export function getForecastClassification(
   }
 
   return { label: "Regular", tone: "regular" };
+}
+
+export function getForecastStripDaysForView(
+  days: WeeklyWeatherDayOverview[],
+  view: ForecastStripView,
+): WeeklyWeatherDayOverview[] {
+  if (view === "today") {
+    return days.slice(0, 1);
+  }
+
+  if (view === "next-days") {
+    const nextDays = days.slice(1);
+
+    return nextDays.length > 0 ? nextDays : days;
+  }
+
+  return days;
 }
 
 export function formatForecastDayLabel(date: string, todayDate: string): string {

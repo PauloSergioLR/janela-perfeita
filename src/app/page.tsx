@@ -19,7 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityRankingCard } from "@/components/result/activity-ranking-card";
 import { AttributionFooter } from "@/components/result/attribution-footer";
 import { DailyOverviewCard } from "@/components/result/daily-overview-card";
-import { ForecastStrip } from "@/components/result/forecast-strip";
+import { BottomForecastStrip } from "@/components/result/forecast-strip";
 import { RecommendationCard } from "@/components/result/recommendation-card";
 import { WeekComparisonCard } from "@/components/result/week-comparison-card";
 import { WeeklyOverviewCard } from "@/components/result/weekly-overview-card";
@@ -1235,7 +1235,7 @@ export default function Home() {
         </section>
 
         {contextualForecastOverview ? (
-          <ForecastStrip
+          <BottomForecastStrip
             overview={contextualForecastOverview}
             title={contextualForecastTitle}
             subtitle={contextualForecastSubtitle}
