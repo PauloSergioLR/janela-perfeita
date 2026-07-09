@@ -579,19 +579,13 @@ export default function Home() {
                 ? "Atenção"
                 : "Aguardando busca";
   const contextualForecastOverview =
-    resultState === "content" && recommendation && forecastStrip
-      ? forecastStrip
-      : resultState === "content" && weeklyOverview
-        ? weeklyOverview
-        : undefined;
-  const contextualForecastTitle = recommendation
-    ? "Próximos dias para decidir"
-    : weeklyOverview
-      ? "Faixa da semana"
-      : "Próximos dias";
-  const contextualForecastSubtitle = recommendation
-    ? `${cockpitActivityLabel} · ${cockpitCityLabel}`
-    : `${cockpitCityLabel} · ${cockpitDateLabel}`;
+    resultState === "content" && weeklyOverview
+      ? weeklyOverview
+      : undefined;
+  const contextualForecastTitle = weeklyOverview
+    ? "Faixa da semana"
+    : "Próximos dias";
+  const contextualForecastSubtitle = `${cockpitCityLabel} · ${cockpitDateLabel}`;
   const weatherStageVariant = getWeatherStageVariant({
     activityId: selectedActivityId || undefined,
     recommendation,
@@ -1148,7 +1142,10 @@ export default function Home() {
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
-              <RecommendationCard recommendation={recommendation} />
+              <RecommendationCard
+                recommendation={recommendation}
+                forecastOverview={forecastStrip}
+              />
             ) : resultState === "content" && activityRanking ? (
               <ActivityRankingCard ranking={activityRanking} />
             ) : resultState === "content" && weekComparison ? (

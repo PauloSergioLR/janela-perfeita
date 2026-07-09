@@ -36,12 +36,21 @@ test("fluxo principal gera recomendação em modo demo", async ({ page }) => {
   await expect(
     page.getByText("Estatísticas climáticas", { exact: true }),
   ).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Resumo" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("tab", { name: "Por hora" }).click();
   const timeline = page.getByLabel("Timeline de oportunidade");
-  await timeline.getByRole("button", { name: /score \d+ de 100/i }).nth(1).click();
+  await timeline
+    .getByRole("button", { name: /score \d+ de 100/i })
+    .nth(1)
+    .click();
   await expect(timeline.getByLabel(/Detalhes de/)).toBeVisible();
-  await expect(page.getByLabel("Previsão dos próximos dias")).toBeVisible();
-  await expect(page.getByText(/\/100/).first()).toBeVisible();
   await expect(page.getByText("Timeline de scores")).toBeVisible();
+  await expect(page.getByText(/\/100/).first()).toBeVisible();
+  await page.getByRole("tab", { name: /Pr.*dias/ }).click();
+  await expect(page.getByLabel("Previsão dos próximos dias")).toBeVisible();
 });
 
 test("busca de cidade exibe estado sem resultado", async ({ page }) => {

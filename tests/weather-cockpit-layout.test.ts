@@ -89,7 +89,7 @@ describe("layout Weather Decision Cockpit", () => {
   it("mantem faixa inferior de resumo sem adicionar mapa", () => {
     expect(page).toContain('aria-label="Resumo da consulta"');
     expect(page).toContain("contextualForecastOverview");
-    expect(page).toContain("Próximos dias para decidir");
+    expect(page).toContain("forecastOverview={forecastStrip}");
     expect(page).not.toContain("xl:sr-only");
     expect(page).not.toContain("MapLibre");
     expect(page).not.toContain("maptiler");
@@ -135,12 +135,20 @@ describe("layout Weather Decision Cockpit", () => {
   it("concentra Janela perfeita em um card protagonista sem duplicar timeline", () => {
     const recommendationCard = readRecommendationCard();
 
+    expect(recommendationCard).toContain('role="tablist"');
+    expect(recommendationCard).toContain("Explorar resultado");
+    expect(recommendationCard).toContain("Resumo");
+    expect(recommendationCard).toContain("Por hora");
+    expect(recommendationCard).toContain("Próximos dias");
+    expect(recommendationCard).toContain("Semana");
+    expect(recommendationCard).toContain("Estatísticas");
+    expect(recommendationCard).toContain("Alternativas");
     expect(recommendationCard).toContain('variant="embedded"');
     expect(recommendationCard).toContain('variant="compact"');
     expect(recommendationCard).toContain('density="compact"');
-    expect(recommendationCard).toContain(
-      "xl:grid-cols-[minmax(145px,0.34fr)_minmax(0,1.1fr)_minmax(220px,0.56fr)]",
-    );
+    expect(recommendationCard).toContain("limit={4}");
+    expect(recommendationCard).toContain("showViewTabs={false}");
+    expect(recommendationCard).toContain('defaultView="weekly"');
     expect(recommendationCard).toContain("<WeatherStatsPanel");
     expect(recommendationCard).toContain("<OpportunityTimeline");
     expect(recommendationCard).toContain("<ScoreBreakdown");

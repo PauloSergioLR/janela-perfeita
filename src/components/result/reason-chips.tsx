@@ -12,6 +12,7 @@ import type { RuleResult } from "@/types";
 interface ReasonChipsProps {
   rules: RuleResult[];
   density?: "normal" | "compact";
+  limit?: number;
 }
 
 interface ReasonStyle {
@@ -41,11 +42,32 @@ const reasonStyles: Record<ReasonKind, ReasonStyle> = {
 export function ReasonChips({
   rules,
   density = "normal",
+  limit,
 }: ReasonChipsProps) {
   const groups = getReasonGroups(rules);
+  const visibleGroups =
+    typeof limit === "number"
+      ? groups.reduce<typeof groups>((result, group) => {
+          const used = result.reduce(
+            (total, currentGroup) => total + currentGroup.rules.length,
+            0,
+          );
+          const available = Math.max(limit - used, 0);
+
+          if (available === 0) {
+            return result;
+          }
+
+          const visibleRules = group.rules.slice(0, available);
+
+          return visibleRules.length > 0
+            ? [...result, { ...group, rules: visibleRules }]
+            : result;
+        }, [])
+      : groups;
   const isCompact = density === "compact";
 
-  if (groups.length === 0) {
+  if (visibleGroups.length === 0) {
     return null;
   }
 
@@ -59,7 +81,7 @@ export function ReasonChips({
           Motivos da recomendação
         </h3>
         <div className="scrollbar-none flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto pb-0.5">
-          {groups.flatMap((group) => {
+          {visibleGroups.flatMap((group) => {
             const style = reasonStyles[group.kind];
             const Icon = style.icon;
 
@@ -88,7 +110,7 @@ export function ReasonChips({
         Motivos da recomendação
       </h3>
       <div className="grid gap-4">
-        {groups.map((group) => {
+        {visibleGroups.map((group) => {
           const style = reasonStyles[group.kind];
           const Icon = style.icon;
 
