@@ -58,7 +58,7 @@ export function ReasonChips({
         <h3 className="shrink-0 text-[10px] leading-3 font-medium text-muted-foreground">
           Motivos da recomendação
         </h3>
-        <div className="flex min-w-0 flex-1 flex-wrap gap-2 max-h-16 overflow-y-auto pr-1">
+        <div className="scrollbar-none flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto pb-0.5">
           {groups.flatMap((group) => {
             const style = reasonStyles[group.kind];
             const Icon = style.icon;
@@ -68,7 +68,7 @@ export function ReasonChips({
                 key={`${rule.factor}-${rule.reason}`}
                 variant="outline"
                 className={cn(
-                  "motion-chip-enter min-h-7 max-w-full justify-start gap-2 whitespace-normal px-2 py-0.5 text-left text-xs leading-4",
+                  "motion-chip-enter min-h-7 max-w-[16rem] shrink-0 snap-start justify-start gap-2 whitespace-normal px-2 py-0.5 text-left text-xs leading-4",
                   style.badgeClassName,
                 )}
               >

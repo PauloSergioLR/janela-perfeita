@@ -19,7 +19,7 @@ export function ControlPanelSection({
   return (
     <section
       className={cn(
-        "space-y-2 border-t border-soft pt-4 first:border-t-0 first:pt-0 xl:space-y-1.5 xl:pt-2.5",
+        "space-y-2 border-t border-soft pt-4 first:border-t-0 first:pt-0 xl:space-y-1.5 xl:pt-2",
         className,
       )}
     >
@@ -30,7 +30,7 @@ export function ControlPanelSection({
         <div className="min-w-0 space-y-0.5">
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
           {description ? (
-            <p className="text-xs leading-4 text-muted-foreground xl:hidden 2xl:block">
+            <p className="text-xs leading-4 text-muted-foreground xl:hidden">
               {description}
             </p>
           ) : null}

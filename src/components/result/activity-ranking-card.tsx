@@ -70,7 +70,7 @@ export function ActivityRankingCard({ ranking }: ActivityRankingCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-col gap-3 p-3 sm:p-4 xl:flex-1 xl:overflow-y-auto">
+      <CardContent className="flex min-h-0 flex-col gap-3 p-3 sm:p-4 xl:flex-1">
         {availabilityNotice ? (
           <div className="rounded-lg border border-sky-400/30 bg-sky-400/10 p-3 text-xs leading-4 text-sky-900 dark:text-sky-100">
             {availabilityNotice}

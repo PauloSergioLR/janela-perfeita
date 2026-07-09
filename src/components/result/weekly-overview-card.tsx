@@ -132,7 +132,7 @@ export function WeeklyOverviewCard({ overview }: WeeklyOverviewCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)] xl:overflow-y-auto xl:p-3">
+      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)] xl:p-3">
         {hasDays ? (
           <>
             <section aria-label="Destaques da semana">

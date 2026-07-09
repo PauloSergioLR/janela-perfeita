@@ -148,7 +148,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)_auto] xl:overflow-y-auto xl:p-3">
+      <CardContent className="grid min-h-0 gap-3 p-3 sm:p-4 xl:flex-1 xl:grid-rows-[auto_minmax(0,1fr)_auto] xl:p-3">
         <div className="grid min-w-0 gap-px overflow-hidden rounded-lg border border-soft bg-border shadow-inner shadow-white/5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {metrics.map((metric) => {
             const Icon = metric.icon;
@@ -191,7 +191,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
           </div>
 
           {hasHourlyData ? (
-            <div className="overflow-x-auto pb-1">
+            <div className="scrollbar-none overflow-x-auto pb-1">
               <div
                 className="flex min-w-max gap-2 xl:min-w-0"
                 role="list"
