@@ -11,6 +11,7 @@ interface WeatherStatsPanelProps {
   sunrise?: string | null;
   sunset?: string | null;
   variant?: "wide" | "compact";
+  limit?: number;
   className?: string;
 }
 
@@ -32,9 +33,13 @@ export function WeatherStatsPanel({
   sunrise,
   sunset,
   variant = "wide",
+  limit,
   className,
 }: WeatherStatsPanelProps) {
-  const stats = getCompactWeatherStats({ weather, sunrise, sunset });
+  const stats = getCompactWeatherStats({ weather, sunrise, sunset }).slice(
+    0,
+    limit,
+  );
   const HeaderIcon = getWeatherIcon(null);
   const isCompact = variant === "compact";
 

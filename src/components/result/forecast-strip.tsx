@@ -21,6 +21,9 @@ interface ForecastStripProps {
   overview: WeeklyWeatherOverview;
   subtitle?: string;
   title?: string;
+  defaultView?: ForecastStripView;
+  showViewTabs?: boolean;
+  className?: string;
 }
 
 interface ScrollState {
@@ -59,10 +62,13 @@ function getScrollState(viewport: HTMLDivElement): ScrollState {
 export function BottomForecastStrip({
   overview,
   subtitle,
+  defaultView = DEFAULT_VIEW,
+  showViewTabs = true,
+  className,
   title = "Próximos dias",
 }: ForecastStripProps) {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
-  const [activeView, setActiveView] = useState<ForecastStripView>(DEFAULT_VIEW);
+  const [activeView, setActiveView] = useState<ForecastStripView>(defaultView);
   const [scrollState, setScrollState] = useState<ScrollState>({
     canScrollNext: false,
     canScrollPrevious: false,
@@ -112,6 +118,10 @@ export function BottomForecastStrip({
   );
 
   useEffect(() => {
+    setActiveView(defaultView);
+  }, [defaultView]);
+
+  useEffect(() => {
     const viewport = scrollViewportRef.current;
 
     if (!viewport) {
@@ -147,7 +157,10 @@ export function BottomForecastStrip({
 
   return (
     <section
-      className="glass-panel min-w-0 rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
+      className={cn(
+        "glass-panel min-w-0 rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2",
+        className,
+      )}
       aria-label="Previsão dos próximos dias"
     >
       <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
@@ -166,34 +179,36 @@ export function BottomForecastStrip({
         </div>
 
         <div className="flex min-w-0 items-center justify-between gap-2 xl:justify-end">
-          <div
-            className="scrollbar-none flex min-w-0 gap-1 overflow-x-auto rounded-lg border border-soft bg-background/35 p-1"
-            role="tablist"
-            aria-label="Recorte da previsão"
-          >
-            {forecastStripViewOptions.map((option) => {
-              const isActive = option.value === activeView;
+          {showViewTabs ? (
+            <div
+              className="scrollbar-none flex min-w-0 gap-1 overflow-x-auto rounded-lg border border-soft bg-background/35 p-1"
+              role="tablist"
+              aria-label="Recorte da previsão"
+            >
+              {forecastStripViewOptions.map((option) => {
+                const isActive = option.value === activeView;
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  id={`bottom-forecast-tab-${option.value}`}
-                  className={cn(
-                    "min-h-7 shrink-0 rounded-md px-2.5 text-[11px] font-medium leading-none text-muted-foreground transition hover:bg-weather-card hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:text-xs",
-                    isActive &&
-                      "cockpit-active text-slate-950 shadow-weather-glow dark:text-slate-50",
-                  )}
-                  role="tab"
-                  aria-controls="bottom-forecast-panel"
-                  aria-selected={isActive}
-                  onClick={() => setActiveView(option.value)}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    id={`bottom-forecast-tab-${option.value}`}
+                    className={cn(
+                      "min-h-7 shrink-0 rounded-md px-2.5 text-[11px] font-medium leading-none text-muted-foreground transition hover:bg-weather-card hover:text-weather-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:text-xs",
+                      isActive &&
+                        "cockpit-active text-slate-950 shadow-weather-glow dark:text-slate-50",
+                    )}
+                    role="tab"
+                    aria-controls="bottom-forecast-panel"
+                    aria-selected={isActive}
+                    onClick={() => setActiveView(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
 
           <div className="flex shrink-0 items-center gap-1">
             <button
@@ -224,7 +239,10 @@ export function BottomForecastStrip({
         id="bottom-forecast-panel"
         className="relative mt-2 min-w-0"
         role="tabpanel"
-        aria-labelledby={`bottom-forecast-tab-${activeView}`}
+        aria-label={showViewTabs ? undefined : title}
+        aria-labelledby={
+          showViewTabs ? `bottom-forecast-tab-${activeView}` : undefined
+        }
       >
         <div
           className={cn(
