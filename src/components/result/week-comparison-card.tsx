@@ -65,7 +65,7 @@ export function WeekComparisonCard({ comparison }: WeekComparisonCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-col gap-3 p-3 sm:p-4 xl:flex-1 xl:overflow-y-auto">
+      <CardContent className="flex min-h-0 flex-col gap-3 p-3 sm:p-4 xl:flex-1">
         <div className="grid min-h-0 gap-3 xl:flex-1 xl:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)]">
           {bestRecommendation ? (
             <section className="rounded-lg border border-sky-400/35 bg-sky-400/10 p-3 text-sky-900 shadow-inner shadow-white/10 dark:text-sky-50 xl:min-h-0">

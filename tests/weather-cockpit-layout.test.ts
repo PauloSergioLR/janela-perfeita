@@ -72,7 +72,7 @@ describe("layout Weather Decision Cockpit", () => {
 
   it("separa seletor de modo, painel lateral e area de resultado", () => {
     expect(page).toContain("<ModeSelector");
-    expect(page).toContain("xl:sticky xl:top-3");
+    expect(page).toContain("xl:h-full xl:min-h-0 xl:gap-2");
     expect(page).toContain('aria-label="Resultado da decisão"');
     expect(page).toContain("w-full max-w-none");
     expect(page).not.toContain("max-w-7xl");
@@ -81,7 +81,7 @@ describe("layout Weather Decision Cockpit", () => {
       "xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)]",
     );
     expect(page).toContain(
-      "xl:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,auto)_auto]",
+      "xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto]",
     );
     expect(page).toContain("grid min-w-0 gap-6");
   });
@@ -122,7 +122,8 @@ describe("layout Weather Decision Cockpit", () => {
   });
 
   it("compacta painel de controle sem mover funcionalidade principal", () => {
-    expect(page).toContain("xl:overflow-y-auto xl:pr-1");
+    expect(page).toContain("xl:flex-1 xl:space-y-2");
+    expect(page).not.toContain("xl:overflow-y-auto xl:pr-1");
     expect(page).toContain("Usar localização");
     expect(page).toContain("h-11 w-full");
     expect(page).toContain("<details");
@@ -138,7 +139,7 @@ describe("layout Weather Decision Cockpit", () => {
     expect(recommendationCard).toContain('variant="compact"');
     expect(recommendationCard).toContain('density="compact"');
     expect(recommendationCard).toContain(
-      "xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)]",
+      "xl:grid-cols-[minmax(145px,0.34fr)_minmax(0,1.1fr)_minmax(220px,0.56fr)]",
     );
     expect(recommendationCard).toContain("<WeatherStatsPanel");
     expect(recommendationCard).toContain("<OpportunityTimeline");
@@ -173,12 +174,12 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).toContain("<DailyOverviewCard overview={dailyOverview} />");
     expect(page).toContain("<WeeklyOverviewCard overview={weeklyOverview} />");
     expect(page).toContain(
-      "flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1",
+      "flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-2",
     );
     expect(activityRankingCard).toContain("xl:h-full xl:min-h-0");
     expect(activityRankingCard).toContain("xl:grid-cols-2");
     expect(dailyOverviewCard).toContain("xl:basis-[calc((100%-5.5rem)/12)]");
-    expect(dailyOverviewCard).toContain("overflow-x-auto");
+    expect(dailyOverviewCard).toContain("scrollbar-none overflow-x-auto");
     expect(weeklyOverviewCard).toContain("Resumo da semana");
     expect(weeklyOverviewCard).not.toContain("overflow-x-auto");
   });

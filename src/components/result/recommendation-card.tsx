@@ -133,7 +133,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   return (
     <Card
       size="sm"
-      className="glass-card min-w-0 overflow-hidden rounded-xl !py-0 xl:flex xl:min-h-0 xl:shrink-0 xl:flex-col xl:gap-0"
+      className="glass-card min-w-0 overflow-hidden rounded-xl !py-0 xl:flex xl:h-full xl:min-h-0 xl:flex-col xl:gap-0"
     >
       <CardHeader className="cockpit-surface-strong gap-2 border-b px-3 !py-2 !pb-2 sm:px-4 xl:!py-1 xl:!pb-1 2xl:!py-2 2xl:!pb-2">
         <div className="flex items-start justify-between gap-3">
@@ -164,9 +164,9 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-2 p-2 sm:p-3 xl:min-h-0 xl:gap-1 xl:p-2 2xl:p-3">
-        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(145px,0.38fr)_minmax(0,1.15fr)_minmax(220px,0.55fr)] xl:gap-1">
-          <section className="score-orb grid min-h-36 place-items-center rounded-lg border border-weather-accent/25 bg-weather-card/65 p-2 shadow-inner shadow-white/10 xl:h-28 2xl:h-40">
+      <CardContent className="grid gap-2 p-2 sm:p-3 xl:min-h-0 xl:flex-1 xl:grid-rows-[auto_auto_auto] xl:gap-1 xl:p-2 2xl:p-3">
+        <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(145px,0.34fr)_minmax(0,1.1fr)_minmax(220px,0.56fr)] xl:gap-1">
+          <section className="score-orb grid min-h-36 place-items-center rounded-lg border border-weather-accent/25 bg-weather-card/65 p-2 shadow-inner shadow-white/10 xl:min-h-28 2xl:min-h-40">
             <div className="grid place-items-center gap-2">
               <ScoreRing score={displayScore} className="!w-28 2xl:!w-44" />
               <span className="text-xs text-muted-foreground">
@@ -175,7 +175,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
           </section>
 
-          <section className="cockpit-surface grid min-w-0 content-start gap-2 rounded-lg border p-2 xl:h-28 xl:overflow-y-auto 2xl:h-40">
+          <section className="cockpit-surface grid min-w-0 content-start gap-2 rounded-lg border p-2 xl:min-h-28 2xl:min-h-40">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
                 <span className="inline-flex items-center gap-2">
@@ -283,7 +283,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             />
           </section>
 
-          <aside className="cockpit-surface min-w-0 rounded-lg border p-2 xl:h-28 xl:overflow-y-auto 2xl:h-40">
+          <aside className="cockpit-surface min-w-0 rounded-lg border p-2 xl:min-h-28 2xl:min-h-40">
             <WeatherStatsPanel
               weather={resultScore?.weather ?? null}
               sunrise={recommendation.sunrise}
@@ -299,7 +299,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
         />
 
         {hasSecondaryContext ? (
-          <div className="grid min-w-0 gap-2 lg:grid-cols-3">
+          <div className="grid min-w-0 gap-2 lg:grid-cols-3 xl:auto-rows-fr">
             {modelAgreement ? (
               <div
                 className={cn(

@@ -27,7 +27,7 @@ describe("WeeklyOverviewCard", () => {
 
     expect(source).toContain('aria-label="Resumo climático da semana"');
     expect(source).toContain("xl:h-full xl:min-h-0");
-    expect(source).toContain("xl:overflow-y-auto");
+    expect(source).not.toContain("xl:overflow-y-auto");
     expect(source).not.toContain("overflow-x-auto");
     expect(source).not.toContain('role="list"');
     expect(source).not.toContain("MapLibre");

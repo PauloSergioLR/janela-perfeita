@@ -641,17 +641,17 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-4 xl:py-3 2xl:px-6">
-      <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,auto)_auto] xl:gap-3">
-        <header className="glass-panel relative grid gap-5 overflow-hidden rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-3 xl:p-3">
+      <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-3 xl:py-2 2xl:px-5">
+      <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-2">
+        <header className="glass-panel relative grid gap-5 overflow-hidden rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-2 xl:p-2">
           <div
             className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-weather-accent/55 to-transparent"
             aria-hidden="true"
           />
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10">
+            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10 xl:size-10">
               <CloudSun
-                className="size-6 text-weather-accent"
+                className="size-6 text-weather-accent xl:size-5"
                 aria-hidden="true"
               />
             </div>
@@ -659,10 +659,10 @@ export default function Home() {
               <p className="text-sm font-medium text-weather-accent">
                 Clima por decisão
               </p>
-              <h1 className="text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-3xl xl:text-2xl">
                 Janela Perfeita
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 xl:hidden">
                 Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
@@ -698,24 +698,24 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid min-w-0 grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2 xl:col-span-1 xl:border-t-0 xl:pt-0">
+          <div className="grid min-w-0 grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2 xl:hidden xl:border-t-0 xl:pt-0">
             <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
                 {activities.length}
               </p>
-              <p className="text-xs text-muted-foreground">atividades</p>
+              <p className="text-xs text-muted-foreground xl:text-[10px]">atividades</p>
             </div>
             <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
                 7
               </p>
-              <p className="text-xs text-muted-foreground">dias</p>
+              <p className="text-xs text-muted-foreground xl:text-[10px]">dias</p>
             </div>
             <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">
+              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
                 0-100
               </p>
-              <p className="text-xs text-muted-foreground">score</p>
+              <p className="text-xs text-muted-foreground xl:text-[10px]">score</p>
             </div>
           </div>
         </header>
@@ -729,14 +729,14 @@ export default function Home() {
           }}
         />
 
-        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-3">
-          <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-3 xl:h-[calc(100%-0.75rem)] xl:min-h-0 xl:gap-3">
+        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-2">
+          <aside className="flex min-w-0 flex-col gap-4 xl:h-full xl:min-h-0 xl:gap-2">
           <Card className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0">
-            <CardHeader className="cockpit-surface-strong border-b xl:pb-3">
+            <CardHeader className="cockpit-surface-strong border-b xl:p-2 xl:pb-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <CardTitle>Painel de controle</CardTitle>
-                  <CardDescription className="text-xs leading-4 xl:hidden 2xl:block">
+                  <CardDescription className="text-xs leading-4 xl:hidden">
                     {searchMode === "clima_semana"
                       ? "Cidade define a consulta dos próximos 7 dias."
                       : searchMode === "dia"
@@ -767,7 +767,7 @@ export default function Home() {
                       </Button>
                     </div>
                     {searchHistory.length > 0 ? (
-                      <div className="grid max-h-40 gap-2 overflow-y-auto pr-1">
+                      <div className="scrollbar-none grid max-h-40 gap-2 overflow-y-auto pr-1">
                         {searchHistory.map((entry) => {
                           const mode = SEARCH_MODE_OPTIONS.find(
                             (option) => option.id === entry.mode,
@@ -807,9 +807,9 @@ export default function Home() {
                 </details>
               </div>
             </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-3">
-              <form className="flex min-h-0 flex-1 flex-col gap-3" onSubmit={handleSubmit}>
-                <div className="min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:pr-1">
+            <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-2">
+              <form className="flex min-h-0 flex-1 flex-col gap-3 xl:gap-2" onSubmit={handleSubmit}>
+                <div className="min-h-0 space-y-3 xl:flex-1 xl:space-y-2">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -842,7 +842,7 @@ export default function Home() {
                         <div
                           id="city-suggestions"
                           role="listbox"
-                          className="glass-panel absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg p-1 text-sm shadow-lg"
+                          className="glass-panel scrollbar-none absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-lg p-1 text-sm shadow-lg"
                         >
                         {cityQueryResult.isFetching ? (
                           <PremiumState
@@ -936,7 +936,7 @@ export default function Home() {
                       <span className="text-muted-foreground">
                         {locationFeedback.description}
                       </span>
-                      <span className="block text-muted-foreground xl:hidden 2xl:block">
+                      <span className="block text-muted-foreground xl:hidden">
                         {CURRENT_LOCATION_ATTRIBUTION}
                       </span>
                     </div>
@@ -997,7 +997,7 @@ export default function Home() {
                           {selectedDateCompactLabel || "Selecionar data"}
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5 xl:hidden 2xl:flex">
+                      <div className="flex flex-wrap gap-1.5 xl:hidden">
                         {dateOptions.map((option) => (
                           <button
                             key={option.value}
@@ -1022,14 +1022,14 @@ export default function Home() {
                   ) : null}
 
                   {usesAvailability ? (
-                    <div className="cockpit-surface grid gap-2 rounded-lg border p-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <Label className="text-xs">Disponibilidade opcional</Label>
-                        <p className="text-[11px] leading-4 text-muted-foreground">
+                    <details className="cockpit-surface group rounded-lg border p-2">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs [&::-webkit-details-marker]:hidden">
+                        <span className="font-medium">Disponibilidade opcional</span>
+                        <span className="text-[11px] leading-4 text-muted-foreground">
                           Filtra horário livre
-                        </p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
+                        </span>
+                      </summary>
+                      <div className="mt-2 grid grid-cols-2 gap-2">
                         <div className="space-y-1">
                           <Label htmlFor="available-from" className="text-xs">
                             De
@@ -1061,7 +1061,7 @@ export default function Home() {
                           />
                         </div>
                       </div>
-                    </div>
+                    </details>
                   ) : null}
                 </div>
                 </ControlPanelSection>
@@ -1090,7 +1090,7 @@ export default function Home() {
                 ) : null}
                 </div>
 
-                <div className="space-y-2 border-t border-soft pt-3 xl:shrink-0">
+                <div className="space-y-2 border-t border-soft pt-3 xl:shrink-0 xl:pt-2">
                 {searchMode === "janela" && !demoMode ? (
                   <label className="cockpit-surface flex items-start gap-2 rounded-lg border p-2 text-xs">
                     <input
@@ -1144,7 +1144,7 @@ export default function Home() {
           </aside>
 
           <section
-            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-3 xl:overflow-y-auto xl:pr-1"
+            className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full xl:gap-2"
             aria-label="Resultado da decisão"
           >
             {resultState === "content" && recommendation ? (
@@ -1242,32 +1242,32 @@ export default function Home() {
           />
         ) : (
           <section
-            className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
+            className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-1.5"
             aria-label="Resumo da consulta"
           >
-            <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-2">
-              <div className="cockpit-surface rounded-lg border px-3 py-2">
-                <p className="text-xs text-muted-foreground">Modo</p>
+            <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-1.5">
+              <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
+                <p className="text-xs text-muted-foreground xl:text-[10px]">Modo</p>
                 <p className="truncate text-sm font-medium">
                   {selectedModeOption?.label ?? "Janela perfeita"}
                 </p>
               </div>
-              <div className="cockpit-surface rounded-lg border px-3 py-2">
-                <p className="text-xs text-muted-foreground">Cidade</p>
+              <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
+                <p className="text-xs text-muted-foreground xl:text-[10px]">Cidade</p>
                 <p className="truncate text-sm font-medium">{cockpitCityLabel}</p>
               </div>
-              <div className="cockpit-surface rounded-lg border px-3 py-2">
-                <p className="text-xs text-muted-foreground">Período</p>
+              <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
+                <p className="text-xs text-muted-foreground xl:text-[10px]">Período</p>
                 <p className="truncate text-sm font-medium">{cockpitDateLabel}</p>
               </div>
-              <div className="cockpit-surface rounded-lg border px-3 py-2">
-                <p className="text-xs text-muted-foreground">Atividade</p>
+              <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
+                <p className="text-xs text-muted-foreground xl:text-[10px]">Atividade</p>
                 <p className="truncate text-sm font-medium">
                   {cockpitActivityLabel}
                 </p>
               </div>
-              <div className="cockpit-surface rounded-lg border px-3 py-2">
-                <p className="text-xs text-muted-foreground">Resultado</p>
+              <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
+                <p className="text-xs text-muted-foreground xl:text-[10px]">Resultado</p>
                 <p className="truncate text-sm font-medium">
                   {cockpitResultLabel}
                 </p>
