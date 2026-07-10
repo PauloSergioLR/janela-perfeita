@@ -63,6 +63,7 @@ interface ActivitySelectorProps {
   value: ActivityId | "";
   onChange: (activityId: ActivityId) => void;
   disabled?: boolean;
+  widePanel?: boolean;
 }
 
 export function ActivitySelector({
@@ -70,10 +71,16 @@ export function ActivitySelector({
   value,
   onChange,
   disabled = false,
+  widePanel = false,
 }: ActivitySelectorProps) {
   return (
     <div
-      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(5.5rem,1fr))]"
+      className={cn(
+        "grid gap-2 sm:grid-cols-2",
+        widePanel
+          ? "xl:grid-cols-7 xl:gap-1"
+          : "xl:grid-cols-[repeat(auto-fit,minmax(5.5rem,1fr))]",
+      )}
       role="radiogroup"
       aria-labelledby="atividade-label"
     >
@@ -88,7 +95,8 @@ export function ActivitySelector({
             type="button"
             aria-label={activity.name}
             className={cn(
-              "cockpit-surface group relative min-h-30 rounded-lg border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-14 xl:p-2",
+              "cockpit-surface group relative min-h-30 rounded-lg border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:p-2",
+              widePanel ? "xl:min-h-12" : "xl:min-h-14",
               selected
                 ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
                 : "",

@@ -723,9 +723,19 @@ export default function Home() {
           }}
         />
 
-        <section className="grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)] xl:items-stretch xl:gap-2">
+        <section
+          className={cn(
+            "grid min-w-0 gap-6 xl:h-full xl:min-h-0 xl:items-stretch xl:gap-2",
+            searchMode === "janela"
+              ? "xl:grid-cols-[clamp(420px,34vw,480px)_minmax(0,1fr)]"
+              : "xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)]",
+          )}
+        >
           <aside className="flex min-w-0 flex-col gap-4 xl:h-full xl:min-h-0 xl:gap-2">
-          <Card className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0">
+          <Card
+            className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0"
+            data-testid="control-panel"
+          >
             <CardHeader className="cockpit-surface-strong border-b xl:p-2 xl:pb-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -803,12 +813,24 @@ export default function Home() {
             </CardHeader>
             <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-2">
               <form className="flex min-h-0 flex-1 flex-col gap-3 xl:gap-3" onSubmit={handleSubmit}>
-                <div className="min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2">
+                <div
+                  className={cn(
+                    "min-h-0 space-y-3 xl:flex-1 xl:space-y-2",
+                    searchMode === "janela"
+                      ? "xl:grid xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-1 xl:space-y-0 xl:overflow-visible xl:pr-0"
+                      : "xl:overflow-y-auto xl:pr-2",
+                  )}
+                  data-testid="control-panel-content"
+                >
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
                   description="Busque uma cidade ou use a localização atual."
-                  className="order-1"
+                  compact={searchMode === "janela"}
+                  className={cn(
+                    "order-1",
+                    searchMode === "janela" && "xl:order-none",
+                  )}
                 >
                 <div className="space-y-2">
                   <Label htmlFor="city" className="text-xs">
@@ -942,11 +964,25 @@ export default function Home() {
                   number="2"
                   title="Quando?"
                   description="Defina a data e, se quiser, sua disponibilidade."
-                  className="order-2"
+                  compact={searchMode === "janela"}
+                  className={cn(
+                    "order-2",
+                    searchMode === "janela" && "xl:order-none",
+                  )}
                 >
-                <div className="grid gap-3">
+                <div
+                  className={cn(
+                    "grid gap-3",
+                    searchMode === "janela" && "xl:gap-1",
+                  )}
+                >
                   {usesDate ? (
-                    <div className="space-y-2">
+                    <div
+                      className={cn(
+                        "space-y-2",
+                        searchMode === "janela" && "xl:space-y-1",
+                      )}
+                    >
                       <div className="flex items-center justify-between gap-2">
                         <Label htmlFor="date">
                           {searchMode === "semana" ? "A partir de" : "Data"}
@@ -1019,7 +1055,12 @@ export default function Home() {
                     <details className="cockpit-surface group rounded-lg border p-2">
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs [&::-webkit-details-marker]:hidden">
                         <span className="font-medium">Disponibilidade opcional</span>
-                        <span className="text-[11px] leading-4 text-muted-foreground">
+                        <span
+                          className={cn(
+                            "text-[11px] leading-4 text-muted-foreground",
+                            searchMode === "janela" && "xl:hidden",
+                          )}
+                        >
                           Filtra horário livre
                         </span>
                       </summary>
@@ -1065,7 +1106,11 @@ export default function Home() {
                     number="3"
                     title="O que você quer fazer?"
                     description="Escolha uma atividade para receber a melhor janela."
-                    className="order-3"
+                    compact={searchMode === "janela"}
+                    className={cn(
+                      "order-3",
+                      searchMode === "janela" && "xl:order-none xl:col-span-2",
+                    )}
                   >
                   <div className="space-y-2">
                     <Label id="atividade-label" className="sr-only">
@@ -1074,6 +1119,7 @@ export default function Home() {
                     <ActivitySelector
                       activities={activities}
                       value={selectedActivityId}
+                      widePanel={searchMode === "janela"}
                       onChange={(activityId) => {
                         setSelectedActivityId(activityId);
                         resetRecommendationState();
@@ -1084,7 +1130,14 @@ export default function Home() {
                 ) : null}
                 </div>
 
-                <div className="space-y-3 border-t border-soft pt-3 xl:shrink-0 xl:pt-3">
+                <div
+                  className={cn(
+                    "space-y-3 border-t border-soft pt-3 xl:shrink-0 xl:pt-3",
+                    searchMode === "janela" &&
+                      !demoMode &&
+                      "xl:grid xl:grid-cols-[minmax(0,1fr)_auto] xl:items-stretch xl:gap-2 xl:space-y-0",
+                  )}
+                >
                 {searchMode === "janela" && !demoMode ? (
                   <label className="cockpit-surface flex items-start gap-2 rounded-lg border p-2 text-xs">
                     <input
@@ -1100,7 +1153,7 @@ export default function Home() {
                       <span className="block font-medium">
                         Comparar modelos Open-Meteo
                       </span>
-                      <span className="block leading-4 text-muted-foreground">
+                      <span className="block leading-4 text-muted-foreground xl:hidden">
                         Mostra concordância quando a recomendação for calculada.
                       </span>
                     </span>

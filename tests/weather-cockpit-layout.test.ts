@@ -78,6 +78,9 @@ describe("layout Weather Decision Cockpit", () => {
     expect(page).not.toContain("max-w-7xl");
     expect(page).not.toContain("xl:overflow-hidden");
     expect(page).toContain(
+      "xl:grid-cols-[clamp(420px,34vw,480px)_minmax(0,1fr)]",
+    );
+    expect(page).toContain(
       "xl:grid-cols-[clamp(280px,22vw,340px)_minmax(0,1fr)]",
     );
     expect(page).toContain(
@@ -122,9 +125,12 @@ describe("layout Weather Decision Cockpit", () => {
   });
 
   it("compacta painel de controle sem mover funcionalidade principal", () => {
+    expect(page).toContain("xl:overflow-visible xl:pr-0");
     expect(page).toContain(
-      "min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2",
+      "xl:grid xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]",
     );
+    expect(page).toContain('widePanel={searchMode === "janela"}');
+    expect(page).toContain('"xl:overflow-y-auto xl:pr-2"');
     expect(page).not.toContain("xl:overflow-y-auto xl:pr-1");
     expect(page).toContain("Usar localização");
     expect(page).toContain("h-11 w-full");
