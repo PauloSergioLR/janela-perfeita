@@ -802,8 +802,8 @@ export default function Home() {
               </div>
             </CardHeader>
             <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-2">
-              <form className="flex min-h-0 flex-1 flex-col gap-3 xl:gap-2" onSubmit={handleSubmit}>
-                <div className="min-h-0 space-y-3 xl:flex-1 xl:space-y-2">
+              <form className="flex min-h-0 flex-1 flex-col gap-3 xl:gap-3" onSubmit={handleSubmit}>
+                <div className="min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2">
                 <ControlPanelSection
                   number="1"
                   title="Onde?"
@@ -1084,7 +1084,7 @@ export default function Home() {
                 ) : null}
                 </div>
 
-                <div className="space-y-2 border-t border-soft pt-3 xl:shrink-0 xl:pt-2">
+                <div className="space-y-3 border-t border-soft pt-3 xl:shrink-0 xl:pt-3">
                 {searchMode === "janela" && !demoMode ? (
                   <label className="cockpit-surface flex items-start gap-2 rounded-lg border p-2 text-xs">
                     <input

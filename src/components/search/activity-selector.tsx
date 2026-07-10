@@ -73,7 +73,7 @@ export function ActivitySelector({
 }: ActivitySelectorProps) {
   return (
     <div
-      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-7 xl:gap-1"
+      className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(5.5rem,1fr))]"
       role="radiogroup"
       aria-labelledby="atividade-label"
     >
@@ -88,7 +88,7 @@ export function ActivitySelector({
             type="button"
             aria-label={activity.name}
             className={cn(
-              "cockpit-surface group relative min-h-30 rounded-lg border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-10 xl:p-1",
+              "cockpit-surface group relative min-h-30 rounded-lg border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/60 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45 xl:min-h-14 xl:p-2",
               selected
                 ? `${visual.selectedClassName} motion-safe:scale-[1.01]`
                 : "",
@@ -98,15 +98,15 @@ export function ActivitySelector({
             disabled={disabled}
             onClick={() => onChange(activity.id)}
           >
-            <span className="flex items-center gap-2 xl:flex-col xl:justify-center xl:gap-0.5 xl:text-center">
+            <span className="flex items-center gap-2 xl:flex-col xl:justify-center xl:gap-1 xl:text-center">
               <span
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-5",
+                  "flex size-10 shrink-0 items-center justify-center rounded-md bg-weather-muted/60 transition-[background-color,transform] duration-200 motion-reduce:transition-none group-hover:bg-weather-card xl:size-6",
                   selected && "bg-background/30 motion-safe:scale-105",
                 )}
               >
                 <Icon
-                  className={cn("size-5 xl:size-3", visual.iconClassName)}
+                  className={cn("size-5 xl:size-3.5", visual.iconClassName)}
                   aria-hidden="true"
                 />
               </span>
@@ -114,7 +114,7 @@ export function ActivitySelector({
                 <span className="block text-sm font-medium leading-4 xl:hidden">
                   {activity.name}
                 </span>
-                <span className="hidden text-[10px] leading-3 font-medium xl:block">
+                <span className="hidden text-[11px] leading-3 font-medium xl:block">
                   {ACTIVITY_COMPACT_LABELS[activity.id]}
                 </span>
                 <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground xl:hidden">
