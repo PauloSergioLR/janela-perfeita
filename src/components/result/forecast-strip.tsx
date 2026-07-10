@@ -275,7 +275,7 @@ export function BottomForecastStrip({
             return (
               <article
                 key={day.date}
-                className="cockpit-surface grid h-[7rem] min-w-0 flex-[0_0_clamp(10.5rem,17vw,22rem)] snap-start grid-rows-[auto_1fr_auto] rounded-lg border p-2 shadow-inner shadow-white/5 xl:h-[6rem]"
+                className="cockpit-surface flex min-h-[8.75rem] min-w-0 flex-[0_0_clamp(11.25rem,18vw,22rem)] snap-start flex-col rounded-lg border p-2.5 shadow-inner shadow-white/5 xl:min-h-[8.25rem]"
                 role="listitem"
               >
                 <div className="flex min-w-0 items-start justify-between gap-2">
@@ -292,7 +292,7 @@ export function BottomForecastStrip({
                   </div>
                 </div>
 
-                <div className="min-w-0 self-center">
+                <div className="mt-2 min-w-0 flex-1">
                   <p className="truncate text-base font-semibold tabular-nums text-slate-950 dark:text-slate-50 xl:text-sm">
                     {formatTemperatureValue(day.temperatureMax)}
                     <span className="px-1 text-xs font-medium text-muted-foreground">
@@ -300,27 +300,31 @@ export function BottomForecastStrip({
                     </span>
                     {formatTemperatureValue(day.temperatureMin)}
                   </p>
-                  <p className="mt-0.5 truncate text-[11px] leading-4 text-muted-foreground">
+                  <p className="mt-1 line-clamp-2 min-h-8 break-words text-[11px] leading-4 text-muted-foreground">
                     {shortSummary}
                   </p>
                 </div>
 
-                <div className="flex min-w-0 items-center justify-between gap-2">
+                <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                   <span
                     className={cn(
-                      "inline-flex max-w-full truncate rounded-md border px-1.5 py-0.5 text-[11px] font-medium leading-4",
+                      "inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-md border px-1.5 py-0.5 text-[11px] font-medium leading-4",
                       classificationClasses[classification.tone],
                     )}
                     title={`${classification.label}: ${shortSummary}`}
                   >
-                    {classification.label}
+                    <span className="truncate">{classification.label}</span>
                   </span>
-                  <span className="flex shrink-0 items-center gap-1 text-[11px] leading-4 text-muted-foreground">
+                  <span className="inline-flex max-w-[4.25rem] shrink-0 items-center justify-end gap-1 text-[11px] leading-4 text-muted-foreground">
                     <RainIcon
-                      className="size-3 text-weather-accent"
+                      className="size-3 shrink-0 text-weather-accent"
                       aria-hidden="true"
                     />
-                    {formatPrecipitationChance(day.precipitationProbabilityMax)}
+                    <span className="whitespace-nowrap tabular-nums">
+                      {formatPrecipitationChance(
+                        day.precipitationProbabilityMax,
+                      )}
+                    </span>
                   </span>
                 </div>
               </article>
