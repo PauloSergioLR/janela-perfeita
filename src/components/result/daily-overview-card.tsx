@@ -1,4 +1,5 @@
 import { CalendarDays, Clock3 } from "lucide-react";
+import { HourlyTimeline } from "@/components/result/hourly-timeline";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -12,7 +13,7 @@ import { getWeatherIcon, getWeatherMetricIcon } from "@/lib/ui/icon-system";
 import { formatRecommendationDate } from "@/lib/ui/recommendation-result";
 import { formatCityLabel } from "@/lib/ui/search-page";
 import { cn } from "@/lib/utils";
-import type { DailyWeatherOverview, HourlyWeather } from "@/types";
+import type { DailyWeatherOverview } from "@/types";
 
 interface DailyOverviewCardProps {
   overview: DailyWeatherOverview;
@@ -28,18 +29,6 @@ function formatDecimal(value: number | null, suffix: string): string {
 
 function formatHour(time: string): string {
   return time.slice(11, 16);
-}
-
-function getHourlyRainRisk(weather: HourlyWeather): string {
-  const precipitation = Math.max(
-    weather.precipitation,
-    weather.rain,
-    weather.showers,
-  );
-
-  return precipitation > 0
-    ? `${precipitation.toFixed(1)} mm`
-    : `${weather.precipitation_probability}%`;
 }
 
 export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
@@ -182,7 +171,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
           })}
         </div>
 
-        <section className="grid min-h-0 gap-3" aria-label="Timeline horária">
+        <section className="grid min-h-0 content-start gap-3" aria-label="Timeline horária">
           <div className="flex items-center gap-2">
             <Clock3 className="size-4 text-weather-accent" aria-hidden="true" />
             <h3 className="text-sm font-medium text-slate-950 dark:text-slate-50">
@@ -191,38 +180,7 @@ export function DailyOverviewCard({ overview }: DailyOverviewCardProps) {
           </div>
 
           {hasHourlyData ? (
-            <div className="scrollbar-none overflow-x-auto pb-1">
-              <div
-                className="flex min-w-max gap-2 xl:min-w-0"
-                role="list"
-              >
-                {overview.hourly.map((weather) => {
-                  const HourWeatherIcon = getWeatherIcon(weather.weather_code);
-
-                  return (
-                    <article
-                      key={weather.time}
-                      role="listitem"
-                      className="cockpit-surface grid w-24 shrink-0 gap-1 rounded-lg border p-2 text-center xl:w-[calc((100%-5.5rem)/12)] xl:basis-[calc((100%-5.5rem)/12)] xl:gap-0.5 xl:p-1.5"
-                    >
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {formatHour(weather.time)}
-                      </span>
-                      <HourWeatherIcon className="mx-auto size-5 text-weather-accent" aria-hidden="true" />
-                      <span className="text-base font-semibold text-slate-950 dark:text-slate-50 xl:text-sm 2xl:text-base">
-                        {Math.round(weather.temperature_2m)}°
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {getHourlyRainRisk(weather)}
-                      </span>
-                      <span className="text-xs text-muted-foreground xl:hidden 2xl:block">
-                        {Math.round(weather.wind_speed_10m)} km/h
-                      </span>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
+            <HourlyTimeline hourly={overview.hourly} />
           ) : (
             <div className="border-y border-soft py-4 text-sm text-muted-foreground">
               Sem dados horários para esta data.

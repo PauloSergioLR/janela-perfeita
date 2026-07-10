@@ -34,6 +34,13 @@ function readDailyOverviewCard() {
   );
 }
 
+function readHourlyTimeline() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/hourly-timeline.tsx"),
+    "utf8",
+  );
+}
+
 function readWeeklyOverviewCard() {
   return readFileSync(
     join(process.cwd(), "src/components/result/weekly-overview-card.tsx"),
@@ -184,6 +191,7 @@ describe("layout Weather Decision Cockpit", () => {
   it("mantem modos contextuais compactos no mesmo painel principal", () => {
     const activityRankingCard = readActivityRankingCard();
     const dailyOverviewCard = readDailyOverviewCard();
+    const hourlyTimeline = readHourlyTimeline();
     const weeklyOverviewCard = readWeeklyOverviewCard();
 
     expect(page).toContain("<ActivityRankingCard ranking={activityRanking} />");
@@ -194,8 +202,9 @@ describe("layout Weather Decision Cockpit", () => {
     );
     expect(activityRankingCard).toContain("xl:h-full xl:min-h-0");
     expect(activityRankingCard).toContain("xl:grid-cols-2");
-    expect(dailyOverviewCard).toContain("xl:basis-[calc((100%-5.5rem)/12)]");
-    expect(dailyOverviewCard).toContain("scrollbar-none overflow-x-auto");
+    expect(dailyOverviewCard).toContain("<HourlyTimeline hourly={overview.hourly} />");
+    expect(hourlyTimeline).toContain("w-24 shrink-0");
+    expect(hourlyTimeline).toContain("overflow-x-auto");
     expect(weeklyOverviewCard).toContain("Resumo da semana");
     expect(weeklyOverviewCard).not.toContain("overflow-x-auto");
   });
