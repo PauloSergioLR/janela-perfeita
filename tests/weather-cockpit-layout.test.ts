@@ -122,7 +122,9 @@ describe("layout Weather Decision Cockpit", () => {
   });
 
   it("compacta painel de controle sem mover funcionalidade principal", () => {
-    expect(page).toContain("xl:flex-1 xl:space-y-2");
+    expect(page).toContain(
+      "min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2",
+    );
     expect(page).not.toContain("xl:overflow-y-auto xl:pr-1");
     expect(page).toContain("Usar localização");
     expect(page).toContain("h-11 w-full");

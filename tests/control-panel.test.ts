@@ -23,7 +23,12 @@ describe("painel lateral de controle", () => {
     expect(page).toContain("glass-card");
     expect(page).toContain("glow-primary h-11 w-full");
     expect(page).toContain("xl:shrink-0");
-    expect(page).toContain("xl:flex-1 xl:space-y-2");
+    expect(page).toContain("xl:overflow-y-auto");
+    expect(page).toContain(
+      "min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2",
+    );
+    expect(page).toContain("space-y-3 border-t border-soft pt-3");
+    expect(page).not.toContain("min-h-0 space-y-3 xl:flex-1 xl:space-y-2");
     expect(page).not.toContain("xl:overflow-y-auto xl:pr-1");
     expect(section).toContain("border-t border-soft");
     expect(section).not.toContain("MapLibre");
