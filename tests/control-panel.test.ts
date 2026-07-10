@@ -23,12 +23,19 @@ describe("painel lateral de controle", () => {
     expect(page).toContain("glass-card");
     expect(page).toContain("glow-primary h-11 w-full");
     expect(page).toContain("xl:shrink-0");
-    expect(page).toContain("xl:overflow-y-auto");
+    expect(page).toContain('searchMode === "janela"');
     expect(page).toContain(
-      "min-h-0 space-y-3 xl:flex-1 xl:overflow-y-auto xl:space-y-2 xl:pr-2",
+      "xl:grid xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-1 xl:space-y-0 xl:overflow-visible xl:pr-0",
     );
+    expect(page).toContain(
+      '"xl:overflow-y-auto xl:pr-2"',
+    );
+    expect(page).toContain(
+      "xl:grid-cols-[clamp(420px,34vw,480px)_minmax(0,1fr)]",
+    );
+    expect(page).toContain('widePanel={searchMode === "janela"}');
     expect(page).toContain("space-y-3 border-t border-soft pt-3");
-    expect(page).not.toContain("min-h-0 space-y-3 xl:flex-1 xl:space-y-2");
+    expect(page).toContain("min-h-0 space-y-3 xl:flex-1 xl:space-y-2");
     expect(page).not.toContain("xl:overflow-y-auto xl:pr-1");
     expect(section).toContain("border-t border-soft");
     expect(section).not.toContain("MapLibre");

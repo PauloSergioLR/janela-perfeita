@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const DESKTOP_VIEWPORTS = [
+  { width: 1280, height: 720 },
   { width: 1366, height: 768 },
   { width: 1440, height: 900 },
   { width: 1600, height: 900 },
@@ -133,6 +134,38 @@ async function expectCockpitLayout(page: Page, context: string) {
   );
 }
 
+async function expectPerfectWindowControlPanel(page: Page, context: string) {
+  const metrics = await page.getByTestId("control-panel").evaluate((panel) => {
+    const content = panel.querySelector<HTMLElement>(
+      '[data-testid="control-panel-content"]',
+    );
+
+    return {
+      contentClientHeight: content?.clientHeight ?? 0,
+      contentOverflowY: content ? getComputedStyle(content).overflowY : "",
+      contentScrollHeight: content?.scrollHeight ?? 0,
+      panelWidth: panel.getBoundingClientRect().width,
+    };
+  });
+
+  expect(
+    metrics.panelWidth,
+    `${context}: painel lateral deve ficar mais largo`,
+  ).toBeGreaterThanOrEqual(420);
+  expect(
+    metrics.panelWidth,
+    `${context}: painel lateral não deve dominar o cockpit`,
+  ).toBeLessThanOrEqual(481);
+  expect(
+    metrics.contentOverflowY,
+    `${context}: conteúdo não deve usar rolagem interna`,
+  ).toBe("visible");
+  expect(
+    metrics.contentScrollHeight,
+    `${context}: conteúdo deve caber sem cortes`,
+  ).toBeLessThanOrEqual(metrics.contentClientHeight + LAYOUT_TOLERANCE_PX);
+}
+
 test.describe("QA visual do cockpit desktop", () => {
   for (const viewport of DESKTOP_VIEWPORTS) {
     test(`não gera scroll ou cortes em ${viewport.width}x${viewport.height}`, async ({
@@ -142,6 +175,7 @@ test.describe("QA visual do cockpit desktop", () => {
       await openCockpitDemo(page);
 
       await expectCockpitLayout(page, "estado inicial");
+      await expectPerfectWindowControlPanel(page, "estado inicial");
       await expectWithinViewport(
         page.getByRole("button", { name: "Encontrar janela" }),
         page,
@@ -161,6 +195,7 @@ test.describe("QA visual do cockpit desktop", () => {
       await expect((await recommendationResponse).ok()).toBe(true);
       await expect(page.getByText("Janela recomendada")).toBeVisible();
       await expectCockpitLayout(page, "resultado calculado");
+      await expectPerfectWindowControlPanel(page, "resultado calculado");
 
       for (const mode of MAIN_MODES) {
         await page.getByRole("radio", { name: mode.name }).click();
@@ -174,6 +209,15 @@ test.describe("QA visual do cockpit desktop", () => {
         );
         await expectCockpitLayout(page, `modo ${mode.name}`);
       }
+
+      await page.goto("/");
+      await expect(page.getByText("Comparar modelos Open-Meteo")).toBeVisible();
+      await expectPerfectWindowControlPanel(page, "modo padrão");
+      await expectWithinViewport(
+        page.getByRole("button", { name: "Encontrar janela" }),
+        page,
+        "CTA com comparação de modelos",
+      );
     });
   }
 });
