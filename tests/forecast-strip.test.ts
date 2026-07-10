@@ -120,6 +120,11 @@ describe("ForecastStrip", () => {
     expect(source).toContain("ChevronLeft");
     expect(source).toContain("ChevronRight");
     expect(source).toContain("Ver próximos dias");
+    expect(source).toContain("flex min-h-[8.75rem]");
+    expect(source).toContain("grid-cols-[minmax(0,1fr)_auto]");
+    expect(source).toContain("line-clamp-2 min-h-8");
+    expect(source).toContain("whitespace-nowrap tabular-nums");
+    expect(source).not.toContain("xl:h-[6rem]");
     expect(source).not.toContain("min-w-max");
     expect(source).not.toContain("w-44");
     expect(source).toContain("getWeatherIcon");
