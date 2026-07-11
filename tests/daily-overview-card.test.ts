@@ -11,6 +11,13 @@ function readDailyOverviewCard() {
   );
 }
 
+function readHourlyTimeline() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/hourly-timeline.tsx"),
+    "utf8",
+  );
+}
+
 describe("DailyOverviewCard", () => {
   it("calcula umidade média e horas de sol com dados reais", () => {
     const summary = getDailyClimateSummary([
@@ -38,10 +45,24 @@ describe("DailyOverviewCard", () => {
     expect(source).toContain("tabular-nums");
     expect(source).toContain("line-clamp-1");
     expect(source).toContain('aria-label="Timeline horária"');
-    expect(source).toContain('role="list"');
-    expect(source).toContain("overflow-x-auto");
+    expect(source).toContain("<HourlyTimeline hourly={overview.hourly} />");
     expect(source).toContain("getWeatherIcon");
     expect(source).not.toContain("MapLibre");
     expect(source).not.toContain("maptiler");
+  });
+
+  it("oferece navegação horizontal adaptável e acessível", () => {
+    const source = readHourlyTimeline();
+
+    expect(source).toContain('aria-label="Ver horários anteriores"');
+    expect(source).toContain('aria-label="Ver próximos horários"');
+    expect(source).toContain("disabled={!canScrollLeft}");
+    expect(source).toContain("disabled={!canScrollRight}");
+    expect(source).toContain("container.clientWidth * 0.85");
+    expect(source).toContain('behavior: "smooth"');
+    expect(source).toContain("overflow-x-auto");
+    expect(source).toContain("hourly.map");
+    expect(source).toContain('role="list"');
+    expect(source).not.toContain("transform: scale");
   });
 });
