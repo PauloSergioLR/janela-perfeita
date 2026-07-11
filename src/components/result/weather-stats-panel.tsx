@@ -47,6 +47,7 @@ export function WeatherStatsPanel({
     <section
       className={cn("min-w-0 space-y-3", isCompact && "space-y-1.5", className)}
       aria-label="Estatísticas climáticas"
+      data-testid="weather-stats"
     >
       <div className="flex min-w-0 items-center gap-2">
         <HeaderIcon

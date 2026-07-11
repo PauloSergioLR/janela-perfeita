@@ -257,11 +257,14 @@ export function RecommendationCard({
         {activeTab === "summary" ? (
           <section
             id="recommendation-panel-summary"
-            className="grid min-h-0 gap-2 xl:h-full xl:grid-rows-[minmax(0,1fr)_auto]"
+            className="grid min-h-0 gap-2 xl:h-full xl:grid-rows-[minmax(0,1fr)_auto] min-[1800px]:grid-rows-[minmax(0,1fr)_auto_auto]"
             role="tabpanel"
             aria-labelledby="recommendation-tab-summary"
           >
-            <div className="grid min-w-0 gap-2 xl:min-h-0 xl:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)_minmax(210px,0.5fr)]">
+            <div
+              className="grid min-w-0 gap-2 xl:min-h-0 xl:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)_minmax(210px,0.5fr)]"
+              data-testid="recommendation-summary-main"
+            >
               <section className="score-orb grid min-h-40 place-items-center rounded-lg border border-weather-accent/25 bg-weather-card/65 p-3 shadow-inner shadow-white/10 xl:min-h-0">
                 <div className="grid place-items-center gap-2">
                   <ScoreRing score={displayScore} className="!w-32 2xl:!w-44" />
@@ -279,7 +282,7 @@ export function RecommendationCard({
                         className="size-4 text-weather-accent"
                         aria-hidden="true"
                       />
-                      Janela recomendada
+                      Melhor janela para
                     </span>
                     {bestWindow ? (
                       <Badge
@@ -295,19 +298,34 @@ export function RecommendationCard({
                       </Badge>
                     ) : null}
                   </div>
-                  <p className="mt-1 text-2xl leading-tight font-semibold text-slate-950 dark:text-slate-50 2xl:text-4xl">
-                    {decisionWindow}
+                  <p className="mt-1 text-xl leading-tight font-semibold text-slate-950 dark:text-slate-50 2xl:text-3xl">
+                    {recommendation.activity.name}
                   </p>
-                  {bestWindow ? (
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      {recommendation.activity.name} ·{" "}
-                      {formatDurationHours(bestWindow.durationHours)}
+                  <div className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <p
+                      className={cn(
+                        "text-2xl leading-none font-semibold tabular-nums text-slate-950 dark:text-slate-50",
+                        bestWindow ? "2xl:text-4xl" : "2xl:text-2xl",
+                      )}
+                    >
+                      {decisionWindow}
                     </p>
-                  ) : (
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      {recommendation.activity.name}
-                    </p>
-                  )}
+                    {bestWindow ? (
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {formatDurationHours(bestWindow.durationHours)}
+                      </span>
+                    ) : null}
+                  </div>
+                  <span
+                    className={cn(
+                      "inline-flex w-fit items-center rounded-md border border-weather-accent/35 bg-weather-accent/10 font-medium text-weather-accent",
+                      bestWindow
+                        ? "mt-2 px-2 py-1 text-[10px]"
+                        : "mt-1 px-1.5 py-0.5 text-[9px]",
+                    )}
+                  >
+                    Janela recomendada
+                  </span>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex min-w-0 items-center gap-1.5">
                       <CalendarDays
@@ -362,7 +380,7 @@ export function RecommendationCard({
                 )}
 
                 {timeFilterNotice ? (
-                  <div className="line-clamp-2 rounded-lg border border-sky-200 bg-sky-50 p-2 text-xs leading-4 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
+                  <div className="line-clamp-1 rounded-lg border border-sky-200 bg-sky-50 px-2 py-1 text-[10px] leading-4 text-sky-950 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-100">
                     {timeFilterNotice}
                   </div>
                 ) : null}
@@ -374,13 +392,26 @@ export function RecommendationCard({
                   sunrise={recommendation.sunrise}
                   sunset={recommendation.sunset}
                   variant="compact"
-                  limit={4}
+                  limit={6}
                 />
               </aside>
             </div>
 
-            <div className="cockpit-surface rounded-lg border p-2">
+            <div
+              className="cockpit-surface rounded-lg border p-2"
+              data-testid="recommendation-reasons"
+            >
               <ReasonChips rules={reasonRules} density="compact" limit={4} />
+            </div>
+
+            <div
+              className="hidden min-h-0 min-[1800px]:block"
+              data-testid="recommendation-timeline"
+            >
+              <OpportunityTimeline
+                recommendation={recommendation}
+                variant="embedded"
+              />
             </div>
           </section>
         ) : null}

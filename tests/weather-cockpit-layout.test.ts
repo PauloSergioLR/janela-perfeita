@@ -55,6 +55,27 @@ function readOpportunityTimeline() {
   );
 }
 
+function readThemeToggle() {
+  return readFileSync(
+    join(process.cwd(), "src/components/ui/theme-toggle.tsx"),
+    "utf8",
+  );
+}
+
+function readHowItWorksPage() {
+  return readFileSync(
+    join(process.cwd(), "src/app/como-funciona/page.tsx"),
+    "utf8",
+  );
+}
+
+function readAttributionFooter() {
+  return readFileSync(
+    join(process.cwd(), "src/components/result/attribution-footer.tsx"),
+    "utf8",
+  );
+}
+
 function readScoreBreakdown() {
   return readFileSync(
     join(process.cwd(), "src/components/result/score-breakdown.tsx"),
@@ -125,10 +146,30 @@ describe("layout Weather Decision Cockpit", () => {
   });
 
   it("apresenta marca, subtitulo e acao discreta no header", () => {
+    const themeToggle = readThemeToggle();
+
     expect(page).toContain("CircleHelp");
     expect(page).toContain("Clima por decisão");
-    expect(page).toContain("Previsão por hora");
-    expect(page).toContain("glow-primary");
+    expect(page).toContain("<ThemeToggle />");
+    expect(page).toContain('data-testid="header-actions"');
+    expect(themeToggle).toContain('aria-label="Alternar tema"');
+    expect(themeToggle).not.toContain("fixed top-");
+  });
+
+  it("explica modos, fonte unica, privacidade e limites", () => {
+    const howItWorksPage = readHowItWorksPage();
+    const attributionFooter = readAttributionFooter();
+
+    expect(howItWorksPage).toContain("Janela perfeita");
+    expect(howItWorksPage).toContain("O que fazer hoje?");
+    expect(howItWorksPage).toContain("Consulta do dia");
+    expect(howItWorksPage).toContain("Consulta da semana");
+    expect(howItWorksPage).toContain("somente a Open-Meteo");
+    expect(howItWorksPage).toContain("Não existe login");
+    expect(howItWorksPage).toContain("alertas oficiais");
+    expect(howItWorksPage).not.toContain("MET Norway");
+    expect(attributionFooter).toContain("Open-Meteo");
+    expect(attributionFooter).not.toContain("MET Norway");
   });
 
   it("compacta painel de controle sem mover funcionalidade principal", () => {
@@ -161,7 +202,7 @@ describe("layout Weather Decision Cockpit", () => {
     expect(recommendationCard).toContain('variant="embedded"');
     expect(recommendationCard).toContain('variant="compact"');
     expect(recommendationCard).toContain('density="compact"');
-    expect(recommendationCard).toContain("limit={4}");
+    expect(recommendationCard).toContain("limit={6}");
     expect(recommendationCard).toContain("showViewTabs={false}");
     expect(recommendationCard).toContain('defaultView="weekly"');
     expect(recommendationCard).toContain("<WeatherStatsPanel");

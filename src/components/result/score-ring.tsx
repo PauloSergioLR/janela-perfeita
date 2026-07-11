@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import {
   getScoreRingBand,
   getScoreRingStrokeOffset,
@@ -30,6 +30,7 @@ function getToneClassName(tone: ReturnType<typeof getScoreRingBand>["tone"]): st
 
 export function ScoreRing({ score, className }: ScoreRingProps) {
   const [isFilled, setIsFilled] = useState(false);
+  const gradientId = useId().replaceAll(":", "");
   const normalizedScore = normalizeScore(score);
   const band = getScoreRingBand(normalizedScore);
   const strokeDashoffset = getScoreRingStrokeOffset(
@@ -60,13 +61,17 @@ export function ScoreRing({ score, className }: ScoreRingProps) {
         aria-hidden="true"
       />
       <svg
-        className={cn(
-          "relative size-full -rotate-90 drop-shadow-[0_0_22px_currentColor]",
-          getToneClassName(band.tone),
-        )}
+        className="relative size-full -rotate-90 drop-shadow-[0_0_22px_var(--weather-cyan)]"
         viewBox="0 0 120 120"
         aria-hidden="true"
       >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--weather-electric)" />
+            <stop offset="52%" stopColor="var(--weather-cyan)" />
+            <stop offset="100%" stopColor="var(--weather-mint)" />
+          </linearGradient>
+        </defs>
         <circle
           cx="60"
           cy="60"
@@ -84,10 +89,8 @@ export function ScoreRing({ score, className }: ScoreRingProps) {
           strokeLinecap="round"
           strokeDasharray={RING_CIRCUMFERENCE}
           strokeDashoffset={isFilled ? strokeDashoffset : RING_CIRCUMFERENCE}
-          className={cn(
-            "stroke-current transition-[stroke-dashoffset] duration-700 ease-out motion-reduce:transition-none",
-            getToneClassName(band.tone),
-          )}
+          stroke={`url(#${gradientId})`}
+          className="transition-[stroke-dashoffset] duration-700 ease-out motion-reduce:transition-none"
         />
       </svg>
       <div className="absolute grid place-items-center text-center">

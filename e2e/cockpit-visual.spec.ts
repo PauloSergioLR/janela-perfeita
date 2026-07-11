@@ -17,6 +17,69 @@ const MAIN_MODES = [
 
 const LAYOUT_TOLERANCE_PX = 4;
 
+async function expectNoIntersection(
+  first: Locator,
+  second: Locator,
+  label: string,
+) {
+  const [firstBox, secondBox] = await Promise.all([
+    first.boundingBox(),
+    second.boundingBox(),
+  ]);
+
+  expect(firstBox, `${label}: primeiro elemento deve existir`).not.toBeNull();
+  expect(secondBox, `${label}: segundo elemento deve existir`).not.toBeNull();
+
+  if (!firstBox || !secondBox) {
+    return;
+  }
+
+  const horizontalGap = Math.max(
+    secondBox.x - (firstBox.x + firstBox.width),
+    firstBox.x - (secondBox.x + secondBox.width),
+  );
+  const verticalGap = Math.max(
+    secondBox.y - (firstBox.y + firstBox.height),
+    firstBox.y - (secondBox.y + secondBox.height),
+  );
+
+  expect(
+    Math.max(horizontalGap, verticalGap),
+    `${label}: elementos não devem se sobrepor`,
+  ).toBeGreaterThanOrEqual(-LAYOUT_TOLERANCE_PX);
+}
+
+async function expectContained(
+  container: Locator,
+  child: Locator,
+  label: string,
+) {
+  const [containerBox, childBox] = await Promise.all([
+    container.boundingBox(),
+    child.boundingBox(),
+  ]);
+
+  expect(containerBox, `${label}: container deve existir`).not.toBeNull();
+  expect(childBox, `${label}: conteúdo deve existir`).not.toBeNull();
+
+  if (!containerBox || !childBox) {
+    return;
+  }
+
+  expect(childBox.x).toBeGreaterThanOrEqual(
+    containerBox.x - LAYOUT_TOLERANCE_PX,
+  );
+  expect(childBox.y).toBeGreaterThanOrEqual(
+    containerBox.y - LAYOUT_TOLERANCE_PX,
+  );
+  expect(childBox.x + childBox.width).toBeLessThanOrEqual(
+    containerBox.x + containerBox.width + LAYOUT_TOLERANCE_PX,
+  );
+  expect(childBox.y + childBox.height).toBeLessThanOrEqual(
+    containerBox.y + containerBox.height + LAYOUT_TOLERANCE_PX,
+  );
+}
+
 async function openCockpitDemo(page: Page) {
   await page.goto("/?demo=true");
   await expect(
@@ -126,11 +189,21 @@ async function expectCockpitLayout(page: Page, context: string) {
   await expectWithinViewport(
     page
       .locator(
-        'section[aria-label="Resumo da consulta"], section[aria-label="Previsão dos próximos dias"]',
+        'section[aria-label="Resumo da consulta"]:visible, section[aria-label="Previsão dos próximos dias"]:visible, section[aria-label="Faixa climática dos próximos dias"]:visible',
       )
       .first(),
     page,
     `${context}: faixa inferior`,
+  );
+  await expectNoIntersection(
+    page.getByTestId("theme-toggle"),
+    page.getByTestId("how-it-works-link"),
+    `${context}: tema e Como funciona`,
+  );
+  await expectNoIntersection(
+    page.getByTestId("control-panel"),
+    page.getByLabel("Resultado da decisão"),
+    `${context}: painel lateral e resultado`,
   );
 }
 
@@ -184,6 +257,11 @@ test.describe("QA visual do cockpit desktop", () => {
 
       await selectDemoCity(page);
       await page.getByRole("radio", { name: "Correr" }).click();
+      await expectNoIntersection(
+        page.getByTestId("activity-selector"),
+        page.getByRole("button", { name: "Encontrar janela" }),
+        "atividades e CTA",
+      );
 
       const recommendationResponse = page.waitForResponse(
         (response) =>
@@ -196,6 +274,29 @@ test.describe("QA visual do cockpit desktop", () => {
       await expect(page.getByText("Janela recomendada")).toBeVisible();
       await expectCockpitLayout(page, "resultado calculado");
       await expectPerfectWindowControlPanel(page, "resultado calculado");
+      await expectNoIntersection(
+        page.getByTestId("recommendation-summary-main"),
+        page.getByTestId("recommendation-reasons"),
+        "resumo e motivos",
+      );
+      await expectContained(
+        page.getByLabel("Resultado da decisão"),
+        page.getByTestId("weather-stats"),
+        "estatísticas dentro do resultado",
+      );
+
+      if (viewport.width >= 1800) {
+        await expectNoIntersection(
+          page.getByTestId("recommendation-reasons"),
+          page.getByTestId("recommendation-timeline"),
+          "motivos e timeline",
+        );
+        await expectContained(
+          page.getByLabel("Resultado da decisão"),
+          page.getByTestId("recommendation-timeline"),
+          "timeline dentro do resultado",
+        );
+      }
 
       for (const mode of MAIN_MODES) {
         await page.getByRole("radio", { name: mode.name }).click();

@@ -25,11 +25,12 @@ export function ModeSelector({
 }: ModeSelectorProps) {
   return (
     <section
-      className="glass-card rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2"
+      className="glass-panel rounded-xl p-2 sm:p-3 xl:shrink-0 xl:p-1.5"
       aria-labelledby="modo-label"
+      data-testid="mode-navigation"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-2">
-        <div className="space-y-1">
+      <div className="grid gap-3 lg:grid-cols-[minmax(180px,0.28fr)_minmax(0,1fr)] lg:items-center xl:block">
+        <div className="space-y-1 xl:sr-only">
           <p id="modo-label" className="text-sm font-medium text-foreground">
             Modo
           </p>
@@ -38,7 +39,7 @@ export function ModeSelector({
           </p>
         </div>
         <div
-          className="cockpit-surface grid gap-1.5 rounded-lg border p-1.5 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-4"
           role="radiogroup"
           aria-labelledby="modo-label"
         >
@@ -53,9 +54,9 @@ export function ModeSelector({
                 role="radio"
                 aria-checked={selected}
                 className={cn(
-                  "group relative min-h-20 rounded-md border border-transparent bg-background/25 p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/50 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none xl:min-h-11 xl:p-1.5 2xl:min-h-14 2xl:p-2",
+                  "group relative min-h-20 rounded-lg border border-soft bg-background/25 p-3 text-left shadow-inner shadow-white/5 transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none hover:border-weather-accent/50 hover:bg-weather-card focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none xl:min-h-11 xl:p-1.5 2xl:min-h-14 2xl:p-2",
                   selected
-                    ? "cockpit-active text-foreground shadow-weather-glow motion-safe:scale-[1.01]"
+                    ? "mode-active text-white shadow-weather-glow motion-safe:scale-[1.01]"
                     : "",
                 )}
                 onClick={() => onChange(mode.id)}
@@ -65,24 +66,30 @@ export function ModeSelector({
                     className={cn(
                       "flex size-9 shrink-0 items-center justify-center rounded-md border border-soft bg-weather-muted/45 transition-[background-color,transform,border-color] duration-200 motion-reduce:transition-none xl:size-7 2xl:size-8",
                       selected &&
-                        "border-weather-accent/45 bg-weather-accent/20 motion-safe:scale-105",
+                        "border-white/35 bg-white/12 motion-safe:scale-105",
                     )}
                   >
                     <Icon
-                      className="size-4 text-weather-accent"
+                      className={cn(
+                        "size-4 text-weather-accent",
+                        selected && "text-weather-cyan",
+                      )}
                       aria-hidden="true"
                     />
                   </span>
                   <span className="min-w-0">
                     <span className="block font-medium">{mode.label}</span>
-                    <span className="block text-xs leading-5 text-muted-foreground xl:hidden">
+                    <span className={cn(
+                      "block text-xs leading-5 text-muted-foreground xl:hidden",
+                      selected && "text-white/75",
+                    )}>
                       {mode.description}
                     </span>
                   </span>
                 </span>
                 {selected ? (
                   <Check
-                    className="motion-selection-check absolute top-3 right-3 size-3.5 text-weather-accent"
+                    className="motion-selection-check absolute top-3 right-3 size-3.5 text-weather-cyan"
                     aria-hidden="true"
                   />
                 ) : null}
