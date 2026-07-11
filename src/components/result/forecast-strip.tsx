@@ -24,6 +24,7 @@ interface ForecastStripProps {
   defaultView?: ForecastStripView;
   showViewTabs?: boolean;
   className?: string;
+  ariaLabel?: string;
 }
 
 interface ScrollState {
@@ -50,6 +51,26 @@ function formatPrecipitationChance(value: number | null): string {
   return value === null ? "--" : `${Math.round(value)}%`;
 }
 
+function getWeatherIconTone(weatherCode: number | null): string {
+  if (weatherCode === 0 || weatherCode === 1) {
+    return "border-amber-400/35 bg-amber-400/10 text-amber-300";
+  }
+
+  if (weatherCode !== null && weatherCode >= 51 && weatherCode < 70) {
+    return "border-sky-400/35 bg-sky-400/10 text-sky-300";
+  }
+
+  if (weatherCode !== null && weatherCode >= 70 && weatherCode < 80) {
+    return "border-cyan-200/35 bg-cyan-200/10 text-cyan-100";
+  }
+
+  if (weatherCode !== null && weatherCode >= 80) {
+    return "border-violet-400/35 bg-violet-400/10 text-violet-300";
+  }
+
+  return "border-slate-300/35 bg-slate-300/10 text-slate-300";
+}
+
 function getScrollState(viewport: HTMLDivElement): ScrollState {
   const maxScrollLeft = viewport.scrollWidth - viewport.clientWidth;
 
@@ -65,6 +86,7 @@ export function BottomForecastStrip({
   defaultView = DEFAULT_VIEW,
   showViewTabs = true,
   className,
+  ariaLabel = "Previsão dos próximos dias",
   title = "Próximos dias",
 }: ForecastStripProps) {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -161,7 +183,7 @@ export function BottomForecastStrip({
         "glass-panel min-w-0 rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-2",
         className,
       )}
-      aria-label="Previsão dos próximos dias"
+      aria-label={ariaLabel}
     >
       <div className="grid min-w-0 gap-2 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
         <div className="flex min-w-0 items-center gap-2">
@@ -275,7 +297,10 @@ export function BottomForecastStrip({
             return (
               <article
                 key={day.date}
-                className="cockpit-surface flex min-h-[8.75rem] min-w-0 flex-[0_0_clamp(11.25rem,18vw,22rem)] snap-start flex-col rounded-lg border p-2.5 shadow-inner shadow-white/5 xl:min-h-[8.25rem]"
+                className={cn(
+                  "cockpit-surface flex min-h-[8.75rem] min-w-0 flex-[0_0_clamp(11.25rem,18vw,22rem)] snap-start flex-col rounded-lg border p-2.5 shadow-inner shadow-white/5 xl:min-h-[8.25rem]",
+                  day.date === todayDate && "cockpit-active",
+                )}
                 role="listitem"
               >
                 <div className="flex min-w-0 items-start justify-between gap-2">
@@ -287,7 +312,12 @@ export function BottomForecastStrip({
                       {formatForecastDate(day.date)}
                     </p>
                   </div>
-                  <div className="grid size-7 shrink-0 place-items-center rounded-md border border-weather-accent/30 bg-weather-accent/10 text-weather-accent">
+                  <div
+                    className={cn(
+                      "grid size-8 shrink-0 place-items-center rounded-md border",
+                      getWeatherIconTone(day.weatherCode),
+                    )}
+                  >
                     <WeatherIcon className="size-4" aria-hidden="true" />
                   </div>
                 </div>

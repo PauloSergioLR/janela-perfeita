@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getAllActivities } from "@/lib/domain/activities";
 import {
   buildCurrentLocationCity,
@@ -637,80 +638,49 @@ export default function Home() {
       <WeatherStage variant={weatherStageVariant} />
       <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-3 xl:py-2 2xl:px-5">
       <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-2">
-        <header className="glass-panel relative grid gap-5 overflow-hidden rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-2 xl:p-2">
+        <header className="app-header relative flex min-w-0 flex-wrap items-center justify-between gap-3 px-2 py-1.5 sm:px-3 xl:py-1">
           <div
-            className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-weather-accent/55 to-transparent"
+            className="pointer-events-none absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-weather-accent/45 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10 xl:size-10">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="brand-mark flex size-12 shrink-0 items-center justify-center rounded-xl border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10 xl:size-10">
               <CloudSun
                 className="size-6 text-weather-accent xl:size-5"
                 aria-hidden="true"
               />
             </div>
-            <div className="min-w-0 space-y-1">
-              <p className="text-sm font-medium text-weather-accent">
-                Clima por decisão
-              </p>
-              <h1 className="text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-3xl xl:text-2xl">
+            <div className="min-w-0">
+              <h1 className="font-heading text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 sm:text-3xl xl:text-2xl">
                 Janela Perfeita
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 xl:hidden">
-                Previsão horária para decidir o melhor momento de cada atividade.
+              <p className="text-sm font-medium text-muted-foreground">
+                Clima por decisão
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-            <Badge
-              variant="outline"
-              className="h-7 border-weather-accent/50 bg-weather-accent/10 px-3 text-weather-accent shadow-inner shadow-white/5"
-            >
-              Previsão por hora
-            </Badge>
-            <Badge
-              variant="outline"
-              className="h-7 border-success/45 bg-success/10 px-3 text-success shadow-inner shadow-white/5"
-            >
-              Open-Meteo
-            </Badge>
+          <div
+            className="flex min-w-0 items-center justify-end gap-2"
+            data-testid="header-actions"
+          >
             {demoMode ? (
               <Badge
                 variant="outline"
-                className="h-7 border-warning/45 bg-warning/10 px-3 text-warning"
+                className="hidden h-8 border-warning/45 bg-warning/10 px-3 text-warning sm:inline-flex"
               >
                 Modo demo
               </Badge>
             ) : null}
             <Link
               href="/como-funciona"
-              className="inline-flex h-8 items-center gap-2 rounded-md border border-soft bg-background/40 px-3 text-xs font-medium text-muted-foreground transition hover:border-weather-accent/50 hover:bg-weather-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-10 min-w-0 items-center gap-2 rounded-lg border border-soft bg-background/40 px-3 text-sm font-medium text-muted-foreground shadow-inner shadow-white/5 backdrop-blur-sm transition hover:border-weather-accent/50 hover:bg-weather-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              data-testid="how-it-works-link"
             >
-              <CircleHelp className="size-3.5" aria-hidden="true" />
-              Como funciona
+              <CircleHelp className="size-4 shrink-0" aria-hidden="true" />
+              <span className="hidden sm:inline">Como funciona</span>
             </Link>
-          </div>
-
-          <div className="grid min-w-0 grid-cols-3 gap-2 border-t border-soft pt-4 text-center lg:col-span-2 xl:hidden xl:border-t-0 xl:pt-0">
-            <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
-                {activities.length}
-              </p>
-              <p className="text-xs text-muted-foreground xl:text-[10px]">atividades</p>
-            </div>
-            <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
-                7
-              </p>
-              <p className="text-xs text-muted-foreground xl:text-[10px]">dias</p>
-            </div>
-            <div className="cockpit-surface rounded-md border px-3 py-2">
-              <p className="text-lg font-semibold text-slate-950 dark:text-slate-50 xl:text-base">
-                0-100
-              </p>
-              <p className="text-xs text-muted-foreground xl:text-[10px]">score</p>
-            </div>
+            <ThemeToggle />
           </div>
         </header>
 
@@ -736,7 +706,7 @@ export default function Home() {
             className="glass-card overflow-visible rounded-xl xl:h-full xl:min-h-0 xl:shrink-0"
             data-testid="control-panel"
           >
-            <CardHeader className="cockpit-surface-strong border-b xl:p-2 xl:pb-2">
+            <CardHeader className="cockpit-surface-strong border-b xl:p-2 xl:pb-2 min-[1800px]:p-4 min-[1800px]:pb-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <CardTitle>Painel de controle</CardTitle>
@@ -811,13 +781,13 @@ export default function Home() {
                 </details>
               </div>
             </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-2">
+            <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-5 xl:p-2 min-[1800px]:p-4">
               <form className="flex min-h-0 flex-1 flex-col gap-3 xl:gap-3" onSubmit={handleSubmit}>
                 <div
                   className={cn(
                     "min-h-0 space-y-3 xl:flex-1 xl:space-y-2",
                     searchMode === "janela"
-                      ? "xl:grid xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-1 xl:space-y-0 xl:overflow-visible xl:pr-0"
+                      ? "xl:grid xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-1 xl:space-y-0 xl:overflow-visible xl:pr-0 2xl:flex 2xl:flex-col 2xl:gap-1 2xl:space-y-0 min-[1800px]:gap-3"
                       : "xl:overflow-y-auto xl:pr-2",
                   )}
                   data-testid="control-panel-content"
@@ -1291,10 +1261,25 @@ export default function Home() {
             subtitle={contextualForecastSubtitle}
           />
         ) : (
-          <section
-            className="glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-1.5"
-            aria-label="Resumo da consulta"
-          >
+          <>
+            {resultState === "content" && forecastStrip ? (
+              <BottomForecastStrip
+                overview={forecastStrip}
+                title="Próximos dias"
+                subtitle={contextualForecastSubtitle}
+                className="hidden min-[1800px]:block"
+                ariaLabel="Faixa climática dos próximos dias"
+              />
+            ) : null}
+            <section
+              className={cn(
+                "glass-panel rounded-xl p-3 sm:p-4 xl:shrink-0 xl:p-1.5",
+                resultState === "content" &&
+                  forecastStrip &&
+                  "min-[1800px]:hidden",
+              )}
+              aria-label="Resumo da consulta"
+            >
             <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:gap-1.5">
               <div className="cockpit-surface rounded-lg border px-3 py-2 xl:px-2 xl:py-1.5">
                 <p className="text-xs text-muted-foreground xl:text-[10px]">Modo</p>
@@ -1323,7 +1308,8 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          </section>
+            </section>
+          </>
         )}
 
         <AttributionFooter disclaimer={resultDisclaimer} />
