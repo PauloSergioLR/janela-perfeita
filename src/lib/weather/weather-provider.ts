@@ -1,15 +1,10 @@
 import type { DailyAstronomy, HourlyWeather } from "@/types";
 
-export type WeatherModelId = "best_match" | "gfs_global" | "ecmwf_ifs025";
-
 export interface ForecastParams {
   lat: number;
   lon: number;
   date: string;
   endDate?: string;
-  model?: WeatherModelId;
-  timezone?: string;
-  referenceAstronomy?: DailyAstronomy[];
 }
 
 export interface NormalizedForecast {

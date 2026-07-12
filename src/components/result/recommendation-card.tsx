@@ -8,7 +8,6 @@ import {
   Layers3,
   ListChecks,
   MapPin,
-  ShieldCheck,
   Timer,
   type LucideIcon,
 } from "lucide-react";
@@ -42,11 +41,7 @@ import {
 import { getScoreRingBand, type ScoreRingTone } from "@/lib/ui/score-ring";
 import { buildRecommendationShareText } from "@/lib/ui/share-result";
 import { cn } from "@/lib/utils";
-import type {
-  ModelAgreement,
-  Recommendation,
-  WeeklyWeatherOverview,
-} from "@/types";
+import type { Recommendation, WeeklyWeatherOverview } from "@/types";
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -108,30 +103,6 @@ function getConfidenceTone(level: string): string {
   return "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
 }
 
-function formatModelAgreementLevel(level: ModelAgreement["level"]): string {
-  if (level === "alta") {
-    return "Alta";
-  }
-
-  if (level === "media") {
-    return "Média";
-  }
-
-  return "Baixa";
-}
-
-function getAgreementTone(level: ModelAgreement["level"]): string {
-  if (level === "alta") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-100";
-  }
-
-  if (level === "media") {
-    return "border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100";
-  }
-
-  return "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/30 dark:text-rose-100";
-}
-
 function ForecastEmptyState({ title }: { title: string }) {
   return (
     <div className="cockpit-surface grid min-h-48 place-items-center rounded-lg border p-4 text-center">
@@ -170,10 +141,6 @@ export function RecommendationCard({
   const qualityLabel = scoreBand.label;
   const scoreTone = getScoreTone(scoreBand.tone);
   const reasonRules = resultScore?.breakdown ?? [];
-  const modelAgreement = recommendation.modelAgreement;
-  const worstDivergence = modelAgreement?.divergences[0];
-  const providerComparison = recommendation.providerComparison;
-  const worstProviderDivergence = providerComparison?.divergences[0];
   const shareText = buildRecommendationShareText(recommendation);
   const timeFilterNotice =
     recommendation.availabilityNotice ?? recommendation.timeWindowNotice;
@@ -447,7 +414,7 @@ export function RecommendationCard({
         {activeTab === "stats" ? (
           <section
             id="recommendation-panel-stats"
-            className="scrollbar-none grid min-h-0 gap-3 xl:h-full xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:overflow-y-auto"
+            className="scrollbar-none grid min-h-0 gap-3 xl:h-full xl:overflow-y-auto"
             role="tabpanel"
             aria-labelledby="recommendation-tab-stats"
           >
@@ -470,65 +437,6 @@ export function RecommendationCard({
             role="tabpanel"
             aria-labelledby="recommendation-tab-alternatives"
           >
-            <div className="grid min-w-0 content-start gap-2">
-              {modelAgreement ? (
-                <div
-                  className={cn(
-                    "rounded-lg border px-3 py-2 text-sm leading-5",
-                    getAgreementTone(modelAgreement.level),
-                  )}
-                >
-                  <div className="flex items-center gap-2 font-medium">
-                    {modelAgreement.level === "alta" ? (
-                      <ShieldCheck className="size-4" aria-hidden="true" />
-                    ) : (
-                      <AlertTriangle className="size-4" aria-hidden="true" />
-                    )}
-                    Modelos: {formatModelAgreementLevel(modelAgreement.level)} (
-                    {modelAgreement.score}/100)
-                  </div>
-                  <p className="mt-1">{modelAgreement.reason}</p>
-                  {worstDivergence ? (
-                    <p className="mt-1 text-xs">
-                      Maior divergência: {worstDivergence.reason}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {providerComparison ? (
-                <div
-                  className={cn(
-                    "rounded-lg border px-3 py-2 text-sm leading-5",
-                    getAgreementTone(providerComparison.level),
-                  )}
-                >
-                  <div className="flex items-center gap-2 font-medium">
-                    {providerComparison.level === "alta" ? (
-                      <ShieldCheck className="size-4" aria-hidden="true" />
-                    ) : (
-                      <AlertTriangle className="size-4" aria-hidden="true" />
-                    )}
-                    Fontes: {formatModelAgreementLevel(providerComparison.level)} (
-                    {providerComparison.score}/100)
-                  </div>
-                  <p className="mt-1">{providerComparison.reason}</p>
-                  {worstProviderDivergence ? (
-                    <p className="mt-1 text-xs">
-                      Maior divergência: {worstProviderDivergence.reason}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {!modelAgreement && !providerComparison ? (
-                <div className="cockpit-surface rounded-lg border p-3 text-sm text-muted-foreground">
-                  Comparações de modelos e fontes não foram solicitadas nesta
-                  busca.
-                </div>
-              ) : null}
-            </div>
-
             <div className="cockpit-surface min-w-0 rounded-lg border p-3">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-950 dark:text-slate-50">
