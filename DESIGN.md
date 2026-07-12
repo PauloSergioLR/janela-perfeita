@@ -92,7 +92,7 @@ Interpretação:
   3. Confiança.
   4. Motivos.
   5. Alternativas.
-- Cards devem ter borda, sombra leve e raio de até 8px.
+- Cards devem ter borda, sombra leve e raio de até 12px.
 - Evitar cards aninhados.
 - Badge e cor devem reforçar status, não virar decoração.
 

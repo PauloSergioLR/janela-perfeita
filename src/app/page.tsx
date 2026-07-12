@@ -614,7 +614,7 @@ export default function Home() {
         : {
             className:
               "border-weather-accent/30 bg-weather-accent/10 text-weather-accent",
-            description: "Não armazenamos sua localização.",
+            description: "Sua permissão é usada para identificar a cidade.",
             disabled: false,
             title: "Localização atual",
           };

@@ -20,10 +20,33 @@ import { getAllActivities } from "@/lib/domain/activities";
 import { buildScoreExplainerActivities } from "@/lib/ui/score-explainer";
 
 export const metadata: Metadata = {
-  title: "Como funciona o score | Janela Perfeita",
+  title: "Como funciona | Janela Perfeita",
   description:
-    "Explicação técnica sobre score, pesos, janelas e confiança da previsão.",
+    "Entenda os modos, o score, as janelas, a confiança, os dados e as limitações do Janela Perfeita.",
 };
+
+const MODES = [
+  {
+    title: "Janela perfeita",
+    description:
+      "Combina cidade, data, atividade e disponibilidade opcional para indicar a melhor janela, alternativas e motivos.",
+  },
+  {
+    title: "O que fazer hoje?",
+    description:
+      "Compara as sete atividades para a cidade, a data e a disponibilidade escolhidas e monta um ranking.",
+  },
+  {
+    title: "Consulta do dia",
+    description:
+      "Resume temperatura, chuva, vento, umidade, UV, luz solar e a timeline completa, sem exigir atividade.",
+  },
+  {
+    title: "Consulta da semana",
+    description:
+      "Compara os próximos sete dias da cidade e destaca condições melhores, piores, mais chuvosas e extremas.",
+  },
+] as const;
 
 const STEPS = [
   {
@@ -35,7 +58,7 @@ const STEPS = [
   {
     title: "Pesos por atividade",
     description:
-      "Correr dá mais peso a conforto térmico; lavar carro pesa chuva; estrelas pesa noite e céu limpo.",
+      "Correr dá mais peso ao conforto térmico; lavar carro, à chuva; observar estrelas, à noite e à qualidade do céu.",
     icon: ListChecks,
   },
   {
@@ -53,11 +76,33 @@ const STEPS = [
 ] as const;
 
 const LIMITATIONS = [
-  "A recomendação depende de previsão meteorológica, então não promete precisão absoluta.",
-  "O app não substitui avaliação local de chuva, vento, segurança ou restrições do lugar.",
+  "A recomendação depende de previsão meteorológica, que pode mudar, então não promete precisão absoluta.",
+  "O app não substitui alertas meteorológicos oficiais nem avaliação local de chuva, vento, segurança ou restrições do lugar.",
   "Scores diferentes entre atividades são esperados, porque cada atividade tem pesos próprios.",
   "Quando não há janela boa, o app mostra o melhor horário isolado apenas para comparação.",
+  "A confiança resume a estabilidade dentro da janela; não é uma probabilidade de acerto fornecida pela Open-Meteo.",
 ];
+
+const RESULT_EXPLORATION = [
+  "Resumo com score, melhor janela, confiança e motivos.",
+  "Timeline horária, estatísticas climáticas e detalhamento dos fatores.",
+  "Próximos dias, comparação semanal e alternativas quando disponíveis.",
+  "Recomendações e rankings podem usar o compartilhamento nativo ou copiar um resumo em texto.",
+  "Manifesto e ícones permitem instalar a experiência; consultas reais continuam dependentes de rede.",
+] as const;
+
+const DATA_DETAILS = [
+  "A Open-Meteo é a única fonte climática e também atende à busca textual de cidades.",
+  "O Nominatim/OpenStreetMap é usado somente para dar um nome aproximado às coordenadas autorizadas na localização atual.",
+  "No modo demo, busca e previsão usam dados locais; a localização automática fica desligada, mas o acionamento manual ainda pode consultar o Nominatim.",
+] as const;
+
+const PRIVACY_DETAILS = [
+  "A localização atual só é solicitada com permissão do navegador.",
+  "Até cinco consultas recentes podem ficar no navegador, incluindo cidade, coordenadas associadas e preferências; a interface permite limpar esse histórico.",
+  "Não há login, banco de dados ou histórico pessoal persistido no servidor.",
+  "A preferência de tema também fica somente no navegador.",
+] as const;
 
 function formatDuration(hours: number): string {
   return hours === 1 ? "1 hora" : `${hours} horas`;
@@ -93,36 +138,79 @@ export default function ComoFuncionaPage() {
           </div>
           <div className="mt-3 max-w-3xl space-y-2">
             <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-4xl">
-              Como funciona o score
+              Como funciona o Janela Perfeita
             </h1>
             <p className="text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
-              Janela Perfeita transforma previsão por hora em decisão prática:
-              quando vale a pena fazer uma atividade ao ar livre.
+              Quatro modos transformam previsão por hora em recomendação,
+              ranking ou panorama climático, sempre com contexto e limitações
+              visíveis.
             </p>
           </div>
         </header>
 
-        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {STEPS.map((step) => {
-            const Icon = step.icon;
-
-            return (
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-slate-50">
+              Quatro modos para perguntas diferentes
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              A cidade é sempre necessária. Data, atividade e disponibilidade
+              aparecem apenas quando ajudam o modo escolhido.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {MODES.map((mode) => (
               <Card
-                key={step.title}
+                key={mode.title}
                 className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card"
               >
                 <CardHeader>
-                  <div className="flex size-9 items-center justify-center rounded-md bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
-                    <Icon className="size-4" aria-hidden="true" />
-                  </div>
-                  <CardTitle>{step.title}</CardTitle>
+                  <CardTitle role="heading" aria-level={3}>
+                    {mode.title}
+                  </CardTitle>
                   <CardDescription className="leading-6">
-                    {step.description}
+                    {mode.description}
                   </CardDescription>
                 </CardHeader>
               </Card>
-            );
-          })}
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-slate-50">
+              Do dado à decisão
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              A API interna valida a consulta, normaliza a previsão da
+              Open-Meteo e entrega o contexto necessário à engine.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {STEPS.map((step) => {
+              const Icon = step.icon;
+
+              return (
+                <Card
+                  key={step.title}
+                  className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card"
+                >
+                  <CardHeader>
+                    <div className="flex size-9 items-center justify-center rounded-md bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
+                      <Icon className="size-4" aria-hidden="true" />
+                    </div>
+                    <CardTitle role="heading" aria-level={3}>
+                      {step.title}
+                    </CardTitle>
+                    <CardDescription className="leading-6">
+                      {step.description}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+          </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)]">
@@ -230,6 +318,74 @@ export default function ComoFuncionaPage() {
               </CardContent>
             </Card>
           </aside>
+        </section>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-slate-50">
+              Resultado, dados e privacidade
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              O cockpit mantém a decisão explorável e deixa claro de onde vêm
+              os dados e o que permanece no navegador.
+            </p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+              <CardHeader>
+                <CardTitle role="heading" aria-level={3}>
+                  Depois do cálculo
+                </CardTitle>
+                <CardDescription>
+                  O resultado continua explorável sem esconder a decisão
+                  principal.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="grid gap-2 text-sm leading-6 text-muted-foreground">
+                  {RESULT_EXPLORATION.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+              <CardHeader>
+                <CardTitle role="heading" aria-level={3}>
+                  Dados e geolocalização
+                </CardTitle>
+                <CardDescription>
+                  Serviços externos têm papéis separados e transparentes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="grid gap-2 text-sm leading-6 text-muted-foreground">
+                  {DATA_DETAILS.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-lg border-border/80 bg-white shadow-sm dark:bg-card">
+              <CardHeader>
+                <CardTitle role="heading" aria-level={3}>
+                  Privacidade
+                </CardTitle>
+                <CardDescription>
+                  Sem conta e sem histórico remoto de consultas.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="grid gap-2 text-sm leading-6 text-muted-foreground">
+                  {PRIVACY_DETAILS.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
         </section>
       </div>
     </main>
