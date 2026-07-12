@@ -5,7 +5,7 @@
 Um *Weather Decision Cockpit* que transforma previsão horária em decisões
 práticas para atividades sensíveis ao clima.
 
-[![CI](https://github.com/PauloSergioLR/janela-perfeita/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/PauloSergioLR/janela-perfeita/actions/workflows/ci.yml)
+[![CI](https://github.com/PauloSergioLR/janela-perfeita/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PauloSergioLR/janela-perfeita/actions/workflows/ci.yml)
 ![Next.js 15](https://img.shields.io/badge/Next.js-15.5-000000?logo=nextdotjs)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-16a34a)](LICENSE)
@@ -338,9 +338,6 @@ npm run test:e2e
   30 dias. Valida o encadeamento técnico, não comprova acurácia meteorológica e
   não constitui estudo científico.
 
-As rotas acima descrevem o código atual. Enquanto a próxima versão não for
-publicada, o deploy online pode refletir uma versão anterior da aplicação.
-
 ## Dados, privacidade e limitações
 
 - A Open-Meteo fornece busca textual de cidades, previsão horária e dados
@@ -380,13 +377,15 @@ Não há configuração especial em `next.config.ts`. Branch de produção, dom�
 e smoke tests devem ser conferidos no processo de release; esta documentação
 não executa deploy.
 
-## Status e próximos passos
+## Versão atual
 
-O produto está funcional na `develop` e passa por preparação documental para o
-lançamento público. Promoção para `main`, definição de versão, release e deploy
-final pertencem a uma tarefa posterior.
+A versão pública atual do Janela Perfeita é a **1.0.0**.
 
-O processo operacional está em [docs/release-checklist.md](docs/release-checklist.md).
+A branch `develop` concentra o desenvolvimento contínuo e a branch `main`
+representa a versão de produção publicada na Vercel.
+
+O processo operacional de release está documentado em
+[docs/release-checklist.md](docs/release-checklist.md).
 
 ## Autor, créditos e licença
 
