@@ -210,14 +210,6 @@ test.describe("QA visual do cockpit desktop", () => {
         await expectCockpitLayout(page, `modo ${mode.name}`);
       }
 
-      await page.goto("/");
-      await expect(page.getByText("Comparar modelos Open-Meteo")).toBeVisible();
-      await expectPerfectWindowControlPanel(page, "modo padrão");
-      await expectWithinViewport(
-        page.getByRole("button", { name: "Encontrar janela" }),
-        page,
-        "CTA com comparação de modelos",
-      );
     });
   }
 });

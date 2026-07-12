@@ -14,21 +14,12 @@ import {
 import { buildDailyWeatherOverview } from "@/lib/engine/daily-weather-overview";
 import { buildWeeklyWeatherOverview } from "@/lib/engine/weekly-weather-overview";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
-import { calculateModelAgreement } from "@/lib/weather/model-agreement";
-import { metNorwayWeatherProvider } from "@/lib/weather/met-norway-weather-provider";
 import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
-import { calculateProviderComparison } from "@/lib/weather/provider-comparison";
-import type {
-  ForecastParams,
-  NormalizedForecast,
-  WeatherModelId,
-} from "@/lib/weather/weather-provider";
+import type { ForecastParams } from "@/lib/weather/weather-provider";
 import type {
   Activity,
   ActivityId,
   City,
-  ModelAgreement,
-  WeatherProviderComparison,
   UserAvailability,
 } from "@/types";
 
@@ -63,12 +54,7 @@ const recommendationModeSchema = z.enum([
 ]);
 const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
 const WEEK_COMPARISON_DAYS = 7;
-const MODEL_COMPARISON_MODELS = [
-  "gfs_global",
-  "ecmwf_ifs025",
-] as const satisfies readonly WeatherModelId[];
 const weatherProvider = openMeteoWeatherProvider;
-const secondaryWeatherProvider = metNorwayWeatherProvider;
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -77,7 +63,6 @@ const recommendationRequestSchema = z
     mode: recommendationModeSchema.default("janela"),
     activityId: z.string().trim().min(1).optional(),
     date: dateSchema.optional(),
-    compareModels: z.boolean().optional().default(false),
     demo: z.boolean().optional().default(false),
     availableFrom: timeSchema.optional(),
     availableTo: timeSchema.optional(),
@@ -250,70 +235,6 @@ function applyDemoDisclaimer<T extends { disclaimer: string }>(value: T): T {
   return value;
 }
 
-async function getOptionalModelAgreement(input: {
-  enabled: boolean;
-  forecastParams: ForecastParams;
-  primaryForecast: NormalizedForecast;
-}): Promise<ModelAgreement | null> {
-  if (!input.enabled) {
-    return null;
-  }
-
-  try {
-    const comparedForecasts = await Promise.all(
-      MODEL_COMPARISON_MODELS.map(async (model) => ({
-        model,
-        forecast: await weatherProvider.getForecast({
-          ...input.forecastParams,
-          model,
-        }),
-      })),
-    );
-
-    return calculateModelAgreement([
-      {
-        model: "best_match",
-        forecast: input.primaryForecast,
-      },
-      ...comparedForecasts,
-    ]);
-  } catch {
-    return null;
-  }
-}
-
-async function getOptionalProviderComparison(input: {
-  enabled: boolean;
-  forecastParams: ForecastParams;
-  primaryForecast: NormalizedForecast;
-  timezone?: string;
-}): Promise<WeatherProviderComparison | null> {
-  if (!input.enabled || !secondaryWeatherProvider.isConfigured) {
-    return null;
-  }
-
-  try {
-    const secondaryForecast = await secondaryWeatherProvider.getForecast({
-      ...input.forecastParams,
-      timezone: input.timezone,
-      referenceAstronomy: input.primaryForecast.dailyAstronomy,
-    });
-
-    return calculateProviderComparison([
-      {
-        provider: weatherProvider.name,
-        forecast: input.primaryForecast,
-      },
-      {
-        provider: secondaryWeatherProvider.name,
-        forecast: secondaryForecast,
-      },
-    ]);
-  } catch {
-    return null;
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
@@ -347,18 +268,6 @@ export async function POST(request: Request) {
             "Não foi possível buscar a previsão agora.",
           );
         });
-    const modelAgreement = await getOptionalModelAgreement({
-      enabled: body.compareModels && body.mode === "janela" && !body.demo,
-      forecastParams,
-      primaryForecast: forecast,
-    });
-    const providerComparison = await getOptionalProviderComparison({
-      enabled: body.mode === "janela" && !body.demo,
-      forecastParams,
-      primaryForecast: forecast,
-      timezone: city.timezone,
-    });
-
     if (body.mode === "atividades") {
       const activityRanking = buildActivityRanking({
         activities: getAllActivities(),
@@ -445,14 +354,6 @@ export async function POST(request: Request) {
       now,
       availability,
     });
-
-    if (modelAgreement) {
-      recommendation.modelAgreement = modelAgreement;
-    }
-
-    if (providerComparison) {
-      recommendation.providerComparison = providerComparison;
-    }
 
     if (body.demo) {
       applyDemoDisclaimer(recommendation);

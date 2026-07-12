@@ -202,7 +202,6 @@ async function requestRecommendation(input: {
   date?: string;
   availableFrom?: string;
   availableTo?: string;
-  compareModels?: boolean;
   demo?: boolean;
 }): Promise<RecommendationResponse> {
   const response = await fetch("/api/recommendation", {
@@ -228,7 +227,6 @@ export default function Home() {
   const [availableFrom, setAvailableFrom] = useState("");
   const [availableTo, setAvailableTo] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("janela");
-  const [compareModels, setCompareModels] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const [locationStatus, setLocationStatus] =
@@ -433,9 +431,7 @@ export default function Home() {
     setSearchHistory(saveSearchHistoryEntry(window.localStorage, entry));
   }
 
-  function runSearch(
-    input: SearchHistoryDraft & { compareModels?: boolean; demo?: boolean },
-  ) {
+  function runSearch(input: SearchHistoryDraft & { demo?: boolean }) {
     const normalizedInput = normalizeSearchHistoryDraft(input);
 
     if (!input.demo && !isCurrentLocationCity(normalizedInput.city)) {
@@ -452,7 +448,6 @@ export default function Home() {
           : normalizedInput.date,
       availableFrom: normalizedInput.availableFrom,
       availableTo: normalizedInput.availableTo,
-      compareModels: input.compareModels,
       demo: input.demo,
     });
   }
@@ -482,7 +477,6 @@ export default function Home() {
       date: searchDate,
       availableFrom: usesAvailability ? availableFrom || undefined : undefined,
       availableTo: usesAvailability ? availableTo || undefined : undefined,
-      compareModels: searchMode === "janela" ? compareModels : false,
       demo: demoMode,
     });
   }
@@ -535,7 +529,6 @@ export default function Home() {
 
     runSearch({
       ...searchInput,
-      compareModels: searchInput.mode === "janela" ? compareModels : false,
       demo: demoMode,
     });
   }
@@ -1130,36 +1123,7 @@ export default function Home() {
                 ) : null}
                 </div>
 
-                <div
-                  className={cn(
-                    "space-y-3 border-t border-soft pt-3 xl:shrink-0 xl:pt-3",
-                    searchMode === "janela" &&
-                      !demoMode &&
-                      "xl:grid xl:grid-cols-[minmax(0,1fr)_auto] xl:items-stretch xl:gap-2 xl:space-y-0",
-                  )}
-                >
-                {searchMode === "janela" && !demoMode ? (
-                  <label className="cockpit-surface flex items-start gap-2 rounded-lg border p-2 text-xs">
-                    <input
-                      type="checkbox"
-                      checked={compareModels}
-                      onChange={(event) => {
-                        setCompareModels(event.target.checked);
-                        resetRecommendationState();
-                      }}
-                      className="mt-0.5 size-4 accent-weather-accent"
-                    />
-                    <span className="min-w-0">
-                      <span className="block font-medium">
-                        Comparar modelos Open-Meteo
-                      </span>
-                      <span className="block leading-4 text-muted-foreground xl:hidden">
-                        Mostra concordância quando a recomendação for calculada.
-                      </span>
-                    </span>
-                  </label>
-                ) : null}
-
+                <div className="space-y-3 border-t border-soft pt-3 xl:shrink-0 xl:pt-3">
                 <Button
                   type="submit"
                   size="lg"
