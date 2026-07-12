@@ -78,7 +78,7 @@ function collectRainPenalty(weather: HourlyWeather[]): ConfidencePenalty | null 
   if (maxPrecipitation >= 1 || badCode) {
     return {
       value: 45,
-      reason: "chuva ou weather code ruim na janela",
+      reason: "chuva ou código meteorológico ruim na janela",
     };
   }
 

@@ -56,7 +56,165 @@ describe("calculadora de score", () => {
     expect(scores).toHaveLength(24);
     expect(scores[0].time).toBe("2026-06-05T00:00");
     expect(scores[0].score).toBe(0);
-    expect(scores[4].score).toBeGreaterThan(0);
+    expect(scores[5].score).toBeGreaterThan(0);
+  });
+
+  it("filtra scores fora da disponibilidade informada", () => {
+    const activity = getActivityById("caminhar")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T07:00"),
+        makeHourlyWeather("2026-06-05T08:00"),
+        makeHourlyWeather("2026-06-05T09:00"),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-05T06:00",
+      availability: {
+        availableFrom: "08:00",
+        availableTo: "10:00",
+      },
+    });
+
+    expect(scores.map((score) => score.score)).toEqual([
+      0,
+      expect.any(Number),
+      expect.any(Number),
+    ]);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "disponibilidade",
+        reason: "Fora da disponibilidade informada (Das 08:00 às 10:00).",
+      }),
+    );
+    expect(scores[1].score).toBeGreaterThanOrEqual(activity.minRecommendedScore);
+  });
+
+  it("usa disponibilidade do usuario antes do horario padrao", () => {
+    const activity = getActivityById("lavar_carro")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T00:00"),
+        makeHourlyWeather("2026-06-05T01:00"),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-04T23:00",
+      availability: {
+        availableFrom: "00:00",
+        availableTo: "02:00",
+      },
+    });
+
+    expect(scores.every((score) => score.score > 0)).toBe(true);
+    expect(
+      scores.some((score) =>
+        score.breakdown.some((rule) => rule.factor === "horario_padrao"),
+      ),
+    ).toBe(false);
+  });
+
+  it("aplica horario padrao para lavar carro sem disponibilidade", () => {
+    const activity = getActivityById("lavar_carro")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T00:00"),
+        makeHourlyWeather("2026-06-05T08:00"),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-04T23:00",
+    });
+
+    expect(scores[0].score).toBe(0);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "horario_padrao",
+      }),
+    );
+    expect(scores[1].score).toBeGreaterThan(0);
+  });
+
+  it("suporta horario padrao cruzando meia-noite para observar estrelas", () => {
+    const activity = getActivityById("observar_estrelas")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T02:00", { cloud_cover: 0 }),
+        makeHourlyWeather("2026-06-05T12:00", { cloud_cover: 0 }),
+        makeHourlyWeather("2026-06-05T21:00", { cloud_cover: 0 }),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-04T23:00",
+    });
+
+    expect(scores[0].breakdown.some((rule) => rule.factor === "horario_padrao")).toBe(false);
+    expect(scores[1].breakdown.some((rule) => rule.factor === "horario_padrao")).toBe(true);
+    expect(scores[2].breakdown.some((rule) => rule.factor === "horario_padrao")).toBe(false);
+  });
+
+  it("aplica horario dinamico do por do sol para fotografia sem disponibilidade", () => {
+    const activity = getActivityById("fotografar_por_do_sol")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T15:00", { cloud_cover: 40 }),
+        makeHourlyWeather("2026-06-05T17:00", { cloud_cover: 40 }),
+        makeHourlyWeather("2026-06-05T18:00", { cloud_cover: 40 }),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-05T12:00",
+    });
+
+    expect(scores[0].score).toBe(0);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "horario_padrao",
+        reason: "Fora do horario padrao da atividade (Das 17:00 às 18:15).",
+      }),
+    );
+    expect(scores[1].score).toBeGreaterThan(0);
+    expect(scores[1].breakdown.some((rule) => rule.factor === "horario_padrao")).toBe(false);
+    expect(scores[2].score).toBeGreaterThan(0);
+  });
+
+  it("mantem fotografia do por do sol presa a hora dourada mesmo com disponibilidade", () => {
+    const activity = getActivityById("fotografar_por_do_sol")!;
+    const scores = calculateDayScores({
+      activity,
+      hourly: [
+        makeHourlyWeather("2026-06-05T09:00", {
+          cloud_cover: 35,
+          visibility: 23000,
+        }),
+        makeHourlyWeather("2026-06-05T17:00", {
+          cloud_cover: 35,
+          visibility: 23000,
+        }),
+      ],
+      astronomy: baseAstronomy,
+      now: "2026-06-05T08:00",
+      availability: {
+        availableFrom: "09:00",
+        availableTo: "10:00",
+      },
+    });
+    const windows = findBestWindows(scores, activity);
+
+    expect(scores[0].score).toBe(0);
+    expect(scores[0].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "horario_padrao",
+        reason: "Fora do horario padrao da atividade (Das 17:00 às 18:15).",
+      }),
+    );
+    expect(scores[1].score).toBe(0);
+    expect(scores[1].breakdown.at(-1)).toEqual(
+      expect.objectContaining({
+        factor: "disponibilidade",
+      }),
+    );
+    expect(windows).toEqual([]);
   });
 
   it("pontua corrida com chuva forte como janela ruim", () => {
@@ -182,6 +340,42 @@ describe("calculadora de score", () => {
         (window) =>
           window.startTime === "2026-06-05T14:00" &&
           window.endTime === "2026-06-05T16:00",
+      ),
+    ).toBe(false);
+  });
+
+  it("penaliza lavar roupa quando chuva forte vem nas proximas horas", () => {
+    const activity = getActivityById("lavar_roupa")!;
+    const hourly = [
+      makeHourlyWeather("2026-06-05T09:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T10:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T11:00", { precipitation: 0 }),
+      makeHourlyWeather("2026-06-05T12:00", {
+        precipitation: 5,
+        rain: 5,
+        weather_code: 63,
+      }),
+      makeHourlyWeather("2026-06-05T13:00", { precipitation: 0 }),
+    ];
+    const scores = calculateDayScores({
+      activity,
+      hourly,
+      astronomy: baseAstronomy,
+      now: "2026-06-05T08:00",
+    });
+    const windows = findBestWindows(scores, activity);
+    const score09h = scores.find((score) => score.hourLabel === "09:00");
+
+    expect(score09h?.score).toBeLessThan(activity.minRecommendedScore);
+    expect(
+      score09h?.breakdown.find((rule) => rule.factor === "chuva_futura")
+        ?.reason,
+    ).toBe("Chuva relevante às 12:00 pode molhar a roupa no varal.");
+    expect(
+      windows.some(
+        (window) =>
+          window.startTime === "2026-06-05T09:00" &&
+          window.endTime === "2026-06-05T12:00",
       ),
     ).toBe(false);
   });

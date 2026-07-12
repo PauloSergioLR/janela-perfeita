@@ -32,6 +32,13 @@ npm run lint
 npm test
 npm run test:coverage
 npm run build
+npm run test:e2e
+```
+
+Em uma instalação nova, prepare o Chromium antes do E2E:
+
+```bash
+npx playwright install chromium
 ```
 
 Esses comandos também rodam no GitHub Actions.
@@ -71,6 +78,7 @@ Antes de abrir PR:
 - rode `npm test`
 - rode `npm run test:coverage`
 - rode `npm run build`
+- rode `npm run test:e2e`
 - confirme que `.next/`, `coverage/`, `next-env.d.ts` e `node_modules/` não
   entraram no Git
 

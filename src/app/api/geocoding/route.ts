@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getDemoCitySuggestions } from "@/lib/demo/demo-weather";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
 
 const geocodingQuerySchema = z.string().trim().min(3);
@@ -11,9 +12,14 @@ function jsonError(status: number, message: string) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const query = geocodingQuerySchema.safeParse(url.searchParams.get("q") ?? "");
+  const demoMode = url.searchParams.get("demo") === "true";
 
   if (!query.success) {
     return jsonError(400, "Informe pelo menos 3 caracteres para buscar cidades.");
+  }
+
+  if (demoMode) {
+    return NextResponse.json({ cities: getDemoCitySuggestions(query.data) });
   }
 
   try {

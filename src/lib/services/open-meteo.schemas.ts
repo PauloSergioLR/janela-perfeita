@@ -57,6 +57,7 @@ export const openMeteoGeocodingResponseSchema = z.object({
 export function parseForecastResponse(payload: unknown): {
   hourly: HourlyWeather[];
   astronomy: DailyAstronomy;
+  dailyAstronomy: DailyAstronomy[];
 } {
   const response = openMeteoForecastResponseSchema.parse(payload);
   const times = response.hourly.time;
@@ -82,14 +83,21 @@ export function parseForecastResponse(payload: unknown): {
     uv_index: response.hourly.uv_index[index] ?? 0,
     relative_humidity_2m: response.hourly.relative_humidity_2m[index] ?? 0,
   }));
+  const dailyAstronomy = response.daily.time.map((date, index) => ({
+    date,
+    sunrise: response.daily.sunrise[index] ?? `${date}T06:00`,
+    sunset: response.daily.sunset[index] ?? `${date}T18:00`,
+  }));
+  const astronomy = dailyAstronomy[0];
+
+  if (!astronomy) {
+    throw new Error("Resposta da previsão sem astronomia diária.");
+  }
 
   return {
     hourly,
-    astronomy: {
-      date: response.daily.time[0],
-      sunrise: response.daily.sunrise[0],
-      sunset: response.daily.sunset[0],
-    },
+    astronomy,
+    dailyAstronomy,
   };
 }
 

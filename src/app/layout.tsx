@@ -1,7 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Providers } from "./providers";
+
+const themeScript = `
+(() => {
+  try {
+    const stored = localStorage.getItem("theme");
+    const isDark = stored ? stored === "dark" : true;
+    document.documentElement.classList.toggle("dark", isDark);
+  } catch {}
+})();
+`;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +65,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0f766e",
-  colorScheme: "light",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -63,11 +74,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Providers>
+          <ThemeToggle />
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -3,8 +3,10 @@ import type {
   HourScore,
   Recommendation,
   RuleResult,
+  UserAvailability,
   WindowResult,
 } from "@/types";
+import { getScoreRingBand } from "./score-ring";
 import { formatCityLabel } from "./search-page";
 
 export interface TimelineDatum {
@@ -13,6 +15,10 @@ export interface TimelineDatum {
   score: number;
   reason: string;
   isRecommended: boolean;
+  isBestWindow: boolean;
+  rainRisk: string | null;
+  wind: string | null;
+  confidenceLevel: ForecastConfidenceLevel | null;
 }
 
 export interface BreakdownSource {
@@ -20,6 +26,13 @@ export interface BreakdownSource {
   subtitle: string;
   score: HourScore | null;
 }
+
+const WHOLE_DAY_MIN_DURATION_HOURS = 22;
+
+type WindowDisplayInput = Pick<
+  WindowResult,
+  "startLabel" | "endLabel" | "durationHours"
+>;
 
 function compareRulesByPositiveImpact(a: RuleResult, b: RuleResult): number {
   return b.score - a.score || b.weight - a.weight || a.label.localeCompare(b.label);
@@ -44,18 +57,109 @@ export function getPrimaryReason(score: HourScore): string {
 export function buildTimelineData(
   scores: HourScore[],
   minRecommendedScore: number,
+  bestWindow: WindowResult | null = null,
 ): TimelineDatum[] {
+  const bestWindowTimes = new Set(
+    bestWindow?.scores.map((score) => score.time) ?? [],
+  );
+
   return scores.map((score) => ({
     time: score.time,
     hourLabel: score.hourLabel,
     score: score.score,
     reason: getPrimaryReason(score),
     isRecommended: score.score >= minRecommendedScore,
+    isBestWindow: bestWindowTimes.has(score.time),
+    rainRisk: getRainRiskLabel(score),
+    wind: getWindLabel(score),
+    confidenceLevel:
+      bestWindowTimes.has(score.time) && bestWindow
+        ? bestWindow.confidence.level
+        : null,
   }));
+}
+
+function getWindLabel(score: HourScore): string | null {
+  const wind = score.weather.wind_speed_10m;
+  const gusts = score.weather.wind_gusts_10m;
+
+  if (!Number.isFinite(wind)) {
+    return null;
+  }
+
+  const windLabel = `Vento: ${Math.round(wind)} km/h`;
+
+  return Number.isFinite(gusts) && gusts > wind
+    ? `${windLabel}, rajadas ${Math.round(gusts)} km/h`
+    : windLabel;
+}
+
+function getRainRiskLabel(score: HourScore): string | null {
+  const precipitation = Math.max(
+    score.weather.precipitation,
+    score.weather.rain,
+    score.weather.showers,
+  );
+
+  if (precipitation > 0) {
+    return `Chuva prevista: ${precipitation} mm`;
+  }
+
+  if (score.weather.precipitation_probability >= 20) {
+    return `Risco de chuva: ${score.weather.precipitation_probability}%`;
+  }
+
+  return null;
 }
 
 export function getAlternativeWindows(windows: WindowResult[]): WindowResult[] {
   return windows.slice(1);
+}
+
+export function formatTimeRange(start: string, end: string): string {
+  if (start === end) {
+    return "Dia inteiro";
+  }
+
+  return `Das ${start} às ${end}`;
+}
+
+export function isWholeDayWindow(window: WindowDisplayInput): boolean {
+  return (
+    window.durationHours >= WHOLE_DAY_MIN_DURATION_HOURS ||
+    window.startLabel === window.endLabel
+  );
+}
+
+export function formatWindowTimeRange(window: WindowDisplayInput): string {
+  return isWholeDayWindow(window)
+    ? "Dia inteiro"
+    : formatTimeRange(window.startLabel, window.endLabel);
+}
+
+export function formatDecisionWindow(
+  window: WindowDisplayInput | null,
+): string {
+  if (!window) {
+    return "Sem janela ideal";
+  }
+
+  return isWholeDayWindow(window)
+    ? "Dia inteiro"
+    : `${window.startLabel} → ${window.endLabel}`;
+}
+
+export function getDecisionQualityLabel(score: number): string {
+  return getScoreRingBand(score).label;
+}
+
+export function formatAvailabilityNotice(
+  availability: UserAvailability,
+): string {
+  return `Dentro da sua disponibilidade: ${formatTimeRange(
+    availability.availableFrom,
+    availability.availableTo,
+  )}.`;
 }
 
 export function formatForecastConfidenceLevel(
@@ -95,6 +199,10 @@ export function getBreakdownSource(
 }
 
 export function formatDurationHours(durationHours: number): string {
+  if (durationHours >= WHOLE_DAY_MIN_DURATION_HOURS) {
+    return "dia inteiro";
+  }
+
   return durationHours === 1 ? "1 hora" : `${durationHours} horas`;
 }
 

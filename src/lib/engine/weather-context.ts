@@ -68,9 +68,9 @@ export function minutesBetweenLocalIso(later: string, earlier: string): number {
   return Math.round((laterTime - earlierTime) / 60_000);
 }
 
-export function addHoursToLocalIso(value: string, hours: number): string {
+export function addMinutesToLocalIso(value: string, minutes: number): string {
   const timestamp =
-    parseLocalDateTime(value).timestamp + hours * MINUTES_IN_HOUR * 60_000;
+    parseLocalDateTime(value).timestamp + minutes * 60_000;
   const date = new Date(timestamp);
 
   return [
@@ -79,6 +79,10 @@ export function addHoursToLocalIso(value: string, hours: number): string {
     )}`,
     `${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())}`,
   ].join("T");
+}
+
+export function addHoursToLocalIso(value: string, hours: number): string {
+  return addMinutesToLocalIso(value, hours * MINUTES_IN_HOUR);
 }
 
 export function buildWeatherContext({

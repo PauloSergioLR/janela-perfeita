@@ -5,7 +5,15 @@ export type ActivityId =
   | "pedalar"
   | "fotografar_por_do_sol"
   | "observar_estrelas"
-  | "lavar_carro";
+  | "lavar_carro"
+  | "lavar_roupa";
+
+export type SearchMode =
+  | "janela"
+  | "atividades"
+  | "semana"
+  | "dia"
+  | "clima_semana";
 
 /** Coordenadas geográficas usadas para consultar previsão meteorológica. */
 export interface Coordinates {
@@ -23,6 +31,21 @@ export interface City {
   coordinates: Coordinates;
 }
 
+/** Intervalo opcional em que o usuario aceita receber recomendacoes. */
+export interface UserAvailability {
+  availableFrom: string;
+  availableTo: string;
+}
+
+/** Janela de horario pratica associada a uma atividade. */
+export interface ActivityTimeWindow {
+  start: string;
+  end: string;
+  label?: string;
+}
+
+export type ActivityTimeWindowStrategy = "golden_hour";
+
 /** Dados meteorológicos de uma hora retornados pela previsão. */
 export interface HourlyWeather {
   time: string;
@@ -33,8 +56,10 @@ export interface HourlyWeather {
   rain: number;
   showers: number;
   weather_code: number;
+  weather_symbol?: string;
   wind_speed_10m: number;
   wind_gusts_10m: number;
+  wind_direction_10m?: number;
   cloud_cover: number;
   cloud_cover_low: number;
   cloud_cover_mid: number;
@@ -97,6 +122,8 @@ export interface Activity {
   shortDescription: string;
   minRecommendedScore: number;
   minDurationHours: number;
+  defaultTimeWindows?: ActivityTimeWindow[];
+  defaultTimeWindowStrategy?: ActivityTimeWindowStrategy;
   rules: ActivityRule[];
 }
 
@@ -128,9 +155,113 @@ export interface Recommendation {
   activity: Activity;
   city: City;
   date: string;
+  sunrise?: string;
+  sunset?: string;
   generatedAt: string;
   scores: HourScore[];
   windows: WindowResult[];
   bestWindow: WindowResult | null;
+  availability?: UserAvailability;
+  availabilityNotice?: string;
+  timeWindowNotice?: string;
   disclaimer: string;
+}
+
+/** Visao meteorologica consolidada para um dia, sem depender de atividade. */
+export interface DailyWeatherOverview {
+  city: City;
+  date: string;
+  generatedAt: string;
+  sunrise: string;
+  sunset: string;
+  weatherCode: number | null;
+  weatherLabel: string;
+  temperatureMax: number | null;
+  temperatureMin: number | null;
+  apparentTemperatureMax: number | null;
+  apparentTemperatureMin: number | null;
+  precipitationSum: number | null;
+  precipitationProbabilityMax: number | null;
+  windSpeedMax: number | null;
+  windGustsMax: number | null;
+  uvIndexMax: number | null;
+  hourly: HourlyWeather[];
+  disclaimer: string;
+}
+
+export interface WeeklyWeatherDayOverview extends DailyWeatherOverview {
+  comfortScore: number;
+  summary: string;
+}
+
+export interface WeeklyWeatherHighlights {
+  bestDay: WeeklyWeatherDayOverview | null;
+  worstDay: WeeklyWeatherDayOverview | null;
+  rainiestDay: WeeklyWeatherDayOverview | null;
+  hottestDay: WeeklyWeatherDayOverview | null;
+  coldestDay: WeeklyWeatherDayOverview | null;
+}
+
+/** Visao meteorologica consolidada dos proximos dias, sem depender de atividade. */
+export interface WeeklyWeatherOverview {
+  city: City;
+  startDate: string;
+  endDate: string;
+  generatedAt: string;
+  days: WeeklyWeatherDayOverview[];
+  highlights: WeeklyWeatherHighlights;
+  disclaimer: string;
+}
+
+/** Item ranqueado quando o app recomenda atividades para uma cidade e data. */
+export interface ActivityRankingItem {
+  position: number;
+  recommendation: Recommendation;
+  score: number;
+  isRecommended: boolean;
+}
+
+/** Ranking de atividades calculado para a mesma cidade e data. */
+export interface ActivityRanking {
+  city: City;
+  date: string;
+  generatedAt: string;
+  items: ActivityRankingItem[];
+  bestActivity: ActivityRankingItem | null;
+  availability?: UserAvailability;
+  disclaimer: string;
+}
+
+/** Item ranqueado quando o app compara dias para uma atividade. */
+export interface DayRankingItem {
+  position: number;
+  recommendation: Recommendation;
+  score: number;
+  isRecommended: boolean;
+}
+
+/** Comparação dos próximos dias para uma atividade. */
+export interface WeekComparison {
+  activity: Activity;
+  city: City;
+  startDate: string;
+  endDate: string;
+  generatedAt: string;
+  days: DayRankingItem[];
+  bestDay: DayRankingItem | null;
+  availability?: UserAvailability;
+  disclaimer: string;
+}
+
+/** Busca salva localmente no navegador para repetição rápida. */
+export interface SearchHistoryEntry {
+  id: string;
+  mode: SearchMode;
+  city: City;
+  activityId?: ActivityId;
+  activityName?: string;
+  date: string;
+  availableFrom?: string;
+  availableTo?: string;
+  createdAt: string;
 }

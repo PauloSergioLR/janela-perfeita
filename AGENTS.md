@@ -1,119 +1,100 @@
-# AGENTS.md
+# AGENTS.md — Janela Perfeita
 
-Este arquivo resume as regras, decisões técnicas, validações e pendências do
-projeto Janela Perfeita para continuidade em novas sessões do Codex.
+Este arquivo define regras permanentes para execução de tarefas com Codex neste repositório.
+
+Prioridade: executar cada issue com qualidade, máxima economia de contexto, tokens e tempo de agente.
+
+---
 
 ## Idioma e comunicação
 
 - Conversar em português.
 - Issues, PRs, títulos, descrições, checklists e documentação em português.
-- Commits seguem Conventional Commits com prefixo técnico em inglês e descrição
-  em português.
-- Exemplos:
-  - `feat: cria servico de forecast open-meteo`
-  - `test: cobre servicos open-meteo`
-  - `docs: documenta dependencias no readme`
-  - `chore: adiciona cobertura ao ci`
+- Commits seguem Conventional Commits: prefixo técnico em inglês e descrição em português.
+  - `feat: cria seletor visual de modos`
+  - `fix: corrige score de chuva futura`
+  - `test: cobre regra de atividade`
+  - `docs: atualiza readme do projeto`
+  - `chore: ajusta configuração do projeto`
+- Evitar respostas longas.
+- Não enviar atualizações intermediárias, salvo bloqueio real, aprovação necessária ou pedido explícito.
+- Ao final: resumo curto, arquivos principais, validações, PR e pendências.
 
-## Fluxo Git
+---
 
-- Branch final: `main`.
-- Branch de integração: `develop`.
-- Features saem de `develop` e voltam por PR para `develop`.
-- No fim do MVP, abrir PR de `develop` para `main`.
-- Não usar `master`.
-- Nomes de branches devem ser curtos, sem numeração:
-  - `feature/tipos-dominio`
-  - `feature/regras-atividades`
-  - `feature/servicos-open-meteo`
-  - `test/cobertura-testes`
-  - `docs/dependencias-projeto`
-- Não excluir branches de feature após merge; o usuário pediu para preservá-las.
-- Cada tarefa deve ter commits pequenos e separados por intenção.
-- Antes de iniciar nova tarefa:
-  - sincronizar `develop`
-  - mover a issue para `In Progress`
-  - criar/vincular branch pela issue quando possível
-  - comentar na issue o início da etapa
-- Ao finalizar:
-  - marcar checklist da issue
-  - abrir PR para `develop`
-  - aguardar CI verde
-  - aprovar a PR após testes/checks passarem e antes do merge
-  - se o GitHub bloquear autoaprovação, registrar a limitação na PR
-  - fazer merge sem excluir branch
-  - fechar issue
-  - mover card para `Done`
-  - sincronizar `develop` local
+## Fluxo Git obrigatório
 
-## Contexto de sessões
+- Base: `develop`. Produção: `main`. Nunca usar `master`.
+- Toda feature, correção ou documentação sai de `develop` e volta por PR para `develop`.
+- Não fazer merge, aprovar PR, fechar issue, mover card, editar Project/Kanban ou comentar em issue sem pedido explícito.
+- Não deletar branches remotas após merge.
+- Criar branch curta, sem numeração desnecessária:
+  - `feature/design-system`
+  - `feature/weather-stage`
+  - `fix/score-chuva`
+  - `test/timeline-score`
+  - `docs/readme-visual`
 
-- Ao fim de cada branch/tarefa, consolidar no `AGENTS.md` o contexto relevante
-  da sessão:
-  - decisões novas
-  - status de issues, PRs e branches
-  - validações executadas
-  - pendências e próxima etapa recomendada
-- Registrar essa atualização em commit separado na branch `contexto-agents`.
-- Depois de atualizar e enviar `contexto-agents`, sempre abrir PR para `develop`
-  e não deixar a atualização de contexto sem PR.
-- Usar commit Conventional Commit, por exemplo:
-  `docs: atualiza contexto agents`.
-- Não misturar atualização de contexto com commits de feature, teste ou correção.
-- Qualquer regra nova dita pelo usuário durante a sessão deve ser registrada no
-  `AGENTS.md` para continuidade em sessões futuras.
+Antes de iniciar:
 
-## GitHub
+```bash
+git checkout develop
+git pull
+git checkout -b nome-da-branch
+```
 
-- Repositório: `PauloSergioLR/janela-perfeita`.
-- Project/Kanban: `Janela Perfeita`, Project #2.
-- Project URL: `https://github.com/users/PauloSergioLR/projects/2`.
-- O Project está vinculado ao repositório.
-- Status usados:
-  - `Todo`
-  - `In Progress`
-  - `Done`
-- Issues criadas:
-  - #1 Configuração inicial com CI e base de testes - concluída.
-  - #2 Tipos centrais do domínio - concluída.
-  - #3 Regras das atividades - concluída.
-  - #4 Serviços Open-Meteo - concluída.
-  - #5 Motor de score e janelas - concluída.
-  - #6 Rotas internas da API - concluída.
-  - #7 Interface de busca - concluída.
-  - #8 Resultado visual e timeline - concluída.
-  - #9 Testes e qualidade - concluída.
-  - #10 PWA, README e deploy - concluída.
-  - #32 T11 - Polimento de textos em PT-BR - concluída.
-  - #33 T12 - Adicionar probabilidade de chuva e weather code - concluída.
-  - #34 T13 - Melhorar regra de lavar carro olhando próximas horas - concluída.
-  - #35 T14 - Adicionar sensação térmica e rajadas de vento - aberta em `Todo`.
-  - #36 T15 - Melhorar score de fotografia de pôr do sol - aberta em `Todo`.
-  - #37 T16 - Melhorar score de observar estrelas - aberta em `Todo`.
-  - #38 T17 - Criar score de confiança da previsão - aberta em `Todo`.
-  - #39 T18 - Criar design direction com Taste Skill - aberta em `Todo`.
-  - #40 T19 - Redesign da home com Taste Skill - aberta em `Todo`.
-  - #41 T20 - Redesign do card de resultado - aberta em `Todo`.
-  - #42 T21 - Melhorar timeline de score - aberta em `Todo`.
-  - #43 T22 - Melhorar estados de loading, empty e error - aberta em `Todo`.
-  - #44 T23 - Polimento mobile e acessibilidade - aberta em `Todo`.
-  - #45 T24 - Tema visual claro/escuro - aberta em `Todo`.
-  - #46 T25 - Modo inverso: o que fazer hoje? - aberta em `Todo`.
-  - #47 T26 - Comparar melhores dias da semana - aberta em `Todo`.
-  - #48 T27 - Compartilhar resultado - aberta em `Todo`.
-  - #49 T28 - Histórico local de buscas - aberta em `Todo`.
-  - #50 T29 - Criar camada WeatherProvider - aberta em `Todo`.
-  - #51 T30 - Comparar modelos da Open-Meteo - aberta em `Todo`.
-  - #52 T31 - Adicionar segunda API meteorológica opcional - aberta em `Todo`.
-  - #53 T32 - Backtesting de acurácia - aberta em `Todo`.
-  - #54 T33 - Playwright para fluxo principal - aberta em `Todo`.
-  - #55 T34 - Modo demo com fixtures - aberta em `Todo`.
-  - #56 T35 - Página técnica explicando o score - aberta em `Todo`.
-  - #57 T36 - Atualizar README com evolução do projeto - aberta em `Todo`.
+Ao finalizar: commit, push, PR para `develop`; nunca merge.
 
-## Validação obrigatória
+---
 
-Antes de abrir PR, sempre rodar:
+## Economia de contexto
+
+Obrigatório em toda issue:
+
+- Uma thread por issue. Não usar `Resume all` em issue nova.
+- Não carregar histórico antigo sem necessidade.
+- Não consultar `docs/ai/agents-history.md` salvo pedido explícito do usuário.
+- Não ler o repositório inteiro; preferir `rg` e arquivos citados pelo usuário, importados ou diretamente testados.
+- Nunca abrir `node_modules/`, `.next/`, `coverage/`, `test-results/`, `playwright-report/`, `dist/`, `build/`, logs, caches ou arquivos gerados.
+- Evitar buscas amplas no GitHub e listas extensas de issues, PRs, branches ou arquivos.
+- Não rodar Project/Kanban: `gh project item-list`, `gh project item-edit`, `gh issue comment`.
+- Não atualizar este arquivo sem pedido explícito.
+
+---
+
+## Modo de trabalho por issue
+
+### Entendimento
+
+Antes de editar, para tarefa grande, ambígua ou arriscada: plano curto com objetivo, arquivos a consultar/alterar, plano e validações; aguardar aprovação.
+
+Para tarefa pequena e clara: implementar direto, preservando escopo e economia de contexto.
+
+### Implementação
+
+- Alterar somente o necessário; evitar refatoração e mudanças cosméticas fora do escopo.
+- Não adicionar biblioteca ou alterar arquitetura sem aprovação clara.
+- Não alterar regra de negócio em issue puramente visual.
+- Não remover testes, não usar `any`, preservar TypeScript strict e interface em PT-BR.
+- Mudanças de regra, comportamento ou bug exigem teste.
+- Testes de serviços externos usam mocks; nunca rede real.
+
+### Validação
+
+Durante desenvolvimento, rodar só validações focadas:
+
+```bash
+npm test -- tests/nome-do-teste.test.ts
+npm run lint
+```
+
+Evitar repetir `npm run build`, `npm test` completo e `npm run test:coverage` na mesma issue.
+
+Antes do PR:
+
+- Documentação/configuração sem impacto no app: `git diff --check`.
+- Código pequeno: `npm run lint` e teste relacionado.
+- App, regra, UI, engine, API ou comportamento relevante:
 
 ```bash
 npm run lint
@@ -122,342 +103,66 @@ npm run test:coverage
 npm run build
 ```
 
-Na PR, aguardar o GitHub Actions passar antes de mergear.
+Se falhar: relatar comando, erro relevante, arquivo e ação/bloqueio.
 
-Workflow atual:
+---
 
-- Arquivo: `.github/workflows/ci.yml`.
-- Roda em PRs e pushes para `develop` e `main`.
-- Job atual: `Lint, testes, cobertura e build`.
-- Executa:
-  - `npm ci`
-  - `npm run lint`
-  - `npm test`
-  - `npm run test:coverage`
-  - `npm run build`
+## Escopo técnico
 
-## Cobertura de testes
+- Web app responsivo: Next.js App Router, React, TypeScript strict, Tailwind, shadcn/ui, TanStack Query, Zod, date-fns, Recharts, Vitest e npm.
+- Node recomendado: 20.
+- Sem login, banco, autenticação, pagamentos, anúncios, marketplace, backend externo separado ou IA no produto.
+- Não adicionar bibliotecas sem justificativa e aprovação; preferir CSS, Tailwind e componentes existentes.
 
-- Script:
+---
+
+## Produto e dados
+
+- Open-Meteo é fonte principal.
+- APIs adicionais: gratuitas e opcionais; nunca API paga ou chave paga obrigatória.
+- Nunca adicionar mapas, MapLibre, MapTiler ou Google Maps.
+- Não prometer precisão meteorológica absoluta.
+- Não armazenar localização, IP, histórico ou dados pessoais.
+- Manter atribuição visível da Open-Meteo quando aplicável.
+
+---
+
+## UI e redesign
+
+Direção: Weather Decision Cockpit; interface escura, premium e climática; midnight blue, glassmorphism discreto, gradientes climáticos, glow suave, score protagonista, painel lateral, resultado principal, timeline visual e cards climáticos.
+
+Em issues visuais:
+
+- Não alterar backend ou reescrever engine sem necessidade.
+- Não alterar regra de negócio em tarefa puramente visual.
+- Usar animações leves, respeitar `prefers-reduced-motion`, acessibilidade e responsividade mobile.
+- Preservar testes existentes.
+
+---
+
+## Testes e qualidade
+
+- Toda funcionalidade relevante deve ter teste.
+- `coverage/` e arquivos gerados nunca entram em commit.
+- Antes de commit:
 
 ```bash
-npm run test:coverage
+git status --short
 ```
 
-- Relatório local HTML:
-
-```text
-coverage/index.html
-```
-
-- `coverage/` não deve ser commitado.
-- Cobertura registrada após a issue #9:
-  - Statements: 93.13%
-  - Branches: 78.91%
-  - Functions: 93.25%
-  - Lines: 93.72%
-- Regra do projeto: toda nova funcionalidade deve vir acompanhada de teste.
-- Testes não devem depender de chamadas reais de rede; usar mocks quando
-  envolver serviços externos.
-
-## Arquivos que nunca devem entrar em commit
-
-Sempre conferir antes de commit:
+Se necessário:
 
 ```bash
 git status --ignored --short
 ```
 
-Devem aparecer apenas como ignorados, nunca staged:
+Nunca commitar `.next/`, `coverage/`, `node_modules/`, logs, caches, builds ou relatórios.
 
-- `.next/`
-- `coverage/`
-- `next-env.d.ts`
-- `node_modules/`
-- caches, logs, builds e relatórios gerados
+---
 
-Arquivos de ignore/configuração relevantes:
+## GitHub e histórico
 
-- `.gitignore`
-- `eslint.config.mjs`
-- `.gitattributes`
-
-## Decisões técnicas
-
-- Produto: web app responsivo, sem app nativo no MVP.
-- Stack:
-  - Next.js 15 com App Router
-  - React 19
-  - TypeScript strict
-  - Tailwind CSS
-  - shadcn/ui
-  - TanStack Query
-  - Zod
-  - date-fns
-  - Recharts
-  - Vitest
-- Node recomendado: 20, documentado em `.nvmrc`.
-- Gerenciador: npm.
-- Instalação local:
-
-```bash
-npm install
-```
-
-- Instalação em CI:
-
-```bash
-npm ci
-```
-
-## Escopo do MVP
-
-Incluir:
-
-- Consulta por cidade, sem exigir GPS.
-- Data de hoje até hoje+6.
-- Seis atividades:
-  - correr
-  - caminhar
-  - pedalar
-  - fotografar pôr do sol
-  - observar estrelas
-  - lavar carro
-- Melhor janela do dia.
-- Score de 0 a 100.
-- Motivos principais.
-- Timeline de scores.
-- Alternativas quando houver.
-- Mensagem honesta quando não houver janela boa.
-
-Não incluir no MVP:
-
-- login
-- banco de dados
-- autenticação
-- pagamento
-- anúncios
-- marketplace
-- IA dentro do produto
-- backend externo separado
-- bibliotecas extras sem necessidade clara
-
-## Open-Meteo
-
-- Projeto tratado como não comercial e de portfólio.
-- Usar Open-Meteo com atribuição visível.
-- Não prometer precisão meteorológica absoluta.
-- Não armazenar localização, IP, histórico ou dados pessoais no MVP.
-- Fontes oficiais usadas:
-  - Forecast API: `https://open-meteo.com/en/docs`
-  - Geocoding API: `https://open-meteo.com/en/docs/geocoding-api`
-  - Terms: `https://open-meteo.com/en/terms`
-  - Licence: `https://open-meteo.com/en/licence`
-
-Endpoints definidos no roteiro:
-
-```text
-GET https://api.open-meteo.com/v1/forecast
-  ?latitude={lat}
-  &longitude={lon}
-  &hourly=temperature_2m,precipitation,wind_speed_10m,cloud_cover,uv_index,relative_humidity_2m
-  &daily=sunrise,sunset
-  &timezone=auto
-  &start_date={yyyy-mm-dd}
-  &end_date={yyyy-mm-dd}
-```
-
-```text
-GET https://geocoding-api.open-meteo.com/v1/search
-  ?name={query}
-  &count=5
-  &language=pt
-  &format=json
-```
-
-## Estado técnico atual
-
-Concluído:
-
-- Setup inicial com Next.js, TypeScript, Tailwind, shadcn/ui, TanStack Query,
-  Vitest e CI.
-- Tipos centrais em `src/types/index.ts`.
-- Regras das atividades em:
-  - `src/lib/domain/activity-rules.ts`
-  - `src/lib/domain/activities.ts`
-- Serviços Open-Meteo em:
-  - `src/lib/services/open-meteo.schemas.ts`
-  - `src/lib/services/open-meteo-weather.service.ts`
-  - `src/lib/services/open-meteo-geocoding.service.ts`
-- Engine de recomendação em:
-  - `src/lib/engine/weather-context.ts`
-  - `src/lib/engine/score-calculator.ts`
-  - `src/lib/engine/window-finder.ts`
-- Rotas internas em:
-  - `src/app/api/geocoding/route.ts`
-  - `src/app/api/recommendation/route.ts`
-- UI principal e resultado em:
-  - `src/app/page.tsx`
-  - `src/lib/ui/search-page.ts`
-  - `src/lib/ui/recommendation-result.ts`
-  - `src/components/result/recommendation-card.tsx`
-  - `src/components/result/score-timeline.tsx`
-  - `src/components/result/score-breakdown.tsx`
-  - `src/components/result/attribution-footer.tsx`
-- Testes atuais:
-  - `tests/configuracao-inicial.test.ts`
-  - `tests/tipos-dominio.test.ts`
-  - `tests/activity-rules.test.ts`
-  - `tests/weather-context.test.ts`
-  - `tests/score-calculator.test.ts`
-  - `tests/window-finder.test.ts`
-  - `tests/api-routes.test.ts`
-  - `tests/search-page-ui.test.ts`
-  - `tests/recommendation-result-ui.test.ts`
-  - `tests/open-meteo-services.test.ts`
-  - `tests/api-schema.test.ts`
-  - `tests/fixtures/`
-- Documentação inicial:
-  - `README.md`
-  - `CONTRIBUTING.md`
-  - `.nvmrc`
-
-Última sessão registrada:
-
-- Issue #9 concluída na branch `test/testes-qualidade`.
-- PR #23 (`test/testes-qualidade` -> `develop`) mergeada com CI verde.
-- Commit principal: `ad12a26 test: cobre engine de recomendacao`.
-- Issue #10 iniciada na branch `docs/pwa-ci-readme`.
-- PR #25 (`docs/pwa-ci-readme` -> `develop`) mergeada com CI verde.
-- PR #27 (`docs/pwa-ci-readme` -> `develop`) mergeada com CI verde para incluir
-  a URL final do deploy no README.
-- Commits da PR #25:
-  - `b8a3efb chore: revisa configuracao de pwa e ci`
-  - `5d61e7e docs: finaliza readme do portfolio`
-- Commit da PR #27:
-  - `be0571d docs: adiciona url de deploy ao readme`
-- PR #25 entrega:
-  - `public/manifest.json`
-  - ícones PWA em `public/icons/`
-  - metadata PWA em `src/app/layout.tsx`
-  - README final de portfólio
-  - screenshot em `docs/screenshot-home.png`
-- Deploy Vercel concluído e verificado:
-  - produção: `https://janela-perfeita.vercel.app`
-  - raiz retornou HTTP 200
-  - `/manifest.json` retornou HTTP 200
-- Configuração Vercel ajustada via CLI/API:
-  - projeto `janela-perfeita` criado na conta `paulosergiolr`
-  - `framework=nextjs`
-  - `installCommand=npm ci`
-  - `buildCommand=npm run build`
-  - `devCommand=npm run dev`
-  - `nodeVersion=20.x`
-  - proteções SSO/git fork desativadas para liberar acesso público
-- Issue #10 fechada e card movido para `Done`.
-- Não há issues abertas no momento.
-- PR #29 (`develop` -> `main`) mergeada com CI verde.
-- MVP integrado em `main`.
-- Branches locais `develop` e `main` sincronizadas após o merge.
-- Validações locais executadas:
-  - `npm run lint`
-  - `npm test`
-  - `npm run test:coverage`
-  - `npm run build`
-- No Windows local, `npm test` via PATH falhou por Volta procurar
-  `npm-prefix.js`; executar via `C:\Program Files\Volta\npm.cmd` funcionou.
-- GitHub bloqueou autoaprovação da PR por ser do mesmo autor; limitação foi
-  registrada nas PRs antes do merge ou antes de manter a PR aberta.
-- Vercel CLI usado via `C:\Program Files\Volta\npx.cmd --yes vercel@latest`.
-- Roteiro de continuação recebido em
-  `C:\Users\lll\Downloads\Janela_Perfeita_Roteiro_Continuacao_Melhorias.md`.
-- Issues pós-MVP #32 a #57 criadas a partir do roteiro e adicionadas ao Project
-  `Janela Perfeita` com status `Todo`.
-- Issue #32 concluída na branch `feature/10-copy-polish-ptbr`.
-- PR #59 (`feature/10-copy-polish-ptbr` -> `develop`) mergeada com CI verde.
-- Commit principal da T11:
-  - `5669143 fix: melhora textos e mensagens da interface`
-- Entrega da T11:
-  - acentuação e padronização de textos visíveis da UI;
-  - mensagens de erro, loading e empty states mais claras;
-  - metadata e disclaimers em PT-BR correto;
-  - rótulo visível `Golden hour` substituído por `Hora dourada`, preservando o
-    identificador técnico `golden_hour`;
-  - testes atualizados para as mensagens corrigidas.
-- Issue #32 fechada e card movido para `Done`.
-- Validações locais executadas na T11:
-  - `npm run lint`
-  - `npm test`
-  - `npm run test:coverage`
-  - `npm run build`
-- Issue #33 concluída na branch `feature/11-precipitation-probability`.
-- PR #61 (`feature/11-precipitation-probability` -> `develop`) mergeada com CI
-  verde.
-- Commit principal da T12:
-  - `8fc84ad feat: considera probabilidade de chuva nas recomendações`
-- Entrega da T12:
-  - `HourlyWeather`, schemas e serviço Open-Meteo atualizados com
-    `precipitation_probability`, `rain`, `showers` e `weather_code`;
-  - regras de chuva passam a considerar acumulado, probabilidade, chuva,
-    pancadas e códigos meteorológicos;
-  - motivos em português cobrem risco moderado, pancadas, garoa, tempestade e
-    precipitação congelada;
-  - fixtures e testes atualizados; cobertura subiu para Statements 95.62%,
-    Branches 83.76%, Functions 93.4%, Lines 96.21%.
-- Issue #33 fechada e card movido para `Done`.
-- Validações locais executadas na T12:
-  - `npm run lint`
-  - `npm test`
-  - `npm run test:coverage`
-  - `npm run build`
-- Issue #34 concluída na branch `feature/12-lavar-carro-janela-seca`.
-- PR #63 (`feature/12-lavar-carro-janela-seca` -> `develop`) mergeada com CI
-  verde.
-- Commit principal da T13:
-  - `835e591 feat: avalia chuva futura para lavar carro`
-- Entrega da T13:
-  - `calculateDayScores` aplica penalidade específica para `lavar_carro` quando
-    a regra de chuva detecta risco relevante nas próximas 3 horas;
-  - breakdown recebe fator `chuva_futura` com motivo em português;
-  - cenário 14h/15h seco e 16h chuva forte coberto por teste, sem recomendar
-    janela 14h-16h como ideal.
-- Issue #34 fechada e card movido para `Done`.
-- Validações locais executadas na T13:
-  - `npm run lint`
-  - `npm test`
-  - `npm run test:coverage`
-  - `npm run build`
-
-## Próxima etapa recomendada
-
-MVP concluído. Continuação pós-MVP em andamento com issues #35 a #57 abertas no
-Project.
-
-Branches principais:
-
-```text
-main
-develop
-```
-
-Produção atual:
-
-```text
-https://janela-perfeita.vercel.app
-```
-
-Próximos passos recomendados:
-
-- Iniciar pela issue #35, T14 - Adicionar sensação térmica e rajadas de vento.
-- Manter `develop` e `main` sincronizadas antes de novas tarefas.
-- Preservar branches remotas de feature, teste, docs e contexto.
-
-## Observações importantes para novas sessões
-
-- Não avançar várias issues sem finalizar a anterior.
-- Não fechar issue sem checklist marcado.
-- Não fazer merge se CI falhar.
-- Não deletar branch remota após merge.
-- Sempre atualizar o Project/Kanban.
-- Sempre documentar decisões relevantes na issue ou PR.
-- Sempre preservar o escopo do MVP.
+- Repositório: `PauloSergioLR/janela-perfeita`.
+- Project/Kanban é responsabilidade do usuário.
+- Documentar decisões relevantes no PR.
+- Histórico antigo: `docs/ai/agents-history.md`; somente referência, nunca carregar automaticamente.

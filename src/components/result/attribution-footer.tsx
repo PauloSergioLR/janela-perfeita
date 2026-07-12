@@ -9,17 +9,18 @@ const DEFAULT_DISCLAIMER =
 
 export function AttributionFooter({ disclaimer }: AttributionFooterProps) {
   return (
-    <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
+    <footer className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6 text-muted-foreground sm:flex-row sm:items-start sm:justify-between xl:shrink-0 xl:pt-2 xl:text-xs xl:leading-5">
       <p>
         Dados meteorológicos por{" "}
         <a
           href="https://open-meteo.com/"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-sky-800 underline-offset-4 hover:underline"
+          aria-label="Open-Meteo (abre em nova aba)"
+          className="inline-flex items-center gap-1 font-medium text-sky-800 underline-offset-4 hover:underline dark:text-sky-300"
         >
           Open-Meteo
-          <ExternalLink className="size-3" />
+          <ExternalLink className="size-3" aria-hidden="true" />
         </a>
         .
       </p>

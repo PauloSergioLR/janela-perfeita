@@ -2,9 +2,13 @@ import { describe, expect, it } from "vitest";
 import { getActivityById } from "@/lib/domain/activities";
 import {
   buildTimelineData,
+  formatDecisionWindow,
   formatForecastConfidenceLevel,
   formatDurationHours,
+  formatTimeRange,
+  formatWindowTimeRange,
   getAlternativeWindows,
+  getDecisionQualityLabel,
   getBreakdownSource,
   getPrimaryReason,
 } from "@/lib/ui/recommendation-result";
@@ -111,9 +115,18 @@ describe("helpers da visualizacao de resultado", () => {
   });
 
   it("monta dados da timeline com referência de recomendação", () => {
+    const bestWindow = makeWindow([
+      makeScore("09:00", 60, [
+        makeRule("chuva", 60, 30, "Sem chuva prevista, mas há risco moderado."),
+      ]),
+    ]);
+    bestWindow.scores[0].weather = makeHourlyWeather("2030-06-05T09:00", {
+      precipitation_probability: 45,
+    });
     const data = buildTimelineData(
-      [makeScore("08:00", 59), makeScore("09:00", 60)],
+      [makeScore("08:00", 59), bestWindow.scores[0]],
       60,
+      bestWindow,
     );
 
     expect(data).toEqual([
@@ -126,6 +139,9 @@ describe("helpers da visualizacao de resultado", () => {
         hourLabel: "09:00",
         score: 60,
         isRecommended: true,
+        isBestWindow: true,
+        rainRisk: "Risco de chuva: 45%",
+        confidenceLevel: "alta",
       }),
     ]);
   });
@@ -164,6 +180,42 @@ describe("helpers da visualizacao de resultado", () => {
   it("formata duracao de janela no singular e plural", () => {
     expect(formatDurationHours(1)).toBe("1 hora");
     expect(formatDurationHours(2)).toBe("2 horas");
+    expect(formatDurationHours(24)).toBe("dia inteiro");
+  });
+
+  it("formata horarios sem mostrar meia-noite duplicada", () => {
+    expect(formatTimeRange("08:00", "17:00")).toBe("Das 08:00 às 17:00");
+    expect(formatTimeRange("21:00", "02:00")).toBe("Das 21:00 às 02:00");
+    expect(formatTimeRange("00:00", "00:00")).toBe("Dia inteiro");
+  });
+
+  it("formata janela principal com seta e estado sem janela", () => {
+    const window = makeWindow([makeScore("07:00", 90)]);
+    window.endLabel = "09:00";
+
+    expect(formatDecisionWindow(window)).toBe("07:00 → 09:00");
+    expect(formatDecisionWindow(null)).toBe("Sem janela ideal");
+  });
+
+  it("classifica a qualidade da decisao pelo score", () => {
+    expect(getDecisionQualityLabel(85)).toBe("Excelente");
+    expect(getDecisionQualityLabel(70)).toBe("Boa");
+    expect(getDecisionQualityLabel(60)).toBe("Aceitável");
+    expect(getDecisionQualityLabel(40)).toBe("Fraca");
+    expect(getDecisionQualityLabel(39)).toBe("Não recomendado");
+  });
+
+  it("formata janela quase inteira como dia inteiro", () => {
+    const window = makeWindow([
+      makeScore("00:00", 80),
+      makeScore("01:00", 80),
+    ]);
+
+    window.startLabel = "00:00";
+    window.endLabel = "00:00";
+    window.durationHours = 24;
+
+    expect(formatWindowTimeRange(window)).toBe("Dia inteiro");
   });
 
   it("formata nivel de confianca da previsao", () => {

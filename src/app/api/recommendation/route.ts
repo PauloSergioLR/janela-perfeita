@@ -1,11 +1,27 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getActivityById } from "@/lib/domain/activities";
-import { calculateDayScores } from "@/lib/engine/score-calculator";
-import { findBestWindows } from "@/lib/engine/window-finder";
+import {
+  DEMO_DISCLAIMER,
+  getDemoCitySuggestions,
+  getDemoForecast,
+} from "@/lib/demo/demo-weather";
+import { getActivityById, getAllActivities } from "@/lib/domain/activities";
+import {
+  buildActivityRanking,
+  buildRecommendation,
+  buildWeekComparison,
+} from "@/lib/engine/recommendation-exploration";
+import { buildDailyWeatherOverview } from "@/lib/engine/daily-weather-overview";
+import { buildWeeklyWeatherOverview } from "@/lib/engine/weekly-weather-overview";
 import { getCitySuggestions } from "@/lib/services/open-meteo-geocoding.service";
-import { getWeatherForecast } from "@/lib/services/open-meteo-weather.service";
-import type { ActivityId, City, Recommendation } from "@/types";
+import { openMeteoWeatherProvider } from "@/lib/weather/open-meteo-weather-provider";
+import type { ForecastParams } from "@/lib/weather/weather-provider";
+import type {
+  Activity,
+  ActivityId,
+  City,
+  UserAvailability,
+} from "@/types";
 
 const ACTIVITY_IDS = [
   "correr",
@@ -14,6 +30,7 @@ const ACTIVITY_IDS = [
   "fotografar_por_do_sol",
   "observar_estrelas",
   "lavar_carro",
+  "lavar_roupa",
 ] as const satisfies readonly ActivityId[];
 
 const citySchema = z.object({
@@ -28,16 +45,73 @@ const citySchema = z.object({
   }),
 });
 
+const recommendationModeSchema = z.enum([
+  "janela",
+  "atividades",
+  "semana",
+  "dia",
+  "clima_semana",
+]);
+const MODES_WITH_ACTIVITY = new Set(["janela", "semana"]);
+const WEEK_COMPARISON_DAYS = 7;
+const weatherProvider = openMeteoWeatherProvider;
+const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
 const recommendationRequestSchema = z
   .object({
-    activityId: z.string().trim().min(1),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    mode: recommendationModeSchema.default("janela"),
+    activityId: z.string().trim().min(1).optional(),
+    date: dateSchema.optional(),
+    demo: z.boolean().optional().default(false),
+    availableFrom: timeSchema.optional(),
+    availableTo: timeSchema.optional(),
     city: citySchema.optional(),
     cityQuery: z.string().trim().min(3).optional(),
   })
   .refine((data) => data.city !== undefined || data.cityQuery !== undefined, {
     message: "Informe uma cidade para gerar a recomendação.",
     path: ["city"],
+  })
+  .superRefine((data, ctx) => {
+    if (MODES_WITH_ACTIVITY.has(data.mode) && !data.activityId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe uma atividade para gerar a recomendação.",
+        path: ["activityId"],
+      });
+    }
+
+    if (data.mode !== "clima_semana" && !data.date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe uma data para gerar a recomendação.",
+        path: ["date"],
+      });
+    }
+
+    if (
+      (data.availableFrom && !data.availableTo) ||
+      (!data.availableFrom && data.availableTo)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Informe inicio e fim da disponibilidade.",
+        path: ["availableFrom"],
+      });
+    }
+
+    if (
+      data.availableFrom &&
+      data.availableTo &&
+      data.availableFrom >= data.availableTo
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A disponibilidade precisa terminar depois do inicio.",
+        path: ["availableTo"],
+      });
+    }
   });
 
 class ApiRouteError extends Error {
@@ -55,6 +129,28 @@ function jsonError(status: number, message: string) {
 
 function isActivityId(value: string): value is ActivityId {
   return (ACTIVITY_IDS as readonly string[]).includes(value);
+}
+
+function addDaysToDate(date: string, days: number): string {
+  const parsedDate = new Date(`${date}T00:00:00.000Z`);
+
+  parsedDate.setUTCDate(parsedDate.getUTCDate() + days);
+
+  return parsedDate.toISOString().slice(0, 10);
+}
+
+function getAvailability(input: {
+  availableFrom?: string;
+  availableTo?: string;
+}): UserAvailability | undefined {
+  if (!input.availableFrom || !input.availableTo) {
+    return undefined;
+  }
+
+  return {
+    availableFrom: input.availableFrom,
+    availableTo: input.availableTo,
+  };
 }
 
 function getLocalDateTimeForZone(date: Date, timeZone?: string): string {
@@ -83,9 +179,25 @@ async function readRequestBody(request: Request): Promise<unknown> {
   }
 }
 
-async function resolveCity(city: City | undefined, cityQuery: string | undefined) {
+async function resolveCity(input: {
+  city: City | undefined;
+  cityQuery: string | undefined;
+  demoMode: boolean;
+}) {
+  const { city, cityQuery, demoMode } = input;
+
   if (city) {
     return city;
+  }
+
+  if (demoMode) {
+    const [demoCity] = getDemoCitySuggestions(cityQuery ?? "");
+
+    if (!demoCity) {
+      throw new ApiRouteError(404, "Cidade não encontrada.");
+    }
+
+    return demoCity;
   }
 
   try {
@@ -106,47 +218,162 @@ async function resolveCity(city: City | undefined, cityQuery: string | undefined
   }
 }
 
+function resolveActivity(activityId: string | undefined): Activity {
+  const activity =
+    activityId && isActivityId(activityId) ? getActivityById(activityId) : undefined;
+
+  if (!activity) {
+    throw new ApiRouteError(404, "Atividade não encontrada.");
+  }
+
+  return activity;
+}
+
+function applyDemoDisclaimer<T extends { disclaimer: string }>(value: T): T {
+  value.disclaimer = DEMO_DISCLAIMER;
+
+  return value;
+}
+
 export async function POST(request: Request) {
   try {
     const payload = await readRequestBody(request);
     const body = recommendationRequestSchema.parse(payload);
-    const activity = isActivityId(body.activityId)
-      ? getActivityById(body.activityId)
-      : undefined;
-
-    if (!activity) {
-      throw new ApiRouteError(404, "Atividade não encontrada.");
-    }
-
-    const city = await resolveCity(body.city, body.cityQuery);
-    const forecast = await getWeatherForecast({
-      lat: city.coordinates.lat,
-      lon: city.coordinates.lon,
-      date: body.date,
-    }).catch(() => {
-      throw new ApiRouteError(502, "Não foi possível buscar a previsão agora.");
+    const city = await resolveCity({
+      city: body.city,
+      cityQuery: body.cityQuery,
+      demoMode: body.demo,
     });
     const generatedAtDate = new Date();
-    const scores = calculateDayScores({
-      activity,
-      hourly: forecast.hourly,
-      astronomy: forecast.astronomy,
-      now: getLocalDateTimeForZone(generatedAtDate, city.timezone),
-    });
-    const windows = findBestWindows(scores, activity);
-    const recommendation: Recommendation = {
+    const generatedAt = generatedAtDate.toISOString();
+    const now = getLocalDateTimeForZone(generatedAtDate, city.timezone);
+    const date = body.date ?? now.slice(0, 10);
+    const availability = getAvailability(body);
+    const forecastParams: ForecastParams = {
+      lat: city.coordinates.lat,
+      lon: city.coordinates.lon,
+      date,
+      endDate:
+        body.mode === "janela" ||
+        body.mode === "semana" ||
+        body.mode === "clima_semana"
+          ? addDaysToDate(date, WEEK_COMPARISON_DAYS - 1)
+          : undefined,
+    };
+    const forecast = body.demo
+      ? getDemoForecast(forecastParams)
+      : await weatherProvider.getForecast(forecastParams).catch(() => {
+          throw new ApiRouteError(
+            502,
+            "Não foi possível buscar a previsão agora.",
+          );
+        });
+    if (body.mode === "atividades") {
+      const activityRanking = buildActivityRanking({
+        activities: getAllActivities(),
+        city,
+        hourly: forecast.hourly,
+        astronomy: forecast.astronomy,
+        generatedAt,
+        now,
+        availability,
+      });
+
+      if (body.demo) {
+        activityRanking.disclaimer = DEMO_DISCLAIMER;
+        activityRanking.items.forEach((item) =>
+          applyDemoDisclaimer(item.recommendation),
+        );
+      }
+
+      return NextResponse.json({ activityRanking });
+    }
+
+    if (body.mode === "dia") {
+      const dailyOverview = buildDailyWeatherOverview({
+        city,
+        hourly: forecast.hourly,
+        astronomy: forecast.astronomy,
+        generatedAt,
+      });
+
+      if (body.demo) {
+        dailyOverview.disclaimer = DEMO_DISCLAIMER;
+      }
+
+      return NextResponse.json({ dailyOverview });
+    }
+
+    if (body.mode === "clima_semana") {
+      const weeklyOverview = buildWeeklyWeatherOverview({
+        city,
+        hourly: forecast.hourly,
+        dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
+        generatedAt,
+      });
+
+      if (body.demo) {
+        weeklyOverview.disclaimer = DEMO_DISCLAIMER;
+        weeklyOverview.days.forEach((day) => {
+          day.disclaimer = DEMO_DISCLAIMER;
+        });
+      }
+
+      return NextResponse.json({ weeklyOverview });
+    }
+
+    const activity = resolveActivity(body.activityId);
+
+    if (body.mode === "semana") {
+      const weekComparison = buildWeekComparison({
+        activity,
+        city,
+        hourly: forecast.hourly,
+        dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
+        generatedAt,
+        now,
+        availability,
+      });
+
+      if (body.demo) {
+        weekComparison.disclaimer = DEMO_DISCLAIMER;
+        weekComparison.days.forEach((day) =>
+          applyDemoDisclaimer(day.recommendation),
+        );
+      }
+
+      return NextResponse.json({ weekComparison });
+    }
+
+    const recommendation = buildRecommendation({
       activity,
       city,
-      date: forecast.astronomy.date,
-      generatedAt: generatedAtDate.toISOString(),
-      scores,
-      windows,
-      bestWindow: windows[0] ?? null,
-      disclaimer:
-        "Recomendação estimada com base na previsão meteorológica da Open-Meteo; não substitui avaliação local das condições.",
-    };
+      hourly: forecast.hourly,
+      astronomy: forecast.astronomy,
+      generatedAt,
+      now,
+      availability,
+    });
 
-    return NextResponse.json({ recommendation });
+    if (body.demo) {
+      applyDemoDisclaimer(recommendation);
+    }
+
+    const forecastStrip = buildWeeklyWeatherOverview({
+      city,
+      hourly: forecast.hourly,
+      dailyAstronomy: forecast.dailyAstronomy.slice(0, WEEK_COMPARISON_DAYS),
+      generatedAt,
+    });
+
+    if (body.demo) {
+      forecastStrip.disclaimer = DEMO_DISCLAIMER;
+      forecastStrip.days.forEach((day) => {
+        day.disclaimer = DEMO_DISCLAIMER;
+      });
+    }
+
+    return NextResponse.json({ recommendation, forecastStrip });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return jsonError(400, "Dados inválidos para gerar recomendação.");
