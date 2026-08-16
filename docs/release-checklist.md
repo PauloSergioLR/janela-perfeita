@@ -70,7 +70,7 @@ deploy ou alteração do Project/Kanban automaticamente.
 - [ ] Confirmar que o projeto aponta para
   `PauloSergioLR/janela-perfeita`.
 - [ ] Confirmar `main` como branch de produção.
-- [ ] Confirmar Node.js 20.
+- [ ] Confirmar Node.js 24.
 - [ ] Confirmar instalação com `npm ci`.
 - [ ] Confirmar build com `npm run build`.
 - [ ] Confirmar que nenhuma variável de ambiente obrigatória foi introduzida.
