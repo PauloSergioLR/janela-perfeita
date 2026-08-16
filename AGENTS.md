@@ -110,7 +110,7 @@ Se falhar: relatar comando, erro relevante, arquivo e ação/bloqueio.
 ## Escopo técnico
 
 - Web app responsivo: Next.js App Router, React, TypeScript strict, Tailwind, shadcn/ui, TanStack Query, Zod, date-fns, Recharts, Vitest e npm.
-- Node recomendado: 20.
+- Node recomendado: 24.
 - Sem login, banco, autenticação, pagamentos, anúncios, marketplace, backend externo separado ou IA no produto.
 - Não adicionar bibliotecas sem justificativa e aprovação; preferir CSS, Tailwind e componentes existentes.
 
