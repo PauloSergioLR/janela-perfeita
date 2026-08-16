@@ -7,7 +7,7 @@ requests para `develop`.
 
 Pré-requisitos:
 
-- Node.js 20 LTS
+- Node.js 24 LTS
 - npm
 - Git
 

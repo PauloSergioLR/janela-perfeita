@@ -299,7 +299,7 @@ cobertura, build e E2E. O badge no início aponta para o workflow real.
 
 ### Pré-requisitos
 
-- Node.js 20;
+- Node.js 24;
 - npm;
 - Git.
 
