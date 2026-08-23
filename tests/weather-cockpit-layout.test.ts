@@ -175,12 +175,15 @@ describe("layout Weather Decision Cockpit", () => {
     );
   });
 
-  it("usa timeline embutida sem overflow horizontal no desktop", () => {
+  it("usa timeline embutida com rolagem própria no mobile e grade no desktop", () => {
     const opportunityTimeline = readOpportunityTimeline();
     const scoreBreakdown = readScoreBreakdown();
 
     expect(opportunityTimeline).toContain('variant?: "card" | "embedded"');
-    expect(opportunityTimeline).not.toContain("overflow-x-auto");
+    expect(opportunityTimeline).toContain(
+      'data-testid="opportunity-timeline-scroll"',
+    );
+    expect(opportunityTimeline).toContain("overflow-x-auto overscroll-x-contain");
     expect(opportunityTimeline).toContain(
       "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
     );

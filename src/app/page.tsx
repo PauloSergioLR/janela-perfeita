@@ -628,15 +628,15 @@ export default function Home() {
   return (
     <>
       <WeatherStage variant={weatherStageVariant} />
-      <main className="relative z-10 min-h-screen px-3 py-4 text-foreground sm:px-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-3 xl:py-2 2xl:px-5">
+      <main className="relative z-10 min-h-screen overflow-x-clip px-3 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] text-foreground sm:px-4 sm:py-4 lg:px-5 xl:h-dvh xl:min-h-0 xl:px-3 xl:py-2 2xl:px-5">
       <div className="grid w-full max-w-none gap-6 xl:h-full xl:min-h-0 xl:grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] xl:gap-2">
-        <header className="glass-panel relative grid gap-5 overflow-hidden rounded-xl p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-2 xl:p-2">
+        <header className="glass-panel relative grid gap-3 overflow-hidden rounded-xl p-3 pr-14 sm:gap-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:gap-2 xl:p-2">
           <div
             className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-weather-accent/55 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="glow-primary flex size-12 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10 xl:size-10">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <div className="glow-primary flex size-10 shrink-0 items-center justify-center rounded-lg border border-weather-accent/55 bg-weather-accent/10 shadow-inner shadow-white/10 sm:size-12 xl:size-10">
               <CloudSun
                 className="size-6 text-weather-accent xl:size-5"
                 aria-hidden="true"
@@ -649,7 +649,7 @@ export default function Home() {
               <h1 className="text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-50 sm:text-3xl xl:text-2xl">
                 Janela Perfeita
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 xl:hidden">
+              <p className="hidden max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 min-[375px]:block xl:hidden">
                 Previsão horária para decidir o melhor momento de cada atividade.
               </p>
             </div>
