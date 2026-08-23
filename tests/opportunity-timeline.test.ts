@@ -63,7 +63,11 @@ describe("OpportunityTimeline", () => {
       "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
     );
     expect(source).toContain("datum.hourLabel.slice(0, 2)");
-    expect(source).not.toContain("overflow-x-auto");
+    expect(source).toContain('data-testid="opportunity-timeline-scroll"');
+    expect(source).toContain("overflow-x-auto overscroll-x-contain");
+    expect(source).toContain(
+      "min-w-[calc(var(--timeline-count)*3.5rem)]",
+    );
     expect(source).toContain('aria-live="polite"');
     expect(source).toContain("selectedDatum.rainRisk");
     expect(source).toContain("selectedDatum.wind");

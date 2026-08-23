@@ -107,23 +107,27 @@ export function OpportunityTimeline({
         <>
           <div
             className={cn(
-              "cockpit-surface rounded-lg border p-2",
+              "cockpit-surface relative rounded-lg border p-2",
               isEmbedded && "xl:p-1.5",
             )}
           >
             <div
-              className={cn(
-                "grid min-w-0 grid-cols-6 gap-1 sm:grid-cols-12",
-                isEmbedded &&
-                  "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))] xl:gap-0.5",
-                !isEmbedded &&
-                  "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
-              )}
-              style={timelineStyle}
+              data-testid="opportunity-timeline-scroll"
+              className="scrollbar-none overflow-x-auto overscroll-x-contain pb-1"
             >
-              {data.map((datum) => {
-                const tone = getOpportunityTone(datum);
-                const isSelected = datum.time === selectedDatum?.time;
+              <div
+                className={cn(
+                  "grid min-w-[calc(var(--timeline-count)*3.5rem)] grid-cols-[repeat(var(--timeline-count),minmax(3.5rem,1fr))] gap-1 xl:min-w-0",
+                  isEmbedded &&
+                    "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))] xl:gap-0.5",
+                  !isEmbedded &&
+                    "xl:grid-cols-[repeat(var(--timeline-count),minmax(0,1fr))]",
+                )}
+                style={timelineStyle}
+              >
+                {data.map((datum) => {
+                  const tone = getOpportunityTone(datum);
+                  const isSelected = datum.time === selectedDatum?.time;
 
                 return (
                   <button
@@ -186,7 +190,8 @@ export function OpportunityTimeline({
                     </span>
                   </button>
                 );
-              })}
+                })}
+              </div>
             </div>
           </div>
 

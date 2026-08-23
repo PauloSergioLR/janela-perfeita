@@ -24,7 +24,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
-      className="fixed top-4 right-4 z-50 flex size-10 items-center justify-center rounded-full border border-border bg-background/80 text-foreground shadow-md backdrop-blur-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))] z-50 flex size-10 items-center justify-center rounded-full border border-border bg-background/80 text-foreground shadow-md backdrop-blur-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:top-4 sm:right-4"
     >
       {isDark ? (
         <Sun className="size-4 text-amber-400" aria-hidden="true" />

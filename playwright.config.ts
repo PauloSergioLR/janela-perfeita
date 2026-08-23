@@ -14,7 +14,13 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: /mobile-responsive\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "mobile",
+      testMatch: /mobile-responsive\.spec\.ts/,
+      use: { ...devices["iPhone 13"], browserName: "chromium" },
     },
   ],
   webServer: {
